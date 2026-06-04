@@ -1,75 +1,127 @@
-# SkillBridge  — Backend API
+# SkillBridge — Backend API Documentation
 
-> AI-powered career guidance and skill exchange platform for students and young professionals.
+> AI-powered career guidance and **skill exchange platform** for students and young professionals worldwide.  
+> *Peer-to-peer skill sharing · No money involved · Free for everyone*
 
-**Stack:** Django 5.x · Django REST Framework · PostgreSQL 14+ · scikit-learn · JWT Auth  
-**Deployed on:** Render (free tier)
+**Stack:** Django 5.x · Django REST Framework · PostgreSQL 14+ · scikit-learn · JWT Auth
 
 ---
 
 ## Table of Contents
 
 1. [Project Overview](#project-overview)
-2. [Tech Stack](#tech-stack)
-3. [Prerequisites](#prerequisites)
-4. [Local Setup](#local-setup)
-5. [Environment Variables](#environment-variables)
-6. [Database Setup](#database-setup)
-7. [Running the Server](#running-the-server)
-8. [Project Structure](#project-structure)
-9. [Database Models](#database-models)
-10. [API Endpoints](#api-endpoints)
-11. [AI Recommendation Engine](#ai-recommendation-engine)
-12. [Authentication](#authentication)
-13. [Admin Panel](#admin-panel)
-14. [Testing](#testing)
-15. [Deployment](#deployment)
-16. [Common Issues & Fixes](#common-issues--fixes)
-17. [Team Responsibilities](#team-responsibilities)
-18. [Contributing Guidelines](#contributing-guidelines)
+2. [Problem Statement](#problem-statement)
+3. [Objectives](#objectives)
+4. [Tech Stack](#tech-stack)
+5. [Prerequisites](#prerequisites)
+6. [Local Setup](#local-setup)
+7. [Environment Variables](#environment-variables)
+8. [Database Setup](#database-setup)
+9. [Running the Server](#running-the-server)
+10. [Project Structure](#project-structure)
+11. [Database Models](#database-models)
+12. [API Endpoints](#api-endpoints)
+13. [AI Recommendation Engine](#ai-recommendation-engine)
+14. [Skill Exchange System](#skill-exchange-system)
+15. [Skill Verification System](#skill-verification-system)
+16. [Authentication](#authentication)
+17. [Admin Panel](#admin-panel)
+18. [Testing](#testing)
+19. [Deployment](#deployment)
+20. [Common Issues & Fixes](#common-issues--fixes)
 
 ---
 
 ## Project Overview
 
-SkillBridge  is a web-based platform where AI-guided career counselling meets a skill-sharing ecosystem. The backend exposes a RESTful API consumed by the React frontend.
+**SkillBridge** is a web-based platform where AI-guided career counseling meets a **skill-sharing ecosystem**. The backend exposes a RESTful API consumed by the React frontend.
 
-**Core features this API powers:**
+### Core Features
 
-- JWT-based user registration and authentication
-- AI-generated career recommendations using TF-IDF + Cosine Similarity
-- Skill gap analysis comparing user skills to target careers
-- Learning roadmap generation with ordered stages
-- Peer-to-peer skill offering and session booking
-- User portfolio management (projects + certifications)
-- Admin panel for user management and platform analytics
-- In-app and email notification system
+| Feature | Description |
+|---------|-------------|
+| **JWT Authentication** | User registration, login, profile management |
+| **AI Career Recommendations** | TF-IDF + Cosine Similarity to suggest career paths based on user skills |
+| **Skill Gap Analysis** | Compares user skills vs. target career requirements |
+| **Learning Roadmap Generation** | Ordered stages to acquire missing skills |
+| **Peer-to-Peer Skill Exchange** | Offer skills you have, request skills you want to learn — **no money involved** |
+| **Exchange Proposal System** | Send/accept/reject skill exchange requests |
+| **Session Booking** | Schedule and rate skill exchange sessions |
+| **Skill Verification** | Certificate upload, on-site exams, community verification (5 trust levels) |
+| **Portfolio Management** | Showcase projects and certifications |
+| **Admin Panel** | User management, platform analytics, skill moderation |
+
+### Platform Philosophy
+
+> *"Everyone has something to teach. Everyone has something to learn. No money required."*
+
+- **Pure learners** (no skills to offer) earn credits through referrals, feedback, or community contributions
+- **Skill credits** system ensures fair exchange without currency
+- **Beginner tokens** (5 free on signup) let anyone start learning immediately
+- **Verification badges** (5 levels) build trust in skill claims
+
+---
+
+## Problem Statement
+
+The major issues that motivated this project are:
+
+| Problem | Description |
+|---------|-------------|
+| **Skills-Industry Gap** | Graduates often lack skills required by the job market, resulting in high unemployment or underemployment |
+| **Lack of Personalized Guidance** | Limited access to quality career counseling and awareness of available opportunities |
+| **Poor Peer Learning Infrastructure** | No formal structure to share skills and encourage collaborative learning |
+| **Information Asymmetry** | Students lack access to current information about in-demand skills and industry trends |
+| **Limited Portfolio Tools** | Students lack tools to create professional portfolios showcasing projects and certifications |
+| **Financial Barriers** | Expensive courses and training programs are inaccessible to many |
+
+These issues limit professional development and decrease human capital productivity. SkillBridge directly addresses these problem dimensions through an integrated digital platform.
+
+---
+
+## Objectives
+
+### Main Objective
+
+To provide a web-based system with an intelligent skill recommendation engine that enables students and young professionals to explore suitable career paths, identify skill gaps, and exchange skills with peers — all without monetary transactions.
+
+### Specific Objectives
+
+| # | Objective |
+|---|-----------|
+| 1 | Provide personalized career path suggestions based on user skills, interests, and goals |
+| 2 | Identify gaps between user skills and industry requirements for desired careers |
+| 3 | Build a skill exchange platform enabling users to gain and give skills without monetary exchange |
+| 4 | Raise awareness about career trends, internships, and in-demand skills |
+| 5 | Help users build professional portfolios to display projects and certifications |
+| 6 | Foster peer-to-peer learning, networking, and collaboration |
+| 7 | Bridge the gap between academic learning and real-world requirements |
 
 ---
 
 ## Tech Stack
 
 | Layer | Technology | Version |
-|---|---|---|
+|-------|-----------|---------|
 | Language | Python | 3.10+ |
 | Web Framework | Django | 5.x |
 | REST API | Django REST Framework | 3.15+ |
 | Database | PostgreSQL | 14+ |
-| Auth | djangorestframework-simplejwt | latest |
+| Authentication | djangorestframework-simplejwt | latest |
 | AI / ML | scikit-learn, pandas, numpy | latest |
-| API Docs | drf-yasg (Swagger) | latest |
+| API Documentation | drf-yasg (Swagger) | latest |
 | CORS | django-cors-headers | latest |
-| Environment | python-decouple | latest |
+| Environment | python-dotenv | latest |
 | Deployment | Render + Gunicorn | — |
 
 ---
 
 ## Prerequisites
 
-Make sure the following are installed on your machine before setup:
+Make sure the following are installed:
 
-- **Python 3.10+** — [python.org](https://www.python.org/downloads/)
-- **PostgreSQL 14+** — [postgresql.org](https://www.postgresql.org/download/)
+- **Python 3.10+** — [python.org](https://python.org)
+- **PostgreSQL 14+** — [postgresql.org](https://postgresql.org)
 - **pip** (comes with Python)
 - **Git**
 
@@ -93,7 +145,7 @@ git clone https://github.com/your-org/skillbridge-backend.git
 cd skillbridge-backend
 ```
 
-### 2. Create and activate a virtual environment
+### 2. Create and activate virtual environment
 
 ```bash
 # Create
@@ -106,21 +158,19 @@ source venv/bin/activate
 venv\Scripts\activate
 ```
 
-You should see `(venv)` in your terminal prompt.
-
 ### 3. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Create your `.env` file
+### 4. Create `.env` file
 
 ```bash
 cp .env.example .env
 ```
 
-Then edit `.env` with your local values (see [Environment Variables](#environment-variables) below).
+Edit `.env` with your local values (see [Environment Variables](#environment-variables)).
 
 ### 5. Run database migrations
 
@@ -129,39 +179,40 @@ python manage.py makemigrations
 python manage.py migrate
 ```
 
-### 6. Create a superuser (admin)
+### 6. Create superuser (admin)
 
 ```bash
 python manage.py createsuperuser
 ```
 
-Follow the prompts to set username, email, and password.
-
 ### 7. (Optional) Load seed data
 
 ```bash
-python manage.py loaddata fixtures/initial_data.json
+python manage.py loaddata fixtures/initial_skills.json
+python manage.py loaddata fixtures/initial_users.json
 ```
 
-### 8. Start the development server
+### 8. Start development server
 
 ```bash
 python manage.py runserver
 ```
 
-API is now live at: `http://localhost:8000/api/`  
-Admin panel: `http://localhost:8000/admin/`  
-Swagger docs: `http://localhost:8000/swagger/`
+| Service | URL |
+|---------|-----|
+| API Root | `http://localhost:8000/api/` |
+| Admin Panel | `http://localhost:8000/admin/` |
+| Swagger Docs | `http://localhost:8000/swagger/` |
 
 ---
 
 ## Environment Variables
 
-Create a `.env` file in the project root. **Never commit this file.**
+Create `.env` in project root. **Never commit this file.**
 
 ```env
 # Django
-SECRET_KEY=your-super-secret-key-minimum-50-characters-long
+SECRET_KEY=your-super-secret-key-minimum-50-characters
 DEBUG=True
 ALLOWED_HOSTS=localhost,127.0.0.1
 
@@ -176,11 +227,17 @@ DB_PORT=5432
 JWT_ACCESS_TOKEN_LIFETIME=3600
 JWT_REFRESH_TOKEN_LIFETIME=86400
 
-# CORS (comma-separated frontend origins)
+# CORS (frontend origins)
 CORS_ALLOWED_ORIGINS=http://localhost:3000
 
-# AI Engine (optional — Anthropic API key for enhanced recommendations)
-ANTHROPIC_API_KEY=your-api-key-here
+# Skill Exchange System
+DEFAULT_BEGINNER_TOKENS=5
+SKILL_CREDIT_EARN_RATE=10
+SKILL_CREDIT_SPEND_RATE=10
+
+# Verification System
+COMMUNITY_VERIFICATION_THRESHOLD=3
+EXPERT_TEACHING_HOURS_THRESHOLD=50
 
 # Email (optional for notifications)
 EMAIL_HOST=smtp.gmail.com
@@ -189,8 +246,6 @@ EMAIL_HOST_USER=your-email@gmail.com
 EMAIL_HOST_PASSWORD=your-app-password
 EMAIL_USE_TLS=True
 ```
-
-See `.env.example` for a complete template with all supported variables.
 
 ---
 
@@ -215,15 +270,7 @@ GRANT ALL PRIVILEGES ON DATABASE skillbridge_db TO skillbridge_user;
 ### Run migrations
 
 ```bash
-python manage.py makemigrations users jobs applications recommendations
-python manage.py migrate
-```
-
-### Reset migrations (development only)
-
-```bash
-find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
-python manage.py makemigrations
+python manage.py makemigrations users skills exchanges recommendations verification portfolio
 python manage.py migrate
 ```
 
@@ -238,7 +285,7 @@ python manage.py runserver
 # Custom port
 python manage.py runserver 8080
 
-# Accessible on local network (for mobile testing)
+# Accessible on local network
 python manage.py runserver 0.0.0.0:8000
 ```
 
@@ -249,53 +296,26 @@ python manage.py runserver 0.0.0.0:8000
 ```
 skillbridge-backend/
 │
-├── manage.py                    # Django management CLI
-├── requirements.txt             # Python dependencies
-├── .env                         # Local environment variables (git-ignored)
-├── .env.example                 # Template for team members
-├── .gitignore                   # Python / Django ignores
-├── Procfile                     # Render/Heroku deployment command
+├── manage.py
+├── requirements.txt
+├── .env
+├── .env.example
+├── .gitignore
+├── Procfile
 │
-├── skillbridge/                 # Project configuration package
-│   ├── __init__.py
-│   ├── settings.py              # All settings (reads from .env)
-│   ├── urls.py                  # Root URL configuration
-│   ├── wsgi.py                  # WSGI entry point (production)
-│   └── asgi.py                  # ASGI entry point (async / websockets)
+├── skillbridge/                 # Project config
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
 │
-└── apps/                        # Django application modules
-    │
-    ├── users/                   # Custom user model + profiles
-    │   ├── models.py            # UserProfile (extends AbstractUser)
-    │   ├── serializers.py       # DRF serializers
-    │   ├── views.py             # Registration, login, profile CRUD
-    │   ├── urls.py              # /api/auth/* routes
-    │   ├── admin.py             # Admin panel registration
-    │   └── tests.py             # Unit + integration tests
-    │
-    ├── jobs/                    # Job listings, skills, companies
-    │   ├── models.py            # Job, Skill, Company
-    │   ├── serializers.py
-    │   ├── views.py             # Job CRUD + search/filter
-    │   ├── urls.py              # /api/jobs/* routes
-    │   ├── admin.py
-    │   └── tests.py
-    │
-    ├── applications/            # Job application workflow
-    │   ├── models.py            # Application (user → job)
-    │   ├── serializers.py
-    │   ├── views.py             # Apply, track status
-    │   ├── urls.py              # /api/applications/* routes
-    │   ├── admin.py
-    │   └── tests.py
-    │
-    └── recommendations/         # AI engine
-        ├── models.py            # Cached recommendation results
-        ├── recommendation_engine.py   # Core TF-IDF + cosine similarity
-        ├── skill_vectorizer.py        # Skill → vector transformation
-        ├── views.py             # /api/recommendations/* endpoints
-        ├── urls.py
-        └── tests.py
+└── apps/
+    ├── users/                   # User profiles, auth
+    ├── skills/                  # Skill catalog
+    ├── exchanges/               # Core skill exchange system
+    ├── recommendations/         # AI engine
+    ├── verification/            # Skill verification system
+    ├── portfolio/               # User portfolios
+    └── notifications/           # In-app + email notifications
 ```
 
 ---
@@ -305,188 +325,366 @@ skillbridge-backend/
 ### UserProfile (extends AbstractUser)
 
 | Field | Type | Description |
-|---|---|---|
-| `username` | CharField | Unique login handle |
-| `email` | EmailField | Unique email address |
-| `phone` | CharField | Optional phone number |
-| `address` | TextField | Location|
-| `profile_picture` | ImageField | Avatar upload |
-| `experience_level` | CharField | `entry` / `mid` / `senior` |
-| `skills` | ManyToManyField | → Skill model |
-
-### Job
-
-| Field | Type | Description |
-|---|---|---|
-| `title` | CharField | Job title |
-| `description` | TextField | Full job description |
-| `requirements` | TextField | Required qualifications |
-| `job_type` | CharField | `full-time` / `part-time` / `contract` / `internship` |
-| `location` | CharField | City or Remote |
-| `salary_min` | DecimalField | Minimum salary (NPR) |
-| `salary_max` | DecimalField | Maximum salary (NPR) |
-| `deadline` | DateField | Application deadline |
-| `is_active` | BooleanField | Visibility toggle |
-| `company` | ForeignKey | → Company |
-| `required_skills` | ManyToManyField | → Skill |
+|-------|------|-------------|
+| `username` | CharField | Unique handle |
+| `email` | EmailField | Unique email |
+| `phone` | CharField | Optional |
+| `profile_picture` | ImageField | Avatar |
+| `bio` | TextField | Short introduction |
+| `experience_level` | CharField | `beginner` / `intermediate` / `advanced` |
+| `skill_credits` | IntegerField | Earned by teaching (default: 0) |
+| `beginner_tokens` | IntegerField | Free tokens for new users (default: 5) |
+| `reputation_score` | FloatField | Average rating from completed exchanges |
+| `total_hours_taught` | IntegerField | Lifetime teaching hours |
+| `total_hours_learned` | IntegerField | Lifetime learning hours |
 
 ### Skill
 
 | Field | Type | Description |
-|---|---|---|
-| `name` | CharField | Skill name e.g. "Django" |
-| `category` | CharField | e.g. "Backend", "Frontend", "AI/ML" |
+|-------|------|-------------|
+| `name` | CharField | e.g., "Python", "UI Design" |
+| `category` | CharField | e.g., "Programming", "Design", "Language" |
+| `popularity_score` | FloatField | Based on exchange frequency |
 
-### Application
+### TeachableSkill
 
 | Field | Type | Description |
-|---|---|---|
-| `applicant` | ForeignKey | → User |
-| `job` | ForeignKey | → Job |
-| `cover_letter` | TextField | Applicant's cover letter |
-| `resume` | FileField | Uploaded resume (PDF) |
-| `portfolio_url` | URLField | Optional portfolio link |
-| `status` | CharField | `pending` / `reviewed` / `shortlisted` / `rejected` / `hired` |
-| `applied_at` | DateTimeField | Auto timestamp |
+|-------|------|-------------|
+| `user` | ForeignKey | → UserProfile |
+| `skill` | ForeignKey | → Skill |
+| `proficiency_level` | CharField | `beginner` / `intermediate` / `expert` |
+| `hourly_commitment` | IntegerField | Hours per week available |
+| `is_active` | BooleanField | Currently offering? |
+
+### LearnableSkill
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `user` | ForeignKey | → UserProfile |
+| `skill` | ForeignKey | → Skill |
+| `motivation` | TextField | Why they want to learn |
+| `urgency` | CharField | `low` / `medium` / `high` |
+
+### ExchangeProposal
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `proposer` | ForeignKey | User making the offer |
+| `receiver` | ForeignKey | User receiving the offer |
+| `offer_skill` | ForeignKey | → TeachableSkill |
+| `request_skill` | ForeignKey | → LearnableSkill |
+| `proposed_hours` | IntegerField | Total hours for exchange |
+| `status` | CharField | `pending` / `accepted` / `rejected` / `completed` / `cancelled` |
+| `message` | TextField | Optional note |
+
+### ExchangeSession
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `proposal` | ForeignKey | → ExchangeProposal |
+| `scheduled_date` | DateTimeField | When session occurs |
+| `duration_hours` | IntegerField | Length of session |
+| `meeting_link` | URLField | Google Meet / Zoom link |
+| `completed` | BooleanField | Session finished? |
+| `teacher_rating` | IntegerField | 1-5 (rated by learner) |
+| `learner_rating` | IntegerField | 1-5 (rated by teacher) |
+
+### SkillCreditTransaction
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `user` | ForeignKey | → UserProfile |
+| `amount` | IntegerField | Positive = earned, Negative = spent |
+| `transaction_type` | CharField | `teach_earn` / `learn_spend` / `signup_bonus` / `referral_bonus` |
+| `description` | TextField | Transaction details |
+
+### SkillVerification (5 Trust Levels)
+
+| Level | Badge | Meaning | Requirement |
+|-------|-------|---------|-------------|
+| 0 | — | Unverified | Default |
+| 1 | 📝 | Self-Declared | Added to profile |
+| 2 | 👍 | Community Verified | 3+ peer verifications |
+| 3 | 🎓 | Certificate Verified | Approved certificate |
+| 4 | ✅ | Platform Tested | Pass on-site exam (80%+) |
+| 5 | ⭐ | Expert | Level 4 + 50+ teaching hours + 4.8+ rating |
+
+### Certificate
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `user` | ForeignKey | → UserProfile |
+| `skill` | ForeignKey | → Skill |
+| `certificate_file` | FileField | Uploaded PDF/image |
+| `issuing_organization` | CharField | e.g., "Coursera" |
+| `status` | CharField | `pending` / `approved` / `rejected` |
+
+### SkillExam
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `skill` | ForeignKey | → Skill |
+| `difficulty` | CharField | `beginner` / `intermediate` / `advanced` |
+| `time_limit_minutes` | IntegerField | Default 30 |
+| `passing_score` | IntegerField | Default 70 |
+| `questions` | JSONField | List of question objects |
+
+### ExamAttempt
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `user` | ForeignKey | → UserProfile |
+| `exam` | ForeignKey | → SkillExam |
+| `score` | FloatField | Percentage score |
+| `passed` | BooleanField | Met passing score? |
+| `can_retake_after` | DateTimeField | 14-day cooldown if failed |
 
 ---
 
 ## API Endpoints
 
-All endpoints are prefixed with `/api/`.
+All endpoints prefixed with `/api/`.
 
 ### Authentication
 
-| Method | Endpoint | Auth Required | Description |
-|---|---|---|---|
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
 | POST | `/auth/register/` | No | Register new user |
-| POST | `/auth/token/` | No | Obtain JWT access + refresh tokens |
-| POST | `/auth/token/refresh/` | No | Refresh expired access token |
-| GET | `/auth/me/` | Yes | Get current user profile |
+| POST | `/auth/token/` | No | Get JWT tokens |
+| POST | `/auth/token/refresh/` | No | Refresh access token |
+| GET | `/auth/me/` | Yes | Get current user |
 | PUT | `/auth/me/` | Yes | Update profile |
-| POST | `/auth/logout/` | Yes | Blacklist refresh token |
+| GET | `/auth/me/credits/` | Yes | Get credit balance |
 
-### Jobs
+### Skills Catalog
 
-| Method | Endpoint | Auth Required | Description |
-|---|---|---|---|
-| GET | `/jobs/` | No | List all active jobs (paginated) |
-| POST | `/jobs/` | Yes (Admin) | Create new job listing |
-| GET | `/jobs/{id}/` | No | Get job detail |
-| PUT | `/jobs/{id}/` | Yes (Admin) | Update job |
-| DELETE | `/jobs/{id}/` | Yes (Admin) | Delete job |
-| GET | `/jobs/?search=python` | No | Search jobs by keyword |
-| GET | `/jobs/?skill=django&type=full-time` | No | Filter by skill and type |
-
-### Applications
-
-| Method | Endpoint | Auth Required | Description |
-|---|---|---|---|
-| GET | `/applications/` | Yes | List my applications |
-| POST | `/applications/` | Yes | Apply for a job |
-| GET | `/applications/{id}/` | Yes | Get application detail |
-| PATCH | `/applications/{id}/status/` | Yes (Admin) | Update application status |
-
-### Recommendations
-
-| Method | Endpoint | Auth Required | Description |
-|---|---|---|---|
-| GET | `/recommendations/` | Yes | Get AI job recommendations |
-| POST | `/recommendations/refresh/` | Yes | Force regenerate recommendations |
-
-### Skills
-
-| Method | Endpoint | Auth Required | Description |
-|---|---|---|---|
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
 | GET | `/skills/` | No | List all skills |
-| POST | `/skills/` | Yes (Admin) | Create skill |
+| GET | `/skills/search/?q=python` | No | Search skills |
+| POST | `/skills/` | Yes (Admin) | Create new skill |
 
-### Full API documentation (Swagger UI): `http://localhost:8000/swagger/`  
-### ReDoc: `http://localhost:8000/redoc/`
+### Teachable/Learnable Skills
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/skills/teachable/` | Yes | Skills I can teach |
+| POST | `/skills/teachable/` | Yes | Add teachable skill |
+| GET | `/skills/learnable/` | Yes | Skills I want to learn |
+| POST | `/skills/learnable/` | Yes | Add learnable skill |
+
+### Skill Exchange
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/exchanges/matches/` | Yes | Find exchange partners |
+| GET | `/exchanges/proposals/` | Yes | List my proposals |
+| POST | `/exchanges/proposals/` | Yes | Create proposal |
+| PUT | `/exchanges/proposals/{id}/accept/` | Yes | Accept proposal |
+| PUT | `/exchanges/proposals/{id}/complete/` | Yes | Complete exchange |
+
+### Exchange Sessions
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/exchanges/sessions/` | Yes | List my sessions |
+| POST | `/exchanges/sessions/` | Yes | Schedule session |
+| PUT | `/exchanges/sessions/{id}/rate/` | Yes | Rate session |
+
+### AI Recommendations
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/recommendations/career/` | Yes | Career path suggestions |
+| GET | `/recommendations/skills/` | Yes | Skill gap analysis |
+| GET | `/recommendations/roadmap/` | Yes | Learning roadmap |
+| GET | `/recommendations/partners/` | Yes | Exchange partners |
+
+### Skill Verification
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/verification/certificate/` | Yes | Upload certificate |
+| GET | `/verification/certificates/` | Yes | List certificates |
+| POST | `/verification/exam/start/` | Yes | Start exam |
+| POST | `/verification/exam/submit/` | Yes | Submit exam |
+| POST | `/verification/community/{user_id}/{skill_id}/` | Yes | Verify user's skill |
+| GET | `/verification/status/{user_id}/` | No | View verification badges |
+
+### Portfolio
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/portfolio/projects/` | Yes | List projects |
+| POST | `/portfolio/projects/` | Yes | Add project |
+| GET | `/portfolio/certifications/` | Yes | List certifications |
+| POST | `/portfolio/certifications/` | Yes | Add certification |
+
+### Full API Documentation
+
+- **Swagger UI:** `http://localhost:8000/swagger/`
+- **ReDoc:** `http://localhost:8000/redoc/`
 
 ---
 
 ## AI Recommendation Engine
 
-Located in `apps/recommendations/recommendation_engine.py`.
+Located in `apps/recommendations/recommendation_engine.py`
 
-### Algorithm
+### Core Algorithms
 
-1. **TF-IDF Vectorization** — converts user skill list and job requirement text into numerical vectors
-2. **Cosine Similarity** — measures how closely a user's skills match each job's requirements
-3. **Boost Factors** applied on top of similarity score:
+| Module | Algorithm | Purpose |
+|--------|-----------|---------|
+| **Career Matching** | TF-IDF + Cosine Similarity | Match user skills to career paths |
+| **Skill Gap Analysis** | Set Difference + Weighted Scoring | Identify missing skills |
+| **Roadmap Generation** | Prerequisite Graph + Topological Sort | Ordered learning stages |
+| **Partner Matching** | Collaborative Filtering | Find complementary skills |
 
-| Factor | Adjustment |
-|---|---|
-| Experience level exact match | +30% |
-| One level off (Senior → Mid) | +10% |
-| Job already applied to | −50% |
+### Career Matching Process
+
+1. **Vectorization:** Convert user skills and career requirements into TF-IDF vectors
+2. **Similarity Scoring:** Cosine similarity between user vector and career paths
+3. **Boost Factors:** Interest alignment (+25%), industry demand (+15%), experience match (+10%)
+
+### Skill Gap Analysis Response
+
+```json
+{
+  "target_career": "Data Scientist",
+  "match_score": 0.65,
+  "matched_skills": ["Python", "SQL", "Statistics"],
+  "missing_skills": [
+    {"skill": "Machine Learning", "priority": "high", "estimated_hours": 40},
+    {"skill": "TensorFlow", "priority": "medium", "estimated_hours": 30}
+  ]
+}
+```
 
 ### Cache Strategy
 
-- Recommendations are cached for **1 hour** per user using Django's cache framework
-- Cache key: `recommendations_user_{user_id}`
-- Manual refresh available via `POST /api/recommendations/refresh/`
+- Career recommendations: **24 hours**
+- Exchange partner matches: **1 hour**
+- Manual refresh: `POST /api/recommendations/refresh/`
 
-### Key files
+---
+
+## Skill Exchange System
+
+### Credit Economy
+
+| Action | Credit Change |
+|--------|---------------|
+| Sign up | +5 beginner tokens |
+| Teach 1 hour | +10 skill credits |
+| Learn 1 hour | -10 skill credits |
+| Refer a friend | +5 credits |
+| Leave feedback | +1 credit |
+| Verify another user | +2 credits |
+
+### Pure Learner Support
+
+Users with no teachable skills can still participate:
+
+| Method | Description |
+|--------|-------------|
+| Beginner Tokens | 5 free on signup (1 token = 1 hour learning) |
+| Referral Program | Invite friends to earn more tokens |
+| Volunteer Tasks | Bug reporting, translation, moderation |
+| Learn Then Teach | After 10 learning hours, qualify to teach basics |
+
+### Exchange Flow
 
 ```
-apps/recommendations/
-├── recommendation_engine.py   # Core matching logic
-├── skill_vectorizer.py        # Skill list → TF-IDF vector
-└── views.py                   # API endpoints + cache logic
+1. User adds Teachable Skills + Learnable Skills
+2. AI finds matching users with complementary skills
+3. User A sends ExchangeProposal to User B
+4. User B accepts/rejects
+5. Schedule sessions via ExchangeSession
+6. Complete sessions and rate each other
+7. Credits automatically transferred
 ```
+
+---
+
+## Skill Verification System
+
+### Verification Levels
+
+| Level | Badge | Requirement |
+|-------|-------|-------------|
+| 1 | 📝 Self-Declared | Add skill to profile |
+| 2 | 👍 Community Verified | 3+ peer verifications |
+| 3 | 🎓 Certificate Verified | Admin-approved certificate |
+| 4 | ✅ Platform Tested | Pass on-site exam (80%+) |
+| 5 | ⭐ Expert | Level 4 + 50+ hours + 4.8+ rating |
+
+### Verification Methods
+
+**1. Certificate Upload**
+- Accepted sources: University degrees, MOOC platforms, Professional certs, Training centers
+- Admin review within 48 hours
+
+**2. On-Site Exam**
+- Multiple choice and coding questions
+- Auto-graded, 80% passing score
+- 14-day retake cooldown if failed
+
+**3. Community Verification**
+- Learners verify teachers after successful sessions
+- 3 verifications = Level 2
+
+### Verification Rewards
+
+| Achievement | Reward |
+|-------------|--------|
+| Level 2 | +10 credits + "Trusted" badge |
+| Level 3 | +20 credits + "Certified" badge |
+| Level 4 | +50 credits + Priority search |
+| Level 5 | +100 credits + Featured status |
 
 ---
 
 ## Authentication
 
-This project uses **JWT (JSON Web Tokens)** via `djangorestframework-simplejwt`.
+JWT via `djangorestframework-simplejwt`.
 
-### How to authenticate API requests
+### Get Token
 
 ```bash
-# 1. Obtain tokens
 curl -X POST http://localhost:8000/api/auth/token/ \
   -H "Content-Type: application/json" \
   -d '{"username": "your_username", "password": "your_password"}'
-
-# Response
-{
-  "access": "eyJ0eXAiOiJKV1Qi...",
-  "refresh": "eyJ0eXAiOiJKV1Qi..."
-}
-
-# 2. Use access token in subsequent requests
-curl http://localhost:8000/api/jobs/ \
-  -H "Authorization: Bearer eyJ0eXAiOiJKV1Qi..."
-
-# 3. Refresh expired access token
-curl -X POST http://localhost:8000/api/auth/token/refresh/ \
-  -d '{"refresh": "eyJ0eXAiOiJKV1Qi..."}'
 ```
 
-**Token lifetimes** (configurable in `.env`):
+### Use Token
 
-- Access token: `1 hour` (3600 seconds)
-- Refresh token: `24 hours` (86400 seconds)
+```bash
+curl http://localhost:8000/api/skills/teachable/ \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1Qi..."
+```
+
+### Token Lifetimes
+
+| Token | Lifetime | Configurable |
+|-------|----------|--------------|
+| Access | 1 hour | `JWT_ACCESS_TOKEN_LIFETIME` |
+| Refresh | 24 hours | `JWT_REFRESH_TOKEN_LIFETIME` |
 
 ---
 
 ## Admin Panel
 
-Django's built-in admin is available at `http://localhost:8000/admin/`.
+Django admin at `http://localhost:8000/admin/`
 
-Log in with the superuser credentials you created during setup.
+**Capabilities:**
 
-**What admins can do:**
-
-- Manage all users and their profiles
-- Create, edit, and deactivate job listings
-- Review and update application statuses
-- View platform analytics reports
-- Configure AI engine API keys
-- Monitor skill offerings and sessions
+- Manage users and credit balances
+- Review certificate submissions
+- Create skill assessment exams
+- View platform analytics (exchanges, active users)
+- Moderate skill categories
+- Handle verification disputes
+- Export usage reports
 
 ---
 
@@ -496,67 +694,51 @@ Log in with the superuser credentials you created during setup.
 # Run all tests
 python manage.py test
 
-# Run tests for a specific app
-python manage.py test apps.users
+# Test specific app
+python manage.py test apps.exchanges
 python manage.py test apps.recommendations
+python manage.py test apps.verification
 
-# Run with verbosity
-python manage.py test --verbosity=2
-
-# Run with pytest (if installed)
-pytest
-
-# Check test coverage
+# With coverage
 pip install coverage
 coverage run manage.py test
 coverage report
-coverage html   # Open htmlcov/index.html in browser
+coverage html
 ```
 
-**Target:** 90%+ coverage on critical paths (auth, recommendations, applications).
+**Target coverage:** 90%+ on exchanges, recommendations, and verification
 
 ---
 
 ## Deployment
 
-### Deploy to Render (free tier)
+### Deploy to Render (Free Tier)
 
-**1. Push your code to GitHub.**
+**1.** Push code to GitHub
 
-**2. Create a new Web Service on [render.com](https://render.com):**
+**2.** Create Web Service on Render:
 
-- Environment: `Python`
-- Build command:
-  ```bash
-  pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate
-  ```
-- Start command:
-  ```bash
-  gunicorn skillbridge.wsgi:application
-  ```
+| Setting | Value |
+|---------|-------|
+| Environment | Python |
+| Build Command | `pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate` |
+| Start Command | `gunicorn skillbridge.wsgi:application` |
 
-**3. Add environment variables** in Render dashboard (same as `.env` but with production values):
+**3.** Add environment variables in Render dashboard
 
-```
-SECRET_KEY=<strong-production-key>
-DEBUG=False
-ALLOWED_HOSTS=your-app.onrender.com
-DATABASE_URL=<auto-filled by Render PostgreSQL add-on>
-```
+**4.** Add PostgreSQL add-on (free tier)
 
-**4. Add PostgreSQL add-on** in Render dashboard (free tier available).
+**5.** API live at: `https://your-app.onrender.com/api/`
 
-**5. Your API will be live at:** `https://your-app.onrender.com/api/`
+### Production Checklist
 
-### Production checklist
-
-- [ ] `DEBUG=False` in environment
-- [ ] Strong `SECRET_KEY` (50+ random characters)
+- [ ] `DEBUG=False`
+- [ ] Strong `SECRET_KEY`
 - [ ] `ALLOWED_HOSTS` set to production domain
-- [ ] `collectstatic` runs in build command
 - [ ] PostgreSQL add-on attached
-- [ ] All environment variables set in dashboard
-- [ ] CORS configured for frontend production URL
+- [ ] CORS configured for frontend URL
+- [ ] Email service configured
+- [ ] Certificate storage (S3 or similar)
 
 ---
 
@@ -565,26 +747,23 @@ DATABASE_URL=<auto-filled by Render PostgreSQL add-on>
 ### PostgreSQL connection error
 
 ```bash
-# Check if PostgreSQL is running
-# macOS
-brew services list | grep postgresql
-
-# Linux
-sudo systemctl status postgresql
+# Check if running
+brew services list | grep postgresql  # macOS
+sudo systemctl status postgresql      # Linux
 
 # Start if stopped
-brew services start postgresql@14   # macOS
-sudo systemctl start postgresql      # Linux
+brew services start postgresql@14
+sudo systemctl start postgresql
 ```
 
-### psycopg2 installation fails
+### psycopg2 fails to install
 
 ```bash
 # macOS
 brew install postgresql
 pip install psycopg2-binary
 
-# Ubuntu / Debian
+# Ubuntu
 sudo apt install libpq-dev python3-dev
 pip install psycopg2-binary
 ```
@@ -601,70 +780,17 @@ python manage.py migrate
 ### CORS errors from frontend
 
 ```python
-# settings.py — add your frontend origin
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "https://your-frontend.vercel.app",
-]
+# settings.py
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "https://your-frontend.vercel.app"]
 CORS_ALLOW_CREDENTIALS = True
 ```
-
-### ModuleNotFoundError after installing package
-
-```bash
-# Make sure your venv is activated
-source venv/bin/activate   # macOS / Linux
-venv\Scripts\activate       # Windows
-
-pip install -r requirements.txt
-```
-
----
-
-## Team Responsibilities
-
-| Member | Role | Primary Files |
-|---|---|---|
-| **Dev 1** | Backend + AI/ML | `apps/recommendations/`, `apps/jobs/models.py`, PostgreSQL schema |
-| **Dev 2** | Backend + Auth | `apps/users/`, `skillbridge/settings.py`, JWT config, `apps/*/admin.py` |
-| **Dev 3** | Frontend UI | (see frontend repo) |
-| **Dev 4** | Frontend Integration | (see frontend repo) |
-
----
-
-## Contributing Guidelines
-
-1. **Never commit `.env`** — it is in `.gitignore` for a reason
-2. **Always work in a feature branch** — never push directly to `main`
-3. **Run migrations after every model change** — `python manage.py makemigrations && python manage.py migrate`
-4. **Write tests for every new view** — aim for 90%+ coverage
-5. **Use `select_related` / `prefetch_related`** to avoid N+1 query problems
-6. **Coordinate API contracts** with Dev 3 and Dev 4 before changing endpoint signatures
-7. **Use PostgreSQL** throughout development — never SQLite
-8. **Cache AI recommendations** — never recompute on every request
-
-### Branch naming convention
-
-```
-feature/add-skill-gap-analysis
-fix/jwt-token-refresh-bug
-chore/update-requirements
-```
-
-### Pull request checklist
-
-- [ ] Tests pass locally (`python manage.py test`)
-- [ ] No new migration conflicts
-- [ ] `.env` not committed
-- [ ] API changes communicated to frontend team
-- [ ] Code reviewed by at least one other team member
 
 ---
 
 ## Quick Reference
 
 ```bash
-# Full reset and start fresh (dev only)
+# Full reset (development only)
 source venv/bin/activate
 find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
 python manage.py makemigrations
@@ -673,15 +799,15 @@ python manage.py createsuperuser
 python manage.py runserver
 
 # Common commands
-python manage.py makemigrations       # Generate migration files
-python manage.py migrate              # Apply migrations to DB
-python manage.py createsuperuser      # Create admin user
-python manage.py runserver            # Start dev server
-python manage.py test                 # Run all tests
-python manage.py shell                # Django interactive shell
-python manage.py collectstatic        # Gather static files (production)
+python manage.py makemigrations
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
+python manage.py test
+python manage.py shell
+python manage.py collectstatic
 ```
 
 ---
 
-*SkillBridge  — Built by Team of 4 | 2-Week Sprint | Westcliff University / King's College Kathmandu*
+*SkillBridge — AI-Powered Skill Exchange Platform*
