@@ -1,6 +1,6 @@
-# SkillBridge Nepal — Backend API
+# SkillBridge  — Backend API
 
-> AI-powered career guidance and skill exchange platform for Nepalese students and young professionals.
+> AI-powered career guidance and skill exchange platform for students and young professionals.
 
 **Stack:** Django 5.x · Django REST Framework · PostgreSQL 14+ · scikit-learn · JWT Auth  
 **Deployed on:** Render (free tier)
@@ -32,7 +32,7 @@
 
 ## Project Overview
 
-SkillBridge Nepal is a web-based platform where AI-guided career counselling meets a skill-sharing ecosystem. The backend exposes a RESTful API consumed by the React frontend.
+SkillBridge  is a web-based platform where AI-guided career counselling meets a skill-sharing ecosystem. The backend exposes a RESTful API consumed by the React frontend.
 
 **Core features this API powers:**
 
@@ -309,7 +309,7 @@ skillbridge-backend/
 | `username` | CharField | Unique login handle |
 | `email` | EmailField | Unique email address |
 | `phone` | CharField | Optional phone number |
-| `address` | TextField | Location in Nepal |
+| `address` | TextField | Location|
 | `profile_picture` | ImageField | Avatar upload |
 | `experience_level` | CharField | `entry` / `mid` / `senior` |
 | `skills` | ManyToManyField | → Skill model |
@@ -684,4 +684,4 @@ python manage.py collectstatic        # Gather static files (production)
 
 ---
 
-*SkillBridge Nepal — Built by Team of 4 | 2-Week Sprint | Westcliff University / King's College Kathmandu*
+*SkillBridge  — Built by Team of 4 | 2-Week Sprint | Westcliff University / King's College Kathmandu*
