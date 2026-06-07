@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Portfolio | {{ user.get_full_name|default:user.username }} | SkillBridge Nepal{% endblock %}
 
 {% block content %}
@@ -36,17 +37,17 @@
                 <h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-background">Featured Projects</h2>
                 <div class="h-1 w-24 bg-primary rounded-full"></div>
             </div>
-            <a class="text-primary font-label-md text-label-md hover:underline flex items-center gap-xs" href="{% url 'portfolio_projects' %}">
+            <a class="text-primary font-label-md text-label-md hover:underline flex items-center gap-xs" href="{% url 'portfolio:project_list' %}">
                 View all work <span class="material-symbols-outlined">arrow_forward</span>
             </a>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
             {% for project in projects|slice:":3" %}
             <div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm border border-surface-container group hover:-translate-y-1 transition-all duration-300">
-                <div class="aspect-video relative overflow-hidden">
-                    <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="{% if project.image %}{{ project.image.url }}{% else %}{% static 'images/project-'|add:forloop.counter|add:'.jpg' %}{% endif %}" alt="{{ project.title }}"/>
-                    <div class="absolute inset-0 bg-primary/10 group-hover:bg-transparent transition-colors duration-300"></div>
-                </div>
+<div class="aspect-video relative overflow-hidden">
+                        <div class="w-full h-full bg-surface-container-high rounded-lg"></div>
+                        <div class="absolute inset-0 bg-primary/10 group-hover:bg-transparent transition-colors duration-300"></div>
+                    </div>
                 <div class="p-md space-y-sm">
                     <div class="flex justify-between items-start">
                         <h3 class="font-headline-md text-headline-md text-primary">{{ project.title }}</h3>
@@ -113,7 +114,7 @@
         <p class="font-body-md text-body-md text-on-primary-container/80 max-w-xl mx-auto relative z-10">I am always looking for new challenges and opportunities to make an impact in the tech landscape of Nepal and beyond.</p>
         <div class="flex flex-wrap justify-center gap-base pt-md relative z-10">
             <a href="mailto:{{ user.email }}" class="bg-[#F4A261] text-white px-lg py-md rounded-2xl font-label-md text-label-md hover:opacity-95 transition-all">Get in Touch</a>
-            <a href="{% url 'mentorship' %}" class="bg-white/10 text-on-primary-container border border-white/20 px-lg py-md rounded-2xl font-label-md text-label-md hover:bg-white/20 transition-all">Book a Consultation</a>
+            <a href="#" class="bg-white/10 text-on-primary-container border border-white/20 px-lg py-md rounded-2xl font-label-md text-label-md hover:bg-white/20 transition-all">Book a Consultation</a>
         </div>
     </section>
 </div>

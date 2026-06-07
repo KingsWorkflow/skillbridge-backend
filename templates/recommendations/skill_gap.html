@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Skill Gap Analysis | SkillBridge Nepal{% endblock %}
 
 {% block content %}
@@ -64,7 +65,7 @@
     <section class="mt-xl">
         <div class="flex justify-between items-end mb-md">
             <h2 class="font-headline-md text-headline-md text-on-background">Skill Exchange Matches</h2>
-            <a class="text-primary font-bold flex items-center gap-xs" href="{% url 'skill_exchange' %}">See all matches <span class="material-symbols-outlined">arrow_forward</span></a>
+            <a class="text-primary font-bold flex items-center gap-xs" href="{% url 'exchanges:skill_exchange' %}">See all matches <span class="material-symbols-outlined">arrow_forward</span></a>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
             {% for mentor in mentors|slice:":3" %}

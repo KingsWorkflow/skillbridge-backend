@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Skill Exchange | SkillBridge Nepal{% endblock %}
 
 {% block content %}
@@ -10,8 +11,8 @@
             <p class="font-body-lg text-body-lg text-on-surface-variant">Connect with peers to trade expertise. No currency, just kinetic growth through shared knowledge.</p>
         </div>
         <div class="flex bg-surface-container p-1 rounded-xl self-start md:self-auto">
-            <a href="{% url 'skill_exchange' %}?tab=offer" class="px-md py-sm rounded-lg font-label-md text-label-md bg-white shadow-sm text-primary transition-all">Offer a Skill</a>
-            <a href="{% url 'skill_exchange' %}?tab=request" class="px-md py-sm rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high transition-all">Request a Skill</a>
+            <a href="{% url 'exchanges:skill_exchange' %}?tab=offer" class="px-md py-sm rounded-lg font-label-md text-label-md bg-white shadow-sm text-primary transition-all">Offer a Skill</a>
+            <a href="{% url 'exchanges:skill_exchange' %}?tab=request" class="px-md py-sm rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high transition-all">Request a Skill</a>
         </div>
     </header>
 

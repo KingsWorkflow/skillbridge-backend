@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Resources | SkillBridge Nepal{% endblock %}
 
 {% block content %}
@@ -79,7 +80,7 @@
             <div class="bg-white rounded-xl p-md shadow-sm border border-outline-variant hover:-translate-y-1 transition-all">
                 <div class="flex justify-between items-start mb-md">
                     <h3 class="font-label-md text-label-md text-on-surface">{{ internship.title }}</h3>
-                    <img class="w-8 h-8 rounded" src="{% static 'images/company-logo.png' %}" alt="Company"/>
+                    <div class="w-8 h-8 rounded bg-surface-container-high"></div>
                 </div>
                 <p class="text-primary font-label-sm text-label-sm mb-sm">{{ internship.company }}</p>
                 <div class="flex items-center gap-xs text-on-surface-variant font-body-sm mb-md">
@@ -97,7 +98,7 @@
         <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
         <h2 class="font-headline-md text-headline-md text-on-surface">Need a personalized plan?</h2>
         <p class="font-body-md text-body-md text-on-surface-variant max-w-xl mx-auto">Our AI Career Guide can analyze your profile and suggest the best resources for you.</p>
-        <a href="{% url 'career_recommendations' %}" class="inline-block px-lg py-md bg-secondary text-on-secondary font-label-md text-label-md rounded-xl hover:scale-105 transition-transform">
+        <a href="{% url 'recommendations:career_recommendations' %}" class="inline-block px-lg py-md bg-secondary text-on-secondary font-label-md text-label-md rounded-xl hover:scale-105 transition-transform">
             Get AI Advice
         </a>
     </div>

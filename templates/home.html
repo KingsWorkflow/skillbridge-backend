@@ -1,11 +1,13 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}SkillBridge Nepal | Home{% endblock %}
 {% block html_class %}light{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
 <section class="relative rounded-3xl overflow-hidden mb-gutter h-[600px] flex items-center group">
-    <img class="absolute inset-0 w-full h-full object-cover grayscale-[20%] group-hover:scale-105 transition-transform duration-700" src="{% static 'images/hero-bg.jpg' %}" alt="A diverse group of young professional Nepalese software engineers and analysts collaborating in a high-tech modern office space in Kathmandu."/>
+    <div class="absolute inset-0 bg-primary opacity-20"></div>
+    <div class="absolute inset-0 topo-bg"></div>
     <div class="absolute inset-0 bg-gradient-to-r from-primary/60 to-transparent"></div>
     <!-- Hero Glassmorphic Card -->
     <div class="relative z-10 ml-8 md:ml-16 max-w-xl glass-morphism p-12 rounded-2xl shadow-2xl border-white/20">
@@ -16,8 +18,8 @@
             SkillBridge Nepal empowers the next generation of Himalayan talent with AI-driven gap analysis and peer-to-peer skill exchange.
         </p>
         <div class="flex flex-wrap gap-4">
-            <a href="{% url 'signup' %}" class="bg-[#E0A354] text-[#121212] px-8 py-4 rounded-xl font-headline-md text-[18px] font-bold liquid-gold-glow hover:-translate-y-1 transition-all">Launch Career</a>
-            <a href="{% url 'resources' %}" class="border-2 border-primary text-primary px-8 py-4 rounded-xl font-headline-md text-[18px] font-bold hover:bg-primary/5 transition-all">Explore Platform</a>
+            <a href="{% url 'users:signup' %}" class="bg-[#E0A354] text-[#121212] px-8 py-4 rounded-xl font-headline-md text-[18px] font-bold liquid-gold-glow hover:-translate-y-1 transition-all">Launch Career</a>
+            <a href="{% url 'recommendations:resources' %}" class="border-2 border-primary text-primary px-8 py-4 rounded-xl font-headline-md text-[18px] font-bold hover:bg-primary/5 transition-all">Explore Platform</a>
         </div>
     </div>
 </section>
@@ -48,9 +50,9 @@
             <p class="font-body-md text-body-md opacity-80">Connect with senior architects and developers for a direct knowledge transfer ecosystem.</p>
         </div>
         <div class="flex -space-x-4 mt-8 relative z-10">
-            <img alt="Mentor" class="w-12 h-12 rounded-full border-2 border-primary" src="{% static 'images/avatar1.jpg' %}"/>
-            <img alt="Mentor" class="w-12 h-12 rounded-full border-2 border-primary" src="{% static 'images/avatar2.jpg' %}"/>
-            <img alt="Mentor" class="w-12 h-12 rounded-full border-2 border-primary" src="{% static 'images/avatar3.jpg' %}"/>
+            <img class="w-12 h-12 rounded-full border-2 border-primary" src="{% static 'images/avatar-placeholder.png' %}"/>
+            <img class="w-12 h-12 rounded-full border-2 border-primary" src="{% static 'images/avatar-placeholder.png' %}"/>
+            <img class="w-12 h-12 rounded-full border-2 border-primary" src="{% static 'images/avatar-placeholder.png' %}"/>
             <div class="w-12 h-12 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold border-2 border-primary">+12</div>
         </div>
         <svg class="absolute -bottom-10 -right-10 opacity-10 group-hover:scale-125 transition-transform duration-500" fill="none" height="200" viewbox="0 0 200 200" width="200" xmlns="http://www.w3.org/2000/svg">
@@ -70,8 +72,8 @@
     </div>
     <!-- Visual Topography Card -->
     <div class="md:col-span-8 h-64 md:h-auto rounded-3xl overflow-hidden relative bento-inner-shadow">
-        <img class="absolute inset-0 w-full h-full object-cover" src="{% static 'images/workspace.jpg' %}" alt="A clean, minimalist high-key workspace featuring an open high-end laptop, a cup of coffee, and a small potted plant on a white desk."/>
-        <div class="absolute inset-0 bg-secondary/10 backdrop-grayscale-[50%]"></div>
+        <div class="absolute inset-0 bg-surface-container-highest"></div>
+        <div class="absolute inset-0 bg-secondary/10"></div>
         <div class="absolute bottom-8 left-8 text-white z-10">
             <p class="font-headline-md text-headline-md font-black">Elevate Your Standard.</p>
             <p class="font-body-md text-body-md opacity-90">Join 5,000+ Nepali professionals.</p>
@@ -89,8 +91,8 @@
     <div class="relative z-10">
         <h2 class="font-display-lg text-[36px] md:text-[54px] text-primary mb-8">Ready to transform your trajectory?</h2>
         <div class="flex justify-center gap-6">
-            <a href="{% url 'signup' %}" class="bg-[#E0A354] text-[#121212] px-10 py-5 rounded-2xl font-headline-md text-[20px] font-extrabold liquid-gold-glow hover:-translate-y-1 transition-all">Join the Hub</a>
-            <a href="{% url 'resources' %}" class="bg-white/50 backdrop-blur-md border border-outline-variant px-10 py-5 rounded-2xl font-headline-md text-[20px] font-extrabold text-primary hover:bg-white/80 transition-all">View Success Stories</a>
+            <a href="{% url 'users:signup' %}" class="bg-[#E0A354] text-[#121212] px-10 py-5 rounded-2xl font-headline-md text-[20px] font-extrabold liquid-gold-glow hover:-translate-y-1 transition-all">Join the Hub</a>
+            <a href="{% url 'recommendations:resources' %}" class="bg-white/50 backdrop-blur-md border border-outline-variant px-10 py-5 rounded-2xl font-headline-md text-[20px] font-extrabold text-primary hover:bg-white/80 transition-all">View Success Stories</a>
         </div>
     </div>
 </section>

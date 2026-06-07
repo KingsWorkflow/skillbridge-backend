@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}My Learnable Skills | SkillBridge Nepal{% endblock %}
+
+{% block content %}
+<div class="max-w-container-max mx-auto py-lg space-y-lg">
+    <header class="mb-lg">
+        <h1 class="font-headline-lg text-headline-lg text-on-background">My Learnable Skills</h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant">Skills you want to learn.</p>
+    </header>
+
+    <div class="space-y-gutter">
+        {% for skill in learnable_skills %}
+        <div class="bg-white p-md rounded-xl shadow-sm border border-outline-variant flex justify-between items-center">
+            <div>
+                <h3 class="font-label-md text-label-md text-on-surface">{{ skill.name }}</h3>
+                <p class="text-body-sm text-on-surface-variant">{{ skill.motivation|truncatechars:50 }} • {{ skill.urgency }} priority</p>
+            </div>
+            <span class="material-symbols-outlined text-primary">edit</span>
+        </div>
+        {% empty %}
+        <div class="text-center py-xl">
+            <p class="text-on-surface-variant">You haven't added any learnable skills yet.</p>
+            <a href="#" class="inline-block mt-md bg-primary text-white px-lg py-sm rounded-lg">Add Skill</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

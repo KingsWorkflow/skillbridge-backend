@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Learning Roadmap | SkillBridge Nepal{% endblock %}
+
+{% block content %}
+<div class="max-w-container-max mx-auto py-lg">
+    <header class="mb-lg">
+        <h1 class="font-headline-lg text-headline-lg text-on-background">Your Learning Roadmap</h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant">Step-by-step learning plan to achieve your career goals.</p>
+    </header>
+
+    <div class="space-y-gutter">
+        {% for step in roadmap %}
+        <div class="bg-white p-md rounded-xl border-l-4 border-primary shadow-sm flex items-start gap-md">
+            <div class="w-12 h-12 rounded-lg bg-primary-container flex items-center justify-center text-on-primary-container flex-shrink-0">
+                <span class="font-bold">{{ step.order }}</span>
+            </div>
+            <div>
+                <h3 class="font-label-md text-label-md text-on-surface">{{ step.skill }}</h3>
+                <p class="font-body-sm text-body-sm text-on-surface-variant">{{ step.description }}</p>
+                <p class="text-label-sm text-primary mt-1">{{ step.estimated_hours }} hours</p>
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center py-xl">
+            <p class="text-on-surface-variant">Generate a learning roadmap based on your career goals.</p>
+            <a href="{% url 'recommendations:career_recommendations' %}" class="inline-block mt-md bg-primary text-on-primary px-lg py-sm rounded-lg">Get Recommendations</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}My Certifications | SkillBridge Nepal{% endblock %}
+
+{% block content %}
+<div class="max-w-container-max mx-auto py-lg">
+    <header class="mb-lg flex justify-between items-center">
+        <div>
+            <h1 class="font-headline-lg text-headline-lg text-on-background">My Certifications</h1>
+            <p class="font-body-lg text-body-lg text-on-surface-variant">Your verified certificates.</p>
+        </div>
+        <a href="{% url 'verification:certificate_upload' %}" class="bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md">Upload New</a>
+    </header>
+
+    <div class="space-y-gutter">
+        {% for cert in certifications %}
+        <div class="bg-white p-md rounded-xl border border-outline-variant flex items-center gap-md">
+            <div class="w-14 h-14 bg-surface-container rounded-lg flex items-center justify-center">
+                <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+            </div>
+            <div>
+                <h3 class="font-label-md text-label-md text-on-surface">{{ cert.skill.name }}</h3>
+                <p class="font-body-sm text-body-sm text-on-surface-variant">{{ cert.issuing_organization }} • {{ cert.status }}</p>
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center py-xl">
+            <p class="text-on-surface-variant">No certifications yet. Add your first certificate!</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

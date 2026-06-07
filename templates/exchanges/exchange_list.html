@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Skill Exchange | SkillBridge Nepal{% endblock %}
+
+{% block content %}
+<div class="max-w-container-max mx-auto py-lg space-y-lg">
+    <header class="mb-lg">
+        <h1 class="font-headline-lg text-headline-lg text-on-background">My Exchanges</h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant">Manage your skill exchange proposals and sessions.</p>
+    </header>
+
+    <div class="space-y-gutter">
+        <h2 class="font-headline-md text-headline-md">Active Proposals</h2>
+        {% for proposal in proposals %}
+        <div class="bg-white p-md rounded-xl shadow-sm border border-outline-variant">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h3 class="font-label-md text-label-md text-on-surface">{{ proposal.offer_skill }} for {{ proposal.request_skill }}</h3>
+                    <p class="text-body-sm text-on-surface-variant">With {{ proposal.receiver.username }} • {{ proposal.proposed_hours }} hours proposed</p>
+                </div>
+                <span class="bg-primary-container/10 text-primary px-sm py-xs rounded-full text-label-sm">{{ proposal.status }}</span>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-on-surface-variant">No active proposals.</p>
+        {% endfor %}
+    </div>
+
+    <div class="space-y-gutter mt-xl">
+        <h2 class="font-headline-md text-headline-md">Upcoming Sessions</h2>
+        {% for session in sessions %}
+        <div class="bg-white p-md rounded-xl shadow-sm border border-outline-variant flex items-center justify-between">
+            <div class="flex items-center gap-md">
+                <div class="w-12 h-12 rounded-lg bg-primary-container flex items-center justify-center">
+                    <span class="material-symbols-outlined text-on-primary-container">schedule</span>
+                </div>
+                <div>
+                    <h4 class="font-label-md text-label-md text-on-surface">{{ session.skill }}</h4>
+                    <p class="text-body-sm text-on-surface-variant">{{ session.with_user }} • {{ session.time }}</p>
+                </div>
+            </div>
+            <a href="#" class="bg-primary text-on-primary px-md py-sm rounded-lg font-label-md text-label-md">Join</a>
+        </div>
+        {% empty %}
+        <p class="text-on-surface-variant">No upcoming sessions.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

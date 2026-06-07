@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Dashboard | SkillBridge Nepal{% endblock %}
 {% block html_class %}light{% endblock %}
 
@@ -11,37 +12,37 @@
             <h3 class="font-headline-md text-headline-md text-primary">{{ user.get_full_name|default:user.username }}</h3>
         </div>
         <nav class="flex flex-col gap-xs flex-grow">
-            <a class="flex items-center gap-sm p-sm bg-primary-container text-on-primary-container rounded-lg font-bold transition-all duration-300" href="{% url 'dashboard' %}">
+            <a class="flex items-center gap-sm p-sm bg-primary-container text-on-primary-container rounded-lg font-bold transition-all duration-300" href="{% url 'users:dashboard' %}">
                 <span class="material-symbols-outlined">dashboard</span>
                 <span class="font-label-md text-label-md">Overview</span>
             </a>
-            <a class="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-300" href="{% url 'my_skills' %}">
+            <a class="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-300" href="{% url 'skills:teachable_skills' %}">
                 <span class="material-symbols-outlined">psychology</span>
                 <span class="font-label-md text-label-md">My Skills</span>
             </a>
-            <a class="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-300" href="{% url 'mentorship' %}">
+            <a class="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-300" href="{% url 'exchanges:exchange_list' %}">
                 <span class="material-symbols-outlined">groups</span>
                 <span class="font-label-md text-label-md">Mentorship</span>
             </a>
-            <a class="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-300" href="{% url 'analytics' %}">
+            <a class="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-300" href="{% url 'recommendations:skill_gap' %}">
                 <span class="material-symbols-outlined">analytics</span>
                 <span class="font-label-md text-label-md">Analytics</span>
             </a>
-            <a class="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-300" href="{% url 'settings' %}">
+            <a class="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-300" href="#">
                 <span class="material-symbols-outlined">settings</span>
                 <span class="font-label-md text-label-md">Settings</span>
             </a>
         </nav>
         <div class="p-md bg-primary-fixed-dim/20 rounded-xl border border-primary-container/10 mb-md">
             <p class="font-label-sm text-label-sm text-primary mb-2">Need guidance?</p>
-            <a href="{% url 'ai_advice' %}" class="w-full py-2 bg-primary text-on-primary rounded-lg font-label-md text-label-md text-center block">Get AI Advice</a>
+            <a href="{% url 'recommendations:resources' %}" class="w-full py-2 bg-primary text-on-primary rounded-lg font-label-md text-label-md text-center block">Get AI Advice</a>
         </div>
         <div class="flex flex-col gap-xs pt-base border-t border-outline-variant">
             <a class="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-300" href="#">
                 <span class="material-symbols-outlined">help</span>
                 <span class="font-label-md text-label-md">Help</span>
             </a>
-            <a class="flex items-center gap-sm p-sm text-error hover:bg-surface-container-high rounded-lg transition-all duration-300" href="{% url 'logout' %}">
+            <a class="flex items-center gap-sm p-sm text-error hover:bg-surface-container-high rounded-lg transition-all duration-300" href="{% url 'users:logout' %}">
                 <span class="material-symbols-outlined">logout</span>
                 <span class="font-label-md text-label-md">Logout</span>
             </a>
@@ -60,16 +61,16 @@
             <div class="md:col-span-8 flex flex-col gap-md">
                 <div class="flex justify-between items-end">
                     <h2 class="font-headline-md text-headline-md text-on-background">Recommended Careers</h2>
-                    <a class="text-primary font-bold flex items-center gap-xs" href="{% url 'career_recommendations' %}">See all matches <span class="material-symbols-outlined">arrow_forward</span></a>
+                    <a class="text-primary font-bold flex items-center gap-xs" href="{% url 'recommendations:career_recommendations' %}">See all matches <span class="material-symbols-outlined">arrow_forward</span></a>
                 </div>
                 <div class="flex gap-md overflow-x-auto pb-xs">
                     {% for career in recommended_careers|slice:":3" %}
                     <div class="min-w-[280px] bg-white p-sm rounded-xl shadow-[0px_4px_20px_rgba(30,111,92,0.08)] border border-outline-variant hover:-translate-y-1 transition-transform">
-                        <img class="w-full h-40 object-cover rounded-lg mb-sm" src="{% static 'images/career-'|add:forloop.counter|add:'.jpg' %}" alt="{{ career.title }}"/>
+                        <div class="w-full h-40 bg-surface-container rounded-lg mb-sm"></div>
                         <span class="px-3 py-1 bg-primary-container text-on-primary-container font-label-sm rounded-full mb-2 inline-block">{{ career.match_type }}</span>
                         <h4 class="font-headline-md text-headline-md text-on-surface mb-1">{{ career.title }}</h4>
                         <p class="font-body-sm text-body-sm text-on-surface-variant mb-md">{{ career.description }}</p>
-                        <a href="{% url 'skill_gap' %}?career={{ career.id }}" class="flex items-center gap-xs text-secondary font-label-md text-label-md">
+                        <a href="{% url 'recommendations:skill_gap' %}?career={{ career.id }}" class="flex items-center gap-xs text-secondary font-label-md text-label-md">
                             Learn More
                             <span class="material-symbols-outlined text-sm">arrow_forward</span>
                         </a>
@@ -97,7 +98,7 @@
         <section class="mt-xl">
             <div class="flex justify-between items-end mb-md">
                 <h2 class="font-headline-md text-headline-md text-on-background">Upcoming Sessions</h2>
-                <a class="text-primary font-bold flex items-center gap-xs" href="{% url 'skill_exchange' %}">View all sessions <span class="material-symbols-outlined">arrow_forward</span></a>
+                <a class="text-primary font-bold flex items-center gap-xs" href="{% url 'exchanges:exchange_list' %}">View all sessions <span class="material-symbols-outlined">arrow_forward</span></a>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
                 {% for session in upcoming_sessions|slice:":3" %}

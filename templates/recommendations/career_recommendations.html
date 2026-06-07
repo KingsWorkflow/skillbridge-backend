@@ -50,7 +50,7 @@
                 <span class="px-base py-xs bg-surface-container-high rounded-full text-label-sm">{{ skill }}</span>
                 {% endfor %}
             </div>
-            <a href="{% url 'skill_gap' %}?career={{ career.id }}" class="w-full border-2 border-primary text-primary font-bold py-3 rounded-xl hover:bg-primary hover:text-on-primary transition-all flex items-center justify-center gap-2">
+            <a href="{% url 'recommendations:skill_gap' %}?career={{ career.id }}" class="w-full border-2 border-primary text-primary font-bold py-3 rounded-xl hover:bg-primary hover:text-on-primary transition-all flex items-center justify-center gap-2">
                 View Gap Analysis
                 <span class="material-symbols-outlined text-sm">chevron_right</span>
             </a>

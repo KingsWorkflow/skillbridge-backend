@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Login | SkillBridge Nepal{% endblock %}
 {% block html_class %}light{% endblock %}
 {% block header %}{% endblock %}
@@ -114,7 +115,7 @@
                 <div class="mt-12 text-center">
                     <p class="font-body-md text-body-md text-on-surface-variant">
                         New to SkillBridge? 
-                        <a class="text-primary font-bold hover:text-secondary transition-colors ml-1" href="{% url 'signup' %}">Create an account</a>
+                        <a class="text-primary font-bold hover:text-secondary transition-colors ml-1" href="{% url 'users:signup' %}">Create an account</a>
                     </p>
                 </div>
             </div>

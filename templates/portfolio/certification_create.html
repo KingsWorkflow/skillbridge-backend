@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Add Certification | SkillBridge Nepal{% endblock %}
+
+{% block content %}
+<div class="max-w-container-max mx-auto py-lg">
+    <header class="mb-lg">
+        <h1 class="font-headline-lg text-headline-lg text-on-background">Add Certification</h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant">Add a certification to your portfolio.</p>
+    </header>
+
+    <form class="space-y-md max-w-2xl">
+        <div class="space-y-2">
+            <label class="font-label-md">Skill</label>
+            <select class="w-full p-sm border border-outline-variant rounded-lg">
+                <option>Select a skill</option>
+            </select>
+        </div>
+        <div class="space-y-2">
+            <label class="font-label-md">Description</label>
+            <textarea class="w-full p-sm border border-outline-variant rounded-lg" rows="3"></textarea>
+        </div>
+        <button class="bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md">Save Certification</button>
+    </form>
+</div>
+{% endblock %}
