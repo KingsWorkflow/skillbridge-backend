@@ -8,6 +8,9 @@ urlpatterns = [
     path('', user_views.home_view, name='home'),
     path('admin/', admin.site.urls),
     
+    # API Endpoints - Users (JWT Authentication)
+    path('api/', include('apps.users.api_urls')),
+    
     # Frontend Pages - Users
     path('', include('apps.users.urls')),
     
