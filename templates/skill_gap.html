@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Skill Gap Analysis | SkillBridge Nepal{% endblock %}
+
+{% block content %}
+<div class="max-w-container-max mx-auto px-md py-lg">
+    <header class="mb-lg">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-md">
+            <div>
+                <span class="bg-primary-container text-on-primary-container px-sm py-xs rounded-full font-label-sm text-label-sm mb-base inline-block uppercase tracking-wider">Analysis Active</span>
+                <h1 class="font-headline-lg text-headline-lg text-primary mb-xs">Skill Gap: {{ target_career|default:'Full Stack Developer' }}</h1>
+                <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">Based on your current portfolio and market demand in Kathmandu's tech ecosystem, you are {{ match_score|default:'72' }}% ready for a Senior Full Stack role.</p>
+            </div>
+            <div class="flex gap-sm">
+                <button id="refreshBtn" class="h-12 px-md bg-[#F4A261] text-white font-bold rounded-lg shadow-sm hover:-translate-y-1 transition-all duration-200">Refresh Skills</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Bento Grid Analysis -->
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+        <!-- Radar Chart -->
+        <div class="md:col-span-8 bg-white rounded-xl p-md shadow-sm border border-surface-container flex flex-col h-full">
+            <div class="flex justify-between items-center mb-md">
+                <h3 class="font-headline-md text-headline-md text-on-surface">Skill Distribution</h3>
+                <div class="flex items-center gap-md text-label-sm">
+                    <div class="flex items-center gap-xs"><span class="w-3 h-3 rounded-full bg-primary"></span> Your Level</div>
+                    <div class="flex items-center gap-xs"><span class="w-3 h-3 rounded-full bg-secondary-container"></span> Market Goal</div>
+                </div>
+            </div>
+            <div class="flex-grow flex items-center justify-center py-lg relative">
+                <div class="w-full max-w-md aspect-square relative border border-outline-variant rounded-full flex items-center justify-center">
+                    <!-- Simulated Radar -->
+                    <svg class="w-full h-full transform -rotate-15 overflow-visible" viewbox="0 0 100 100">
+                        <polygon fill="rgba(30, 111, 92, 0.4)" points="50,25 70,45 65,70 35,65 25,40" stroke="#1E6F5C" stroke-width="1.5"></polygon>
+                        <polygon fill="rgba(255, 171, 105, 0.2)" points="50,10 85,35 75,80 25,80 15,35" stroke="#8e4e14" stroke-width="0.5"></polygon>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Priority Goals -->
+        <div class="md:col-span-4 bg-white rounded-xl p-md shadow-sm border border-surface-container flex flex-col gap-md">
+            <h3 class="font-headline-md text-headline-md text-on-surface">Priority Goals</h3>
+            <div class="space-y-md">
+                {% for goal in priority_goals|slice:":3" %}
+                <div class="flex items-start gap-sm">
+                    <div class="w-8 h-8 rounded-lg bg-{{ goal.color|default:'tertiary-container' }} flex items-center justify-center text-white flex-shrink-0">
+                        <span class="material-symbols-outlined text-[18px]">{{ goal.icon|default:'terminal' }}</span>
+                    </div>
+                    <div class="flex-grow">
+                        <p class="font-label-md text-label-md text-on-surface">{{ goal.skill }}</p>
+                        <p class="text-body-sm text-on-surface-variant mb-1">Missing: {{ goal.missing|default:'Key skills' }}</p>
+                        <div class="w-full h-1 bg-surface-container rounded-full">
+                            <div class="h-full bg-{{ goal.color|default:'tertiary' }} w-{{ goal.progress|default:'25' }}"></div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Mentor Matches -->
+    <section class="mt-xl">
+        <div class="flex justify-between items-end mb-md">
+            <h2 class="font-headline-md text-headline-md text-on-background">Skill Exchange Matches</h2>
+            <a class="text-primary font-bold flex items-center gap-xs" href="{% url 'skill_exchange' %}">See all matches <span class="material-symbols-outlined">arrow_forward</span></a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+            {% for mentor in mentors|slice:":3" %}
+            <div class="bg-white rounded-xl p-md border border-surface-container shadow-sm hover:-translate-y-1 transition-all duration-300">
+                <div class="flex items-center gap-md mb-md">
+                    <div class="w-14 h-14 rounded-xl bg-surface-container overflow-hidden">
+                        <img class="w-full h-full object-cover" src="{% if mentor.avatar %}{{ mentor.avatar.url }}{% else %}{% static 'images/avatar-placeholder.png' %}{% endif %}" alt="{{ mentor.name }}"/>
+                    </div>
+                    <div>
+                        <h4 class="font-label-md text-label-md text-on-surface">{{ mentor.name }}</h4>
+                        <p class="text-body-sm text-on-surface-variant">{{ mentor.title }}</p>
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-xs mb-md">
+                    {% for skill in mentor.skills|slice:":3" %}
+                    <span class="px-base py-xs bg-tertiary-fixed-dim/20 text-tertiary rounded-full text-label-sm">{{ skill }}</span>
+                    {% endfor %}
+                </div>
+                <div class="pt-md border-t border-surface-container flex justify-between items-center">
+                    <p class="text-label-sm text-secondary font-bold">Closed {{ mentor.closed_gaps|default:'8' }} Gaps</p>
+                    <button class="bg-primary text-white px-md py-base rounded-lg text-label-md font-bold">Request Swap</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}

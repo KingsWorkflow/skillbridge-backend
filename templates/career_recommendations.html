@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Career Recommendations | SkillBridge Nepal{% endblock %}
+
+{% block content %}
+<div class="max-w-container-max mx-auto px-md py-lg">
+    <!-- Header -->
+    <header class="mb-lg">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-md mb-lg">
+            <div class="max-w-2xl">
+                <span class="bg-primary-container/10 text-primary px-sm py-xs rounded-full font-label-sm text-label-sm mb-base inline-block">AI-Powered</span>
+                <h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-background mb-2">AI Career Recommendations</h1>
+                <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">Discover personalized career paths tailored for the Nepali market.</p>
+            </div>
+            <button class="bg-secondary text-on-secondary font-bold px-lg py-sm rounded-lg font-label-md text-label-md">Refresh Skills</button>
+        </div>
+
+        <!-- Search Form -->
+        <form class="grid grid-cols-1 md:grid-cols-2 gap-md">
+            <div class="space-y-xs">
+                <label class="font-label-md text-label-md text-on-surface-variant">Core Interests</label>
+                <input class="w-full bg-white border border-outline-variant rounded-xl h-12 px-4 focus:ring-2 focus:ring-primary" placeholder="e.g., Design, Data, Teaching" type="text"/>
+            </div>
+            <div class="space-y-xs">
+                <label class="font-label-md text-label-md text-on-surface-variant">Current Skills</label>
+                <input class="w-full bg-white border border-outline-variant rounded-xl h-12 px-4 focus:ring-2 focus:ring-primary" placeholder="e.g., React, English, Management" type="text"/>
+            </div>
+        </form>
+    </header>
+
+    <!-- Results Grid -->
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+        {% for career in career_matches|slice:":6" %}
+        <div class="bg-white rounded-xl p-md shadow-sm border border-outline-variant hover:-translate-y-1 transition-all duration-300">
+            <div class="flex justify-between items-start mb-md">
+                <div>
+                    <span class="bg-{{ career.badge_color|default:'primary-container' }}/10 text-{{ career.badge_color|default:'primary' }} px-sm py-xs rounded-full font-label-sm text-label-sm mb-2 inline-block">{{ career.match_type|default:'Top Match' }}</span>
+                    <h3 class="font-headline-md text-headline-md text-on-surface">{{ career.title }}</h3>
+                    <div class="flex items-center gap-1 mt-1 text-secondary font-label-md text-label-md">
+                        <span class="material-symbols-outlined text-[18px]">trending_up</span>
+                        {{ career.growth }}
+                    </div>
+                </div>
+                <div class="bg-primary-container/10 p-2 rounded-lg">
+                    <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">{{ career.icon|default:'work' }}</span>
+                </div>
+            </div>
+            <p class="font-body-sm text-body-sm text-on-surface-variant mb-md">{{ career.description }}</p>
+            <div class="flex flex-wrap gap-xs mb-md">
+                {% for skill in career.skills_required|slice:":4" %}
+                <span class="px-base py-xs bg-surface-container-high rounded-full text-label-sm">{{ skill }}</span>
+                {% endfor %}
+            </div>
+            <a href="{% url 'skill_gap' %}?career={{ career.id }}" class="w-full border-2 border-primary text-primary font-bold py-3 rounded-xl hover:bg-primary hover:text-on-primary transition-all flex items-center justify-center gap-2">
+                View Gap Analysis
+                <span class="material-symbols-outlined text-sm">chevron_right</span>
+            </a>
+        </div>
+        {% endfor %}
+    </section>
+</div>
+{% endblock %}
