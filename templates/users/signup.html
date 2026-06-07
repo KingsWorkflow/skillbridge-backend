@@ -1,9 +1,12 @@
 {% extends "base.html" %}
+{% load form_tags %}
 {% block title %}Sign Up | SkillBridge Nepal{% endblock %}
 {% block html_class %}light{% endblock %}
+{% block header %}{% endblock %}
 
 {% block content %}
-<div class="max-w-container-max w-full grid grid-cols-1 lg:grid-cols-12 gap-gutter min-h-[870px] items-stretch">
+<div class="flex-grow flex items-center justify-center p-margin-mobile md:p-margin-desktop">
+    <div class="max-w-container-max w-full grid grid-cols-1 lg:grid-cols-12 gap-gutter min-h-[870px] items-stretch">
     <!-- Left Side: Platform Value Props (Bento Tile) -->
     <section class="hidden lg:flex lg:col-span-5 flex-col justify-between p-10 rounded-xl glass-morphism relative overflow-hidden h-[700px]">
         <div class="relative z-10">
@@ -64,6 +67,7 @@
         <div class="p-8 md:p-12 rounded-xl bg-white border border-on-surface/10 shadow-lg flex-grow">
             <form class="space-y-6" method="post">
                 {% csrf_token %}
+                {{ form.non_field_errors }}
                 <!-- Role Toggle -->
                 <div class="mb-8">
                     <label class="font-label-md text-label-md text-primary block mb-3">I AM A:</label>
@@ -74,34 +78,43 @@
                         <button class="py-3 rounded-md font-label-md text-label-md transition-all text-on-surface-variant hover:bg-surface-variant" id="roleProfessional" onclick="setRole('professional')" type="button">
                             Professional
                         </button>
-                        <input id="roleInput" name="role" type="hidden" value="student"/>
+                        <input id="roleInput" name="experience_level" type="hidden" value="student"/>
                     </div>
                 </div>
                 <!-- Name & Email Group -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-2">
-                        <label class="font-label-md text-label-md text-on-surface-variant" for="fullName">Full Name</label>
-                        <input class="w-full bg-surface-container-lowest border-0 border-b-2 border-outline-variant focus:border-secondary focus:ring-0 transition-all px-0 py-2 font-body-md text-body-md" id="fullName" name="full_name" placeholder="Aayush Shrestha" type="text"/>
+                        <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.username.id_for_label }}">Username</label>
+                        {{ form.username|add_class:"w-full bg-surface-container-lowest border-0 border-b-2 border-outline-variant focus:border-secondary focus:ring-0 transition-all px-0 py-2 font-body-md text-body-md" }}
                     </div>
                     <div class="space-y-2">
-                        <label class="font-label-md text-label-md text-on-surface-variant" for="email">Email Address</label>
-                        <input class="w-full bg-surface-container-lowest border-0 border-b-2 border-outline-variant focus:border-secondary focus:ring-0 transition-all px-0 py-2 font-body-md text-body-md" id="email" name="email" placeholder="aayush@example.np" type="email"/>
+                        <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.email.id_for_label }}">Email Address</label>
+                        {{ form.email|add_class:"w-full bg-surface-container-lowest border-0 border-b-2 border-outline-variant focus:border-secondary focus:ring-0 transition-all px-0 py-2 font-body-md text-body-md" }}
                     </div>
                 </div>
                 <!-- Password -->
                 <div class="space-y-2">
-                    <label class="font-label-md text-label-md text-on-surface-variant" for="password">Create Password</label>
+                    <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.password1.id_for_label }}">Password</label>
                     <div class="relative">
-                        <input class="w-full bg-surface-container-lowest border-0 border-b-2 border-outline-variant focus:border-secondary focus:ring-0 transition-all px-0 py-2 font-body-md text-body-md" id="password" name="password" placeholder="••••••••" type="password"/>
+                        {{ form.password1|add_class:"w-full bg-surface-container-lowest border-0 border-b-2 border-outline-variant focus:border-secondary focus:ring-0 transition-all px-0 py-2 font-body-md text-body-md" }}
                         <button class="absolute right-0 top-1/2 -translate-y-1/2 text-on-surface-variant" type="button">
                             <span class="material-symbols-outlined">visibility</span>
                         </button>
                     </div>
                     <p class="text-[12px] text-on-surface-variant">Must be at least 8 characters with one special symbol.</p>
                 </div>
+                <div class="space-y-2">
+                    <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.password2.id_for_label }}">Confirm Password</label>
+                    {{ form.password2|add_class:"w-full bg-surface-container-lowest border-0 border-b-2 border-outline-variant focus:border-secondary focus:ring-0 transition-all px-0 py-2 font-body-md text-body-md" }}
+                </div>
+                <!-- Phone -->
+                <div class="space-y-2">
+                    <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.phone.id_for_label }}">Phone (Optional)</label>
+                    {{ form.phone|add_class:"w-full bg-surface-container-lowest border-0 border-b-2 border-outline-variant focus:border-secondary focus:ring-0 transition-all px-0 py-2 font-body-md text-body-md" }}
+                </div>
                 <!-- Terms -->
                 <div class="flex items-center gap-3 py-2">
-                    <input class="rounded border-outline text-primary focus:ring-primary h-5 w-5" id="terms" name="terms" type="checkbox"/>
+                    <input class="rounded border-outline text-primary focus:ring-primary h-5 w-5" id="terms" type="checkbox"/>
                     <label class="font-body-md text-body-md text-on-surface-variant" for="terms">
                         I agree to the <a class="text-primary font-bold hover:underline" href="#">Terms of Service</a> and <a class="text-primary font-bold hover:underline" href="#">Privacy Policy</a>.
                     </label>
@@ -115,7 +128,6 @@
                     <p class="font-body-md text-body-md text-on-surface-variant">
                         Already have an account? 
                         <a class="text-primary font-bold hover:text-secondary transition-colors ml-1" href="{% url 'users:login' %}">Sign In</a>
-                    </p>
                 </div>
             </form>
         </div>
@@ -132,6 +144,7 @@
             </div>
         </div>
     </section>
+    </div>
 </div>
 {% endblock %}
 
