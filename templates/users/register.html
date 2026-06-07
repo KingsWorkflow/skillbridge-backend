@@ -86,19 +86,19 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-2">
                         <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.username.id_for_label }}">Username</label>
-                        {{ form.username|add_class:"w-full bg-surface-container-lowest border-0 border-b-2 border-outline-variant focus:border-secondary focus:ring-0 transition-all px-0 py-2 font-body-md text-body-md" }}
+                        {{ form.username }}
                     </div>
                     <div class="space-y-2">
                         <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.email.id_for_label }}">Email Address</label>
-                        {{ form.email|add_class:"w-full bg-surface-container-lowest border-0 border-b-2 border-outline-variant focus:border-secondary focus:ring-0 transition-all px-0 py-2 font-body-md text-body-md" }}
+                        {{ form.email }}
                     </div>
                 </div>
                 <!-- Password -->
                 <div class="space-y-2">
                     <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.password1.id_for_label }}">Password</label>
                     <div class="relative">
-                        {{ form.password1|add_class:"w-full bg-surface-container-lowest border-0 border-b-2 border-outline-variant focus:border-secondary focus:ring-0 transition-all px-0 py-2 font-body-md text-body-md" }}
-                        <button class="absolute right-0 top-1/2 -translate-y-1/2 text-on-surface-variant" type="button">
+                        {{ form.password1 }}
+                        <button class="absolute right-0 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors toggle-password" type="button">
                             <span class="material-symbols-outlined">visibility</span>
                         </button>
                     </div>
@@ -106,12 +106,17 @@
                 </div>
                 <div class="space-y-2">
                     <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.password2.id_for_label }}">Confirm Password</label>
-                    {{ form.password2|add_class:"w-full bg-surface-container-lowest border-0 border-b-2 border-outline-variant focus:border-secondary focus:ring-0 transition-all px-0 py-2 font-body-md text-body-md" }}
+                    <div class="relative">
+                        {{ form.password2 }}
+                        <button class="absolute right-0 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors toggle-password" type="button">
+                            <span class="material-symbols-outlined">visibility</span>
+                        </button>
+                    </div>
                 </div>
                 <!-- Phone -->
                 <div class="space-y-2">
                     <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.phone.id_for_label }}">Phone (Optional)</label>
-                    {{ form.phone|add_class:"w-full bg-surface-container-lowest border-0 border-b-2 border-outline-variant focus:border-secondary focus:ring-0 transition-all px-0 py-2 font-body-md text-body-md" }}
+                    {{ form.phone }}
                 </div>
                 <!-- Terms -->
                 <div class="flex items-center gap-3 py-2">
@@ -122,7 +127,7 @@
                 </div>
                 <!-- CTA -->
                 <div class="pt-4 flex flex-col items-center gap-6">
-                    <button class="w-full bg-[#E0A354] text-[#121212] py-4 rounded-xl font-headline-md text-[18px] font-extrabold uppercase tracking-wider hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-2" type="submit">
+                    <button class="w-full bg-[#E0A354] text-white py-4 rounded-xl font-headline-md text-[18px] font-extrabold uppercase tracking-wider hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-2" type="submit">
                         Create Account
                         <span class="material-symbols-outlined">arrow_forward</span>
                     </button>
@@ -171,5 +176,21 @@
             roleInput.value = 'professional';
         }
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleButtons = document.querySelectorAll('.toggle-password');
+        toggleButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const passwordInput = this.closest('.relative').querySelector('input');
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    this.querySelector('.material-symbols-outlined').textContent = 'visibility_off';
+                } else {
+                    passwordInput.type = 'password';
+                    this.querySelector('.material-symbols-outlined').textContent = 'visibility';
+                }
+            });
+        });
+    });
 </script>
 {% endblock %}
