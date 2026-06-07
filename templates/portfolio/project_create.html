@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Add Project | SkillBridge Nepal{% endblock %}
+
+{% block content %}
+<div class="max-w-container-max mx-auto py-lg">
+    <header class="mb-lg">
+        <h1 class="font-headline-lg text-headline-lg text-on-background">Add New Project</h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant">Showcase your work to the community.</p>
+    </header>
+
+    <form class="space-y-md max-w-2xl">
+        <div class="space-y-2">
+            <label class="font-label-md">Project Title</label>
+            <input class="w-full p-sm border border-outline-variant rounded-lg" name="title" type="text"/>
+        </div>
+        <div class="space-y-2">
+            <label class="font-label-md">Description</label>
+            <textarea class="w-full p-sm border border-outline-variant rounded-lg" name="description" rows="4"></textarea>
+        </div>
+        <div class="space-y-2">
+            <label class="font-label-md">Technologies Used</label>
+            <input class="w-full p-sm border border-outline-variant rounded-lg" name="technologies" type="text" placeholder="e.g., React, Django, PostgreSQL"/>
+        </div>
+        <button class="bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md">Save Project</button>
+    </form>
+</div>
+{% endblock %}

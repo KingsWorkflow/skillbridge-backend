@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}My Projects | SkillBridge Nepal{% endblock %}
+
+{% block content %}
+<div class="max-w-container-max mx-auto py-lg space-y-lg">
+    <header class="mb-lg flex justify-between items-center">
+        <div>
+            <h1 class="font-headline-lg text-headline-lg text-on-background">My Projects</h1>
+            <p class="font-body-lg text-body-lg text-on-surface-variant">Your portfolio projects.</p>
+        </div>
+        <a href="{% url 'portfolio:project_create' %}" class="bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md">Add Project</a>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+        {% for project in projects %}
+        <div class="bg-white rounded-xl p-md shadow-sm border border-outline-variant">
+            <div class="aspect-video bg-surface-container-high rounded-lg mb-sm"></div>
+            <h3 class="font-label-md text-label-md text-on-surface">{{ project.title }}</h3>
+            <p class="text-body-sm text-on-surface-variant">{{ project.description|truncatechars:80 }}</p>
+        </div>
+        {% empty %}
+        <div class="col-span-full text-center py-xl">
+            <p class="text-on-surface-variant">No projects yet. Add your first project to get started!</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

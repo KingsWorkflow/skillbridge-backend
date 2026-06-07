@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Dashboard | SkillBridge Nepal{% endblock %}
+{% block html_class %}light{% endblock %}
+
+{% block content %}
+<div class="flex max-w-container-max mx-auto">
+    <!-- SideNavBar -->
+    <aside class="hidden lg:flex flex-col h-full w-64 p-md gap-base bg-surface-container-low">
+        <div class="mb-lg">
+            <p class="font-label-md text-label-md text-on-surface-variant">Welcome back</p>
+            <h3 class="font-headline-md text-headline-md text-primary">{{ user.get_full_name|default:user.username }}</h3>
+        </div>
+        <nav class="flex flex-col gap-xs flex-grow">
+            <a class="flex items-center gap-sm p-sm bg-primary-container text-on-primary-container rounded-lg font-bold transition-all duration-300" href="{% url 'users:dashboard' %}">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="font-label-md text-label-md">Overview</span>
+            </a>
+            <a class="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-300" href="{% url 'skills:teachable_skills' %}">
+                <span class="material-symbols-outlined">psychology</span>
+                <span class="font-label-md text-label-md">My Skills</span>
+            </a>
+            <a class="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-300" href="{% url 'exchanges:exchange_list' %}">
+                <span class="material-symbols-outlined">groups</span>
+                <span class="font-label-md text-label-md">Mentorship</span>
+            </a>
+            <a class="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-300" href="{% url 'recommendations:skill_gap' %}">
+                <span class="material-symbols-outlined">analytics</span>
+                <span class="font-label-md text-label-md">Analytics</span>
+            </a>
+            <a class="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-300" href="#">
+                <span class="material-symbols-outlined">settings</span>
+                <span class="font-label-md text-label-md">Settings</span>
+            </a>
+        </nav>
+        <div class="p-md bg-primary-fixed-dim/20 rounded-xl border border-primary-container/10 mb-md">
+            <p class="font-label-sm text-label-sm text-primary mb-2">Need guidance?</p>
+            <a href="{% url 'recommendations:resources' %}" class="w-full py-2 bg-primary text-on-primary rounded-lg font-label-md text-label-md text-center block">Get AI Advice</a>
+        </div>
+        <div class="flex flex-col gap-xs pt-base border-t border-outline-variant">
+            <a class="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-300" href="#">
+                <span class="material-symbols-outlined">help</span>
+                <span class="font-label-md text-label-md">Help</span>
+            </a>
+            <a class="flex items-center gap-sm p-sm text-error hover:bg-surface-container-high rounded-lg transition-all duration-300" href="{% url 'users:logout' %}">
+                <span class="material-symbols-outlined">logout</span>
+                <span class="font-label-md text-label-md">Logout</span>
+            </a>
+        </div>
+    </aside>
+    <!-- Main Content -->
+    <main class="flex-1 p-md overflow-hidden">
+        <!-- Header Section -->
+        <div class="mb-lg">
+            <h1 class="font-display-lg text-display-lg text-on-background mb-base">Your Growth Dashboard</h1>
+            <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">Track your professional evolution and connect with the community.</p>
+        </div>
+        <!-- Bento Grid Content -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+            <!-- Recommended Careers Carousel -->
+            <div class="md:col-span-8 flex flex-col gap-md">
+                <div class="flex justify-between items-end">
+                    <h2 class="font-headline-md text-headline-md text-on-background">Recommended Careers</h2>
+                    <a class="text-primary font-bold flex items-center gap-xs" href="{% url 'recommendations:career_recommendations' %}">See all matches <span class="material-symbols-outlined">arrow_forward</span></a>
+                </div>
+                <div class="flex gap-md overflow-x-auto pb-xs">
+                    {% for career in recommended_careers|slice:":3" %}
+                    <div class="min-w-[280px] bg-white p-sm rounded-xl shadow-[0px_4px_20px_rgba(30,111,92,0.08)] border border-outline-variant hover:-translate-y-1 transition-transform">
+                        <div class="w-full h-40 bg-surface-container rounded-lg mb-sm"></div>
+                        <span class="px-3 py-1 bg-primary-container text-on-primary-container font-label-sm rounded-full mb-2 inline-block">{{ career.match_type }}</span>
+                        <h4 class="font-headline-md text-headline-md text-on-surface mb-1">{{ career.title }}</h4>
+                        <p class="font-body-sm text-body-sm text-on-surface-variant mb-md">{{ career.description }}</p>
+                        <a href="{% url 'recommendations:skill_gap' %}?career={{ career.id }}" class="flex items-center gap-xs text-secondary font-label-md text-label-md">
+                            Learn More
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <!-- Skill Gap Score -->
+            <div class="md:col-span-4 bg-white p-md rounded-xl shadow-[0px_4px_20px_rgba(30,111,92,0.08)] border border-outline-variant flex flex-col justify-center text-center">
+                <h3 class="font-headline-md text-headline-md text-on-background mb-md">Skill Gap Score</h3>
+                <div class="relative flex items-center justify-center">
+                    <svg class="w-48 h-48 transform -rotate-15" viewbox="0 0 100 100">
+                        <circle class="text-surface-container" cx="50" cy="50" fill="transparent" r="40" stroke="currentColor" stroke-width="8"></circle>
+                        <circle class="text-primary" cx="50" cy="50" fill="transparent" r="40" stroke="currentColor" stroke-dasharray="251.2" stroke-dashoffset="{{ gap_stroke_dashoffset|default:'120' }}" stroke-width="8"></circle>
+                    </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        <span class="text-display-lg font-display-lg text-on-background">{{ gap_score|default:'70' }}</span>
+                        <span class="font-label-md text-label-md text-on-surface-variant uppercase">Target: 95</span>
+                    </div>
+                </div>
+                <p class="font-body-sm text-body-sm text-on-surface-variant mt-md px-md">Focus on '{{ priority_skill|default:'System Design' }}' to increase your market value.</p>
+            </div>
+        </div>
+        <!-- Upcoming Sessions -->
+        <section class="mt-xl">
+            <div class="flex justify-between items-end mb-md">
+                <h2 class="font-headline-md text-headline-md text-on-background">Upcoming Sessions</h2>
+                <a class="text-primary font-bold flex items-center gap-xs" href="{% url 'exchanges:exchange_list' %}">View all sessions <span class="material-symbols-outlined">arrow_forward</span></a>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+                {% for session in upcoming_sessions|slice:":3" %}
+                <div class="bg-white rounded-xl p-md border border-outline-variant shadow-[0px_4px_20px_rgba(30,111,92,0.08)] hover:-translate-y-1 transition-transform">
+                    <div class="flex items-center gap-md mb-md">
+                        <div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container">
+                            <span class="material-symbols-outlined">{{ session.icon|default:'terminal' }}</span>
+                        </div>
+                        <div>
+                            <h4 class="font-body-md font-bold text-on-surface">{{ session.skill }}</h4>
+                            <p class="font-body-sm text-body-sm text-on-surface-variant">{{ session.with_user }} • {{ session.time }}</p>
+                        </div>
+                    </div>
+                    <button class="w-full py-2 border border-primary text-primary rounded-lg font-label-md text-label-md hover:bg-primary hover:text-on-primary transition-all">Join Session</button>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+</div>
+{% endblock %}

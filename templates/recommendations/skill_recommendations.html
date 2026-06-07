@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Skill Recommendations | SkillBridge Nepal{% endblock %}
+
+{% block content %}
+<div class="max-w-container-max mx-auto py-lg">
+    <header class="mb-lg">
+        <h1 class="font-headline-lg text-headline-lg text-on-background">Skill Recommendations</h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant">Based on your profile, we recommend focusing on these skills next.</p>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+        {% for skill in skill_matches %}
+        <div class="bg-white p-md rounded-xl shadow-sm border border-outline-variant hover:-translate-y-1 transition-all">
+            <div class="flex items-center gap-md mb-md">
+                <div class="w-12 h-12 rounded-lg bg-primary-container flex items-center justify-center text-on-primary-container">
+                    <span class="material-symbols-outlined">code</span>
+                </div>
+                <h3 class="font-label-md text-label-md text-on-surface">{{ skill.name }}</h3>
+            </div>
+            <p class="font-body-sm text-body-sm text-on-surface-variant mb-md">{{ skill.reason }}</p>
+            <div class="flex justify-between items-center">
+                <span class="text-label-sm text-primary font-bold">{{ skill.match_score }}% match</span>
+                <button class="bg-secondary text-on-secondary px-sm py-xs rounded-lg text-label-sm">Learn More</button>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full text-center py-xl">
+            <p class="text-on-surface-variant">No skill recommendations yet. Complete your profile for better suggestions.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

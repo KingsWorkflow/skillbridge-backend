@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Resources | SkillBridge Nepal{% endblock %}
+
+{% block content %}
+<div class="max-w-container-max mx-auto px-md py-lg">
+    <!-- Header -->
+    <header class="mb-lg">
+        <h1 class="font-headline-lg text-headline-lg text-on-surface mb-xs">Trending &amp; Resources</h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant">Stay ahead with the latest market shifts and educational gems in the Nepal ecosystem.</p>
+    </header>
+
+    <!-- Two-column Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+        <!-- Trending Careers -->
+        <div class="md:col-span-8 bg-white rounded-xl p-md shadow-sm border border-outline-variant">
+            <div class="flex justify-between items-center mb-md">
+                <h2 class="font-headline-md text-headline-md text-primary">Trending Careers in Nepal</h2>
+                <span class="bg-secondary-container text-on-secondary-container font-label-sm text-label-sm px-base py-1 rounded-full">Updated Today</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-md">
+                {% for career in trending_careers|slice:":4" %}
+                <div class="bg-surface-container-low p-sm rounded-lg hover:-translate-y-1 transition-transform">
+                    <div class="flex items-start gap-md">
+                        <div class="bg-primary-container text-on-primary-container p-sm rounded-lg">
+                            <span class="material-symbols-outlined">data_object</span>
+                        </div>
+                        <div>
+                            <h3 class="font-label-md text-label-md text-on-surface">{{ career.title }}</h3>
+                            <p class="font-body-sm text-body-sm text-on-surface-variant">{{ career.description }}</p>
+                            <p class="mt-2 font-label-sm text-label-sm text-primary">Growth: {{ career.growth }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Top Skills -->
+        <div class="md:col-span-4 bg-primary text-on-primary rounded-xl p-md shadow-sm flex flex-col justify-between">
+            <div>
+                <h2 class="font-headline-md text-headline-md mb-md">Top 5 Skills</h2>
+                <ol class="space-y-md">
+                    <li class="flex items-center gap-md">
+                        <span class="bg-on-primary text-primary w-8 h-8 rounded-full flex items-center justify-center font-bold">1</span>
+                        <span class="font-label-md text-label-md">Cloud Architecture (AWS/Azure)</span>
+                    </li>
+                    <li class="flex items-center gap-md">
+                        <span class="bg-on-primary text-primary w-8 h-8 rounded-full flex items-center justify-center font-bold">2</span>
+                        <span class="font-label-md text-label-md">Python &amp; Data Analytics</span>
+                    </li>
+                    <li class="flex items-center gap-md">
+                        <span class="bg-on-primary text-primary w-8 h-8 rounded-full flex items-center justify-center font-bold">3</span>
+                        <span class="font-label-md text-label-md">UI/UX Design Thinking</span>
+                    </li>
+                    <li class="flex items-center gap-md">
+                        <span class="bg-on-primary text-primary w-8 h-8 rounded-full flex items-center justify-center font-bold">4</span>
+                        <span class="font-label-md text-label-md">Agile Project Management</span>
+                    </li>
+                    <li class="flex items-center gap-md">
+                        <span class="bg-on-primary text-primary w-8 h-8 rounded-full flex items-center justify-center font-bold">5</span>
+                        <span class="font-label-md text-label-md">Cybersecurity Fundamentals</span>
+                    </li>
+                </ol>
+            </div>
+            <div class="mt-lg p-md bg-white/10 rounded-lg border border-white/20">
+                <p class="font-body-sm text-body-sm italic opacity-90">"AI-Powered Tip: Mastering Python alone increases your employability score by 40% in Nepal's tech market."</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Internships Section -->
+    <section class="mt-xl">
+        <div class="flex justify-between items-end mb-md">
+            <h2 class="font-headline-md text-headline-md text-on-surface">Local Internship Opportunities</h2>
+            <a class="text-primary font-label-md text-label-md flex items-center gap-xs" href="#">View All <span class="material-symbols-outlined">arrow_forward</span></a>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-gutter">
+            {% for internship in internships|slice:":3" %}
+            <div class="bg-white rounded-xl p-md shadow-sm border border-outline-variant hover:-translate-y-1 transition-all">
+                <div class="flex justify-between items-start mb-md">
+                    <h3 class="font-label-md text-label-md text-on-surface">{{ internship.title }}</h3>
+                    <div class="w-8 h-8 rounded bg-surface-container-high"></div>
+                </div>
+                <p class="text-primary font-label-sm text-label-sm mb-sm">{{ internship.company }}</p>
+                <div class="flex items-center gap-xs text-on-surface-variant font-body-sm mb-md">
+                    <span class="material-symbols-outlined text-[16px]">location_on</span>
+                    {{ internship.location }}
+                </div>
+                <button class="w-full py-3 bg-secondary-container text-on-secondary-container font-label-md text-label-md rounded-lg hover:opacity-90 transition-all">{{ internship.type }}</button>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- AI Career Guide CTA -->
+    <div class="mt-xl bg-primary-container/10 rounded-xl p-lg text-center space-y-md relative overflow-hidden border border-primary/10">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+        <h2 class="font-headline-md text-headline-md text-on-surface">Need a personalized plan?</h2>
+        <p class="font-body-md text-body-md text-on-surface-variant max-w-xl mx-auto">Our AI Career Guide can analyze your profile and suggest the best resources for you.</p>
+        <a href="{% url 'recommendations:career_recommendations' %}" class="inline-block px-lg py-md bg-secondary text-on-secondary font-label-md text-label-md rounded-xl hover:scale-105 transition-transform">
+            Get AI Advice
+        </a>
+    </div>
+</div>
+{% endblock %}

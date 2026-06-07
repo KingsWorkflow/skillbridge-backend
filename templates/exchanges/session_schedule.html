@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Schedule Session | SkillBridge Nepal{% endblock %}
+
+{% block content %}
+<div class="max-w-container-max mx-auto py-lg">
+    <header class="mb-lg">
+        <h1 class="font-headline-lg text-headline-lg text-on-background">Schedule Exchange Session</h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant">Schedule a session with your exchange partner.</p>
+    </header>
+
+    <form class="space-y-md max-w-2xl">
+        <div class="space-y-2">
+            <label class="font-label-md">Scheduled Date/Time</label>
+            <input class="w-full p-sm border border-outline-variant rounded-lg" type="datetime-local"/>
+        </div>
+        <div class="space-y-2">
+            <label class="font-label-md">Duration (hours)</label>
+            <input class="w-full p-sm border border-outline-variant rounded-lg" type="number" min="1" max="8"/>
+        </div>
+        <button class="bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md">Schedule Session</button>
+    </form>
+</div>
+{% endblock %}

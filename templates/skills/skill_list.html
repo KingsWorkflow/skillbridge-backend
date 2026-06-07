@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Skill Catalog | SkillBridge Nepal{% endblock %}
+
+{% block content %}
+<div class="max-w-container-max mx-auto py-lg space-y-lg">
+    <header class="mb-lg">
+        <h1 class="font-headline-lg text-headline-lg text-on-background">Skill Catalog</h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant">Browse all available skills for exchange.</p>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-gutter">
+        {% for skill in skills %}
+        <a href="#" class="bg-white p-md rounded-xl shadow-sm border border-outline-variant hover:-translate-y-1 transition-all text-center">
+            <span class="material-symbols-outlined text-primary text-4xl mb-2">code</span>
+            <h3 class="font-label-md text-label-md text-on-surface">{{ skill.name }}</h3>
+            <p class="text-body-sm text-on-surface-variant">{{ skill.category }}</p>
+        </a>
+        {% empty %}
+        <div class="col-span-full text-center py-xl">
+            <p class="text-on-surface-variant">No skills available yet. Check back later!</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% load static %}
+{% load form_tags %}
+{% block title %}Login | SkillBridge Nepal{% endblock %}
+{% block html_class %}light{% endblock %}
+{% block header %}{% endblock %}
+
+{% block content %}
+<div class="flex-grow flex items-center justify-center p-margin-mobile md:p-margin-desktop">
+    <div class="max-w-container-max w-full grid grid-cols-1 lg:grid-cols-12 gap-gutter min-h-[870px] items-stretch">
+        <!-- Left Side: Visual Narrative (Bento Stack) -->
+        <section class="hidden lg:flex lg:col-span-5 flex-col justify-between p-10 rounded-xl glass-morphism relative overflow-hidden h-[700px]">
+            <div class="relative z-10">
+                <span class="inline-block px-3 py-1 bg-primary text-on-primary rounded-full font-label-md text-[12px] mb-6">WELCOME BACK</span>
+                <h1 class="font-headline-lg text-headline-lg text-primary mb-8">Your Professional <br/><span class="text-secondary">Journey Continues</span></h1>
+                <div class="space-y-8">
+                    <div class="flex gap-4 items-start group">
+                        <div class="w-12 h-12 rounded-lg bg-primary-container flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined text-primary-fixed" style="font-variation-settings: 'FILL' 1;">workspace</span>
+                        </div>
+                        <div>
+                            <h3 class="font-title-lg text-title-lg text-primary">Skill Dashboard</h3>
+                            <p class="font-body-md text-body-md text-on-surface-variant mt-1">Track your credits, exchanges, and learning progress in one unified view.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 items-start group">
+                        <div class="w-12 h-12 rounded-lg bg-primary-container flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined text-primary-fixed" style="font-variation-settings: 'FILL' 1;">trending_up</span>
+                        </div>
+                        <div>
+                            <h3 class="font-title-lg text-title-lg text-primary">Career Growth</h3>
+                            <p class="font-body-md text-body-md text-on-surface-variant mt-1">Access personalized recommendations and skill gap analysis anytime.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 items-start group">
+                        <div class="w-12 h-12 rounded-lg bg-primary-container flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined text-primary-fixed" style="font-variation-settings: 'FILL' 1;">group</span>
+                        </div>
+                        <div>
+                            <h3 class="font-title-lg text-title-lg text-primary">Community Network</h3>
+                            <p class="font-body-md text-body-md text-on-surface-variant mt-1">Connect with verified peers and mentors across Nepal's tech ecosystem.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-auto relative z-10 pt-8 border-t border-on-surface/10">
+                <p class="font-body-md text-body-md italic text-primary">"Your skills are your superpower. Let's keep building them together."</p>
+                <div class="mt-4 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-secondary-container"></div>
+                    <div>
+                        <p class="font-label-md text-label-md text-on-surface">SkillBridge Nepal Team</p>
+                        <p class="text-[12px] text-on-surface-variant">Kathmandu, Nepal</p>
+                    </div>
+                </div>
+            </div>
+            <div class="absolute -bottom-20 -right-20 opacity-10 pointer-events-none">
+                <svg fill="none" height="400" viewbox="0 0 400 400" width="400" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0 200C0 89.5431 89.5431 0 200 0C310.457 0 400 89.5431 400 200C400 155.228 155.228 200 100 200C44.7715 200 0 155.228 0 200Z" fill="#104D3F"></path>
+                </svg>
+            </div>
+        </section>
+        <!-- Right Side: Login Form (The Glassmorphic Shell) -->
+        <section class="col-span-12 lg:col-span-7 flex flex-col gap-6">
+            <div class="glass-morphism p-8 md:p-10 rounded-xl shadow-sm">
+                <h2 class="font-headline-md text-headline-md text-on-surface mb-2">Welcome Back</h2>
+                <p class="font-body-md text-body-md text-on-surface-variant">Enter your credentials to access your professional dashboard.</p>
+            </div>
+            <div class="p-8 md:p-12 rounded-xl bg-white border border-on-surface/10 shadow-lg flex-grow">
+                <form class="space-y-6" method="post">
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+                    <div class="space-y-2">
+                        <label class="font-label-md text-label-md text-on-surface-variant block mb-3" for="{{ form.username.id_for_label }}">Email Address</label>
+                        <div class="relative">
+                            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">mail</span>
+                            {{ form.username }}
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <label class="font-label-md text-label-md text-on-surface-variant block mb-3" for="{{ form.password.id_for_label }}">Password</label>
+                            <a class="font-label-md text-label-md text-secondary hover:underline transition-all" href="{% url 'users:password_reset' %}">Forgot password?</a>
+                        </div>
+                        <div class="relative">
+                            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">lock</span>
+                            {{ form.password }}
+                            <button class="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors toggle-password" type="button" data-target="password">
+                                <span class="material-symbols-outlined">visibility</span>
+                            </button>
+                        </div>
+                    </div>
+                    <button class="w-full bg-secondary text-white py-4 rounded-xl font-headline-md text-[18px] font-extrabold uppercase tracking-wider hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-2" type="submit">
+                        Sign In
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                    </button>
+                </form>
+                <div class="relative my-10">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-on-surface/10"></div>
+                    </div>
+                    <div class="relative flex justify-center text-label-md">
+                        <span class="px-4 bg-surface/50 backdrop-blur-sm text-on-surface-variant font-label-md">Or continue with</span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-gutter">
+                    <button class="flex items-center justify-center gap-3 py-3 px-4 border border-on-surface/10 rounded-lg hover:bg-surface-container transition-colors bento-tile">
+                        <img alt="Google" class="w-5 h-5" src="{% static 'images/google-icon.svg' %}"/>
+                        <span class="font-label-md text-label-md">Google</span>
+                    </button>
+                    <button class="flex items-center justify-center gap-3 py-3 px-4 border border-on-surface/10 rounded-lg hover:bg-surface-container transition-colors bento-tile">
+                        <img alt="LinkedIn" class="w-5 h-5" src="{% static 'images/linkedin-icon.svg' %}"/>
+                        <span class="font-label-md text-label-md">LinkedIn</span>
+                    </button>
+                </div>
+                <div class="pt-4 flex flex-col items-center gap-6">
+                    <p class="font-body-md text-body-md text-on-surface-variant">
+                        New to SkillBridge? 
+                        <a class="text-primary font-bold hover:text-secondary transition-colors ml-1" href="{% url 'users:register' %}">Create an account</a>
+                    </p>
+                </div>
+            </div>
+            <div class="p-6 rounded-xl glass-morphism flex items-center justify-between">
+                <div class="flex -space-x-3">
+                    <div class="w-10 h-10 rounded-full border-2 border-white bg-secondary-container flex items-center justify-center font-bold">AS</div>
+                    <div class="w-10 h-10 rounded-full border-2 border-white bg-primary flex items-center justify-center font-bold">KP</div>
+                    <div class="w-10 h-10 rounded-full border-2 border-white bg-tertiary flex items-center justify-center font-bold">NM</div>
+                </div>
+                <p class="font-label-md text-label-md text-on-surface">Joined by 12,000+ Nepalese students this month</p>
+                <div class="flex items-center gap-1 text-secondary">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+                    <span class="font-bold">4.9</span>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleButtons = document.querySelectorAll('.toggle-password');
+        toggleButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const passwordInput = this.closest('.relative').querySelector('input');
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    this.querySelector('.material-symbols-outlined').textContent = 'visibility_off';
+                } else {
+                    passwordInput.type = 'password';
+                    this.querySelector('.material-symbols-outlined').textContent = 'visibility';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Create Proposal | SkillBridge Nepal{% endblock %}
+
+{% block content %}
+<div class="max-w-container-max mx-auto py-lg">
+    <header class="mb-lg">
+        <h1 class="font-headline-lg text-headline-lg text-on-background">Create Exchange Proposal</h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant">Propose a skill exchange to another user.</p>
+    </header>
+
+    <form class="space-y-md max-w-2xl">
+        <div class="space-y-2">
+            <label class="font-label-md">Skill to Offer</label>
+            <select class="w-full p-sm border border-outline-variant rounded-lg">
+                <option>Select your skill</option>
+            </select>
+        </div>
+        <div class="space-y-2">
+            <label class="font-label-md">Skill to Request</label>
+            <select class="w-full p-sm border border-outline-variant rounded-lg">
+                <option>Select skill you want</option>
+            </select>
+        </div>
+        <div class="space-y-2">
+            <label class="font-label-md">Message</label>
+            <textarea class="w-full p-sm border border-outline-variant rounded-lg" rows="3"></textarea>
+        </div>
+        <button class="bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md">Send Proposal</button>
+    </form>
+</div>
+{% endblock %}

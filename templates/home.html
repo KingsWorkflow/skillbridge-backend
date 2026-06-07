@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}SkillBridge Nepal | Home{% endblock %}
+{% block html_class %}light{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="relative rounded-3xl overflow-hidden mb-gutter h-[600px] flex items-center group">
+    <div class="absolute inset-0 bg-primary opacity-20"></div>
+    <div class="absolute inset-0 topo-bg"></div>
+    <div class="absolute inset-0 bg-gradient-to-r from-primary/60 to-transparent"></div>
+    <!-- Hero Glassmorphic Card -->
+    <div class="relative z-10 ml-8 md:ml-16 max-w-xl glass-morphism p-12 rounded-2xl shadow-2xl border-white/20">
+        <h1 class="font-display-lg text-[48px] md:text-display-lg leading-tight mb-6 text-primary">
+            Bridge the gap between <span class="text-secondary">academics</span> and <span class="text-secondary">industry</span>.
+        </h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant mb-8">
+            SkillBridge Nepal empowers the next generation of Himalayan talent with AI-driven gap analysis and peer-to-peer skill exchange.
+        </p>
+        <div class="flex flex-wrap gap-4">
+            <a href="{% url 'users:signup' %}" class="bg-[#E0A354] text-[#121212] px-8 py-4 rounded-xl font-headline-md text-[18px] font-bold liquid-gold-glow hover:-translate-y-1 transition-all">Launch Career</a>
+            <a href="{% url 'recommendations:resources' %}" class="border-2 border-primary text-primary px-8 py-4 rounded-xl font-headline-md text-[18px] font-bold hover:bg-primary/5 transition-all">Explore Platform</a>
+        </div>
+    </div>
+</section>
+
+<!-- Bento Features Grid -->
+<section class="grid grid-cols-1 md:grid-cols-12 gap-gutter mb-gutter">
+    <!-- AI Guidance Tile -->
+    <div class="md:col-span-7 bg-surface-container-lowest bento-inner-shadow border border-outline-variant/10 p-8 rounded-3xl flex flex-col justify-between hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300">
+        <div>
+            <span class="material-symbols-outlined text-secondary text-4xl mb-4" style="font-variation-settings: 'FILL' 1;">psychology</span>
+            <h3 class="font-headline-md text-headline-md text-primary mb-4">AI-Driven Pathfinding</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant max-w-md">Our neural networks analyze real-time market demands in Nepal and abroad to suggest your next certification, course, or project.</p>
+        </div>
+        <div class="mt-12">
+            <div class="w-full h-2 bg-primary/10 rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-[#E0A354] to-[#fbba69] w-[75%] relative">
+                    <div class="absolute inset-0 bg-white/20 animate-pulse"></div>
+                </div>
+            </div>
+            <p class="mt-2 font-label-md text-label-md text-primary">Career Readiness: 75%</p>
+        </div>
+    </div>
+    <!-- Skill Exchange Tile -->
+    <div class="md:col-span-5 bg-primary text-on-primary p-8 rounded-3xl flex flex-col justify-between group overflow-hidden relative hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300">
+        <div class="relative z-10">
+            <span class="material-symbols-outlined text-secondary-fixed text-4xl mb-4">hub</span>
+            <h3 class="font-headline-md text-headline-md mb-2">Skill Exchange</h3>
+            <p class="font-body-md text-body-md opacity-80">Connect with senior architects and developers for a direct knowledge transfer ecosystem.</p>
+        </div>
+        <div class="flex -space-x-4 mt-8 relative z-10">
+            <img class="w-12 h-12 rounded-full border-2 border-primary" src="{% static 'images/avatar-placeholder.png' %}"/>
+            <img class="w-12 h-12 rounded-full border-2 border-primary" src="{% static 'images/avatar-placeholder.png' %}"/>
+            <img class="w-12 h-12 rounded-full border-2 border-primary" src="{% static 'images/avatar-placeholder.png' %}"/>
+            <div class="w-12 h-12 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold border-2 border-primary">+12</div>
+        </div>
+        <svg class="absolute -bottom-10 -right-10 opacity-10 group-hover:scale-125 transition-transform duration-500" fill="none" height="200" viewbox="0 0 200 200" width="200" xmlns="http://www.w3.org/2000/svg">
+            <path d="M100 0C155.228 0 200 44.7715 200 100C200 155.228 155.228 200 100 200C44.7715 200 0 155.228 0 100C0 44.7715 44.7715 0 100 0Z" fill="white"></path>
+        </svg>
+    </div>
+    <!-- Gap Analysis Tile -->
+    <div class="md:col-span-4 glass-morphism p-8 rounded-3xl border-[#E0A354]/30 flex flex-col justify-between hover:-translate-y-1 transition-all">
+        <span class="material-symbols-outlined text-secondary text-4xl mb-4" style="font-variation-settings: 'FILL' 1;">analytics</span>
+        <h3 class="font-headline-md text-headline-md text-primary mb-2">Gap Analysis</h3>
+        <p class="font-body-md text-body-md text-on-surface-variant">Instant assessment of your CV against active job descriptions in the Himalayan tech corridor.</p>
+        <div class="mt-8 flex gap-2 flex-wrap">
+            <span class="bg-primary-container text-on-primary-container px-3 py-1 rounded-full text-xs font-bold">Python</span>
+            <span class="bg-primary-container text-on-primary-container px-3 py-1 rounded-full text-xs font-bold">AWS</span>
+            <span class="bg-error-container text-on-error-container px-3 py-1 rounded-full text-xs font-bold">Docker (Missing)</span>
+        </div>
+    </div>
+    <!-- Visual Topography Card -->
+    <div class="md:col-span-8 h-64 md:h-auto rounded-3xl overflow-hidden relative bento-inner-shadow">
+        <div class="absolute inset-0 bg-surface-container-highest"></div>
+        <div class="absolute inset-0 bg-secondary/10"></div>
+        <div class="absolute bottom-8 left-8 text-white z-10">
+            <p class="font-headline-md text-headline-md font-black">Elevate Your Standard.</p>
+            <p class="font-body-md text-body-md opacity-90">Join 5,000+ Nepali professionals.</p>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section with Fluid Background -->
+<section class="bg-surface-container-high rounded-[3rem] p-12 md:p-24 relative overflow-hidden text-center">
+    <div class="absolute inset-0 opacity-20 pointer-events-none">
+        <svg class="w-full h-full" viewbox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg">
+            <path d="M850,500Q850,650 725,725Q600,800 450,775Q300,750 225,625Q150,500 225,375Q300,250 450,225Q600,200 725,275Q850,350 850,500Z" fill="%23E0A354"></path>
+        </svg>
+    </div>
+    <div class="relative z-10">
+        <h2 class="font-display-lg text-[36px] md:text-[54px] text-primary mb-8">Ready to transform your trajectory?</h2>
+        <div class="flex justify-center gap-6">
+            <a href="{% url 'users:signup' %}" class="bg-[#E0A354] text-[#121212] px-10 py-5 rounded-2xl font-headline-md text-[20px] font-extrabold liquid-gold-glow hover:-translate-y-1 transition-all">Join the Hub</a>
+            <a href="{% url 'recommendations:resources' %}" class="bg-white/50 backdrop-blur-md border border-outline-variant px-10 py-5 rounded-2xl font-headline-md text-[20px] font-extrabold text-primary hover:bg-white/80 transition-all">View Success Stories</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
