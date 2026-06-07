@@ -9,9 +9,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     
     # Frontend Pages - Users
-    path('users/', include('apps.users.urls')),
-    path('login/', user_views.login_view, name='login_page'),
-    path('signup/', user_views.signup_view, name='signup_page'),
+    path('', include('apps.users.urls')),
     
     # Frontend Pages - Skills
     path('skills/', include('apps.skills.urls')),
