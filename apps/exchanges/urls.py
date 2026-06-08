@@ -4,8 +4,13 @@ from . import views
 app_name = 'exchanges'
 
 urlpatterns = [
-    path('', views.exchange_list, name='exchange_list'),
-    path('skill-exchange/', views.skill_exchange, name='skill_exchange'),
-    path('proposals/create/', views.proposal_create, name='proposal_create'),
-    path('sessions/schedule/', views.session_schedule, name='session_schedule'),
+    path('', views.skill_exchange, name='skill_exchange'),
+    path('exchange/', views.exchange_list, name='exchange_list'),
+    path('proposals/', views.proposal_list, name='proposal_list'),
+    path('proposals/create/<int:receiver_id>/', views.create_proposal, name='create_proposal'),
+    path('proposals/<int:proposal_id>/accept/', views.accept_proposal, name='accept_proposal'),
+    path('proposals/<int:proposal_id>/reject/', views.reject_proposal, name='reject_proposal'),
+    path('sessions/schedule/<int:proposal_id>/', views.schedule_session, name='schedule_session'),
+    path('sessions/<int:session_id>/rate/', views.rate_session, name='rate_session'),
+    path('sessions/<int:session_id>/complete/', views.complete_session, name='complete_session'),
 ]

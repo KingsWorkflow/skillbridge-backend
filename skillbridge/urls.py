@@ -7,6 +7,7 @@ from apps.users import views as user_views
 urlpatterns = [
     path('', user_views.home_view, name='home'),
     path('admin/', admin.site.urls),
+    path('admin/', include('apps.admin_custom.urls')),
     
     # API Endpoints - Users (JWT Authentication)
     path('api/', include('apps.users.api_urls')),

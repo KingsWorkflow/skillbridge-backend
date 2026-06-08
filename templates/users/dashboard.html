@@ -3,8 +3,32 @@
 {% block title %}Dashboard | SkillBridge Nepal{% endblock %}
 {% block html_class %}light{% endblock %}
 
+{% block header %}
+<nav class="sticky top-0 w-full z-50 bg-surface shadow-[0px_4px_20px_rgba(30,111,92,0.08)]">
+    <div class="flex justify-between items-center px-margin-desktop py-4 max-w-container-max mx-auto">
+        <div class="flex items-center gap-lg">
+            <span class="text-headline-md font-headline-md text-primary">SkillBridge Nepal</span>
+            <div class="hidden md:flex gap-md">
+                <a class="font-body-md text-body-md text-primary font-bold border-b-2 border-primary active:scale-95 duration-200" href="{% url 'users:dashboard' %}">Dashboard</a>
+                <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors active:scale-95 duration-200" href="{% url 'recommendations:career_recommendations' %}">Career</a>
+                <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors active:scale-95 duration-200" href="{% url 'recommendations:skill_gap' %}">Skill Gap</a>
+                <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors active:scale-95 duration-200" href="{% url 'exchanges:skill_exchange' %}">Exchange</a>
+                <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors active:scale-95 duration-200" href="{% url 'portfolio:portfolio' %}">Portfolio</a>
+                <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors active:scale-95 duration-200" href="{% url 'recommendations:resources' %}">Resources</a>
+            </div>
+        </div>
+        <div class="flex items-center gap-md">
+            <button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">notifications</button>
+            <button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high/50 p-2 rounded-full transition-all" title="Profile">
+                <span class="material-symbols-outlined">person</span>
+            </button>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
 {% block content %}
-<div class="flex max-w-container-max mx-auto">
+<div class="flex max-w-container-max mx-auto min-h-[calc(100vh-72px)]">
     <!-- SideNavBar -->
     <aside class="hidden lg:flex flex-col h-full w-64 p-md gap-base bg-surface-container-low">
         <div class="mb-lg">
@@ -42,35 +66,53 @@
                 <span class="material-symbols-outlined">help</span>
                 <span class="font-label-md text-label-md">Help</span>
             </a>
-            <a class="flex items-center gap-sm p-sm text-error hover:bg-surface-container-high rounded-lg transition-all duration-300" href="{% url 'users:logout' %}">
-                <span class="material-symbols-outlined">logout</span>
-                <span class="font-label-md text-label-md">Logout</span>
-            </a>
+            <form method="post" action="{% url 'users:logout' %}" class="inline">
+                {% csrf_token %}
+                <button type="submit" class="flex items-center gap-sm p-sm text-error hover:bg-surface-container-high rounded-lg transition-all duration-300">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span class="font-label-md text-label-md">Logout</span>
+                </button>
+            </form>
         </div>
     </aside>
     <!-- Main Content -->
-    <main class="flex-1 p-md overflow-hidden">
-        <!-- Header Section -->
-        <div class="mb-lg">
-            <h1 class="font-display-lg text-display-lg text-on-background mb-base">Your Growth Dashboard</h1>
-            <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">Track your professional evolution and connect with the community.</p>
-        </div>
+    <main class="flex-grow p-margin-desktop lg:p-lg overflow-hidden">
+        <!-- Portfolio Progress Header (Asymmetric Layout) -->
+        <section class="mb-lg grid grid-cols-1 md:grid-cols-12 gap-gutter items-center">
+            <div class="md:col-span-8">
+                <h1 class="font-display-lg text-display-lg text-on-background mb-base">Your Growth Dashboard</h1>
+                <p class="font-body-lg text-body-lg text-on-surface-variant">Track your professional evolution and connect with the community.</p>
+            </div>
+            <div class="md:col-span-4 bg-white p-md rounded-xl shadow-[0px_4px_20px_rgba(30,111,92,0.08)] border border-surface-container">
+                <div class="flex justify-between items-center mb-base">
+                    <span class="font-label-md text-label-md text-on-surface-variant uppercase">Portfolio Progress</span>
+                    <span class="font-label-md text-label-md text-primary">78%</span>
+                </div>
+                <div class="w-full bg-surface-container rounded-full h-3">
+                    <div class="bg-secondary h-3 rounded-full" style="width: 78%"></div>
+                </div>
+                <p class="font-body-sm text-body-sm text-on-surface-variant mt-sm">2 tasks remaining to reach 'Expert' status.</p>
+            </div>
+        </section>
         <!-- Bento Grid Content -->
         <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
-            <!-- Recommended Careers Carousel -->
+            <!-- Recommended Careers (Carousel) -->
             <div class="md:col-span-8 flex flex-col gap-md">
-                <div class="flex justify-between items-end">
+                <div class="flex justify-between items-center">
                     <h2 class="font-headline-md text-headline-md text-on-background">Recommended Careers</h2>
-                    <a class="text-primary font-bold flex items-center gap-xs" href="{% url 'recommendations:career_recommendations' %}">See all matches <span class="material-symbols-outlined">arrow_forward</span></a>
+                    <div class="flex gap-base">
+                        <button class="p-2 rounded-full border border-outline-variant hover:bg-surface-container transition-colors"><span class="material-symbols-outlined text-body-md">chevron_left</span></button>
+                        <button class="p-2 rounded-full border border-outline-variant hover:bg-surface-container transition-colors"><span class="material-symbols-outlined text-body-md">chevron_right</span></button>
+                    </div>
                 </div>
-                <div class="flex gap-md overflow-x-auto pb-xs">
+                <div class="flex gap-md overflow-x-auto hide-scrollbar pb-xs">
                     {% for career in recommended_careers|slice:":3" %}
-                    <div class="min-w-[280px] bg-white p-sm rounded-xl shadow-[0px_4px_20px_rgba(30,111,92,0.08)] border border-outline-variant hover:-translate-y-1 transition-transform">
+                    <div class="min-w-[280px] bg-white p-sm rounded-xl shadow-[0px_4px_20px_rgba(30,111,92,0.08)] hover:-translate-y-1 transition-transform border border-surface-container">
                         <div class="w-full h-40 bg-surface-container rounded-lg mb-sm"></div>
-                        <span class="px-3 py-1 bg-primary-container text-on-primary-container font-label-sm rounded-full mb-2 inline-block">{{ career.match_type }}</span>
-                        <h4 class="font-headline-md text-headline-md text-on-surface mb-1">{{ career.title }}</h4>
+                        <span class="px-3 py-1 bg-primary-container/10 text-primary font-label-sm text-label-sm rounded-full mb-base inline-block">{{ career.match_type|default:'Top Match' }}</span>
+                        <h4 class="font-headline-md text-headline-md text-on-surface mb-xs">{{ career.title }}</h4>
                         <p class="font-body-sm text-body-sm text-on-surface-variant mb-md">{{ career.description }}</p>
-                        <a href="{% url 'recommendations:skill_gap' %}?career={{ career.id }}" class="flex items-center gap-xs text-secondary font-label-md text-label-md">
+                        <a href="{% url 'recommendations:skill_gap' %}" class="flex items-center gap-xs text-secondary font-label-md text-label-md">
                             Learn More
                             <span class="material-symbols-outlined text-sm">arrow_forward</span>
                         </a>
@@ -78,45 +120,59 @@
                     {% endfor %}
                 </div>
             </div>
-            <!-- Skill Gap Score -->
-            <div class="md:col-span-4 bg-white p-md rounded-xl shadow-[0px_4px_20px_rgba(30,111,92,0.08)] border border-outline-variant flex flex-col justify-center text-center">
-                <h3 class="font-headline-md text-headline-md text-on-background mb-md">Skill Gap Score</h3>
+            <!-- Skill Gap Score (Gauge) -->
+            <div class="md:col-span-4 bg-white p-md rounded-xl shadow-[0px_4px_20px_rgba(30,111,92,0.08)] border border-surface-container flex flex-col items-center justify-center text-center">
+                <h3 class="font-headline-md text-headline-md text-on-background mb-lg self-start">Skill Gap Score</h3>
                 <div class="relative flex items-center justify-center">
-                    <svg class="w-48 h-48 transform -rotate-15" viewbox="0 0 100 100">
-                        <circle class="text-surface-container" cx="50" cy="50" fill="transparent" r="40" stroke="currentColor" stroke-width="8"></circle>
-                        <circle class="text-primary" cx="50" cy="50" fill="transparent" r="40" stroke="currentColor" stroke-dasharray="251.2" stroke-dashoffset="{{ gap_stroke_dashoffset|default:'120' }}" stroke-width="8"></circle>
+                    <svg class="w-48 h-48 transform -rotate-90">
+                        <circle class="text-surface-container" cx="96" cy="96" fill="transparent" r="80" stroke="currentColor" stroke-width="12"></circle>
+                        <circle class="text-primary" cx="96" cy="96" fill="transparent" r="80" stroke="currentColor" stroke-dasharray="502.4" stroke-dashoffset="150" stroke-width="12"></circle>
                     </svg>
                     <div class="absolute inset-0 flex flex-col items-center justify-center">
                         <span class="text-display-lg font-display-lg text-on-background">{{ gap_score|default:'70' }}</span>
                         <span class="font-label-md text-label-md text-on-surface-variant uppercase">Target: 95</span>
                     </div>
                 </div>
-                <p class="font-body-sm text-body-sm text-on-surface-variant mt-md px-md">Focus on '{{ priority_skill|default:'System Design' }}' to increase your market value.</p>
+                <p class="font-body-sm text-body-sm text-on-surface-variant mt-lg px-md">You are <span class="text-primary font-bold">25 points</span> away from reaching the Senior Dev benchmark. Focusing on '{{ priority_skill|default:'System Design' }}' will bridge this gap faster.</p>
+            </div>
+            <!-- Upcoming Skill Exchange Sessions (List) -->
+            <div class="md:col-span-7 bg-white p-md rounded-xl shadow-[0px_4px_20px_rgba(30,111,92,0.08)] border border-surface-container">
+                <div class="flex justify-between items-center mb-md">
+                    <h3 class="font-headline-md text-headline-md text-on-background">Skill Exchange Sessions</h3>
+                    <a class="text-primary font-label-md text-label-md hover:underline transition-all" href="{% url 'exchanges:exchange_list' %}">View All</a>
+                </div>
+                <div class="flex flex-col">
+                    {% for session in upcoming_sessions|slice:":3" %}
+                    <div class="flex items-center justify-between py-md border-b border-outline-variant hover:bg-surface-container-low transition-colors px-xs rounded-lg cursor-pointer">
+                        <div class="flex items-center gap-md">
+                            <div class="w-12 h-12 rounded-full bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed">
+                                <span class="material-symbols-outlined">{{ session.icon|default:'terminal' }}</span>
+                            </div>
+                            <div>
+                                <h4 class="font-body-md text-body-md font-bold text-on-surface">{{ session.skill }}</h4>
+                                <p class="font-body-sm text-body-sm text-on-surface-variant">with {{ session.with_user }} • {{ session.time|date:"M d, Y g:i A" }}</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-outline">chevron_right</span>
+                    </div>
+                    {% empty %}
+                    <p class="font-body-sm text-body-sm text-on-surface-variant py-md">No upcoming sessions.</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <!-- AI Career Guide (Glassmorphism inspired response card) -->
+            <div class="md:col-span-5 bg-primary-container/5 p-md rounded-xl border border-primary-container/10 flex flex-col relative overflow-hidden">
+                <div class="absolute -right-8 -top-8 w-32 h-32 bg-primary/10 rounded-full blur-3xl"></div>
+                <div class="flex items-center gap-base mb-md">
+                    <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+                    <h3 class="font-headline-md text-headline-md text-primary">AI Career Advisor</h3>
+                </div>
+                <p class="font-body-md text-body-md text-on-surface mb-lg italic border-l-4 border-primary pl-md">"Based on your recent 'Full Stack' progress, I recommend focusing on Next.js server actions. This matches 85% of high-paying jobs in Kathmandu right now."</p>
+                <div class="mt-auto">
+                    <button class="w-full py-4 bg-secondary text-white rounded-xl font-headline-md text-headline-md hover:shadow-lg hover:-translate-y-1 transition-all">Start Next Goal</button>
+                </div>
             </div>
         </div>
-        <!-- Upcoming Sessions -->
-        <section class="mt-xl">
-            <div class="flex justify-between items-end mb-md">
-                <h2 class="font-headline-md text-headline-md text-on-background">Upcoming Sessions</h2>
-                <a class="text-primary font-bold flex items-center gap-xs" href="{% url 'exchanges:exchange_list' %}">View all sessions <span class="material-symbols-outlined">arrow_forward</span></a>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
-                {% for session in upcoming_sessions|slice:":3" %}
-                <div class="bg-white rounded-xl p-md border border-outline-variant shadow-[0px_4px_20px_rgba(30,111,92,0.08)] hover:-translate-y-1 transition-transform">
-                    <div class="flex items-center gap-md mb-md">
-                        <div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container">
-                            <span class="material-symbols-outlined">{{ session.icon|default:'terminal' }}</span>
-                        </div>
-                        <div>
-                            <h4 class="font-body-md font-bold text-on-surface">{{ session.skill }}</h4>
-                            <p class="font-body-sm text-body-sm text-on-surface-variant">{{ session.with_user }} • {{ session.time }}</p>
-                        </div>
-                    </div>
-                    <button class="w-full py-2 border border-primary text-primary rounded-lg font-label-md text-label-md hover:bg-primary hover:text-on-primary transition-all">Join Session</button>
-                </div>
-                {% endfor %}
-            </div>
-        </section>
     </main>
 </div>
 {% endblock %}

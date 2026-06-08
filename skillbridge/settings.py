@@ -26,6 +26,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
+    'admin_interface',
+    'colorfield',
     
     # Local apps
     'apps.users',
@@ -34,6 +36,7 @@ INSTALLED_APPS = [
     'apps.recommendations',
     'apps.verification',
     'apps.portfolio',
+    'apps.admin_custom',
 ]
 
 MIDDLEWARE = [
@@ -42,6 +45,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'apps.users.middleware.JWTAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -106,8 +110,47 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Default primary key
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Admin Interface Configuration
+ADMIN_INTERFACE = {
+    'name': 'SkillBridge Admin',
+    'site_title': 'SkillBridge Admin',
+    'site_header': 'SkillBridge Administration',
+    'welcome_sign': 'Welcome to SkillBridge Admin Dashboard',
+    'copyright': 'SkillBridge',
+    'default_theme': 'slate-indigo',
+    'show_sidebar': True,
+    'collapsible_sidebar': True,
+    'collapse_sidebar_by_default': False,
+    'color_themes': [
+        {
+            'name': 'slate-indigo',
+            'title': 'Slate & Indigo (Default)',
+            'primary_color': '#4f46e5',
+            'secondary_color': '#64748b',
+            'success_color': '#22c55e',
+            'warning_color': '#f59e0b',
+            'danger_color': '#ef4444',
+            'info_color': '#3b82f6',
+            'text_primary': '#1e293b',
+            'text_secondary': '#64748b',
+            'bg_primary': '#ffffff',
+            'bg_secondary': '#f8fafc',
+            'bg_dark': '#1e293b',
+            'sidebar_bg': '#1e293b',
+            'sidebar_text': '#e2e8f0',
+            'sidebar_active': '#4f46e5',
+        },
+    ],
+}
+
 # Custom user model
 AUTH_USER_MODEL = 'users.UserProfile'
+
+# Authentication backends for email-based authentication
+AUTHENTICATION_BACKENDS = [
+    'apps.users.backends.EmailBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
 
 # Authentication URLs
 LOGIN_URL = '/login/'
@@ -136,3 +179,10 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
 }
+
+# JWT Cookie Settings
+JWT_COOKIE_NAME = 'access_token'
+JWT_REFRESH_COOKIE_NAME = 'refresh_token'
+JWT_COOKIE_SECURE = os.getenv('JWT_COOKIE_SECURE', 'False') == 'True'
+JWT_COOKIE_HTTP_ONLY = True
+JWT_COOKIE_SAMESITE = 'Lax'

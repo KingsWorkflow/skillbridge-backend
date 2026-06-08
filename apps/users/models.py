@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
+
 class UserProfile(AbstractUser):
     phone = models.CharField(max_length=15, blank=True, null=True)
     profile_picture = models.ImageField(upload_to='profiles/', blank=True, null=True)
@@ -21,9 +22,21 @@ class UserProfile(AbstractUser):
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     def __str__(self):
         return self.username
-    
+
+    def clean(self):
+        """Normalize email to lowercase before saving."""
+        if self.email:
+            self.email = self.email.lower()
+        super().clean()
+
+    def save(self, *args, **kwargs):
+        """Normalize email to lowercase before saving."""
+        if self.email:
+            self.email = self.email.lower()
+        super().save(*args, **kwargs)
+
     class Meta:
         db_table = 'users'

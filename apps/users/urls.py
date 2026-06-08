@@ -15,3 +15,11 @@ urlpatterns = [
     path('reset/<uidb64>/<token>/', views.CustomPasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('reset/done/', views.CustomPasswordResetCompleteView.as_view(), name='password_reset_complete'),
 ]
+
+# API endpoints
+urlpatterns += [
+    path('api/register/', views.RegisterAPIView.as_view(), name='api_register'),
+    path('api/login/', views.LoginAPIView.as_view(), name='api_login'),
+    path('api/me/', views.MeAPIView.as_view(), name='api_me'),
+    path('api/credits/', views.CreditsAPIView.as_view(), name='api_credits'),
+]

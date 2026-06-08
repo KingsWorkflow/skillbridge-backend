@@ -1,0 +1,69 @@
+{% extends "admin/base_site.html" %}
+{% load static i18n admin_urls %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          slate: { 850: '#1e293b', 900: '#0f172a' },
+          indigo: { 600: '#4f46e5', 500: '#6366f1' }
+        }
+      }
+    }
+  }
+</script>
+<style>
+  body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+  #header { background: linear-gradient(90deg, #1e293b 0%, #1e3a8a 100%); }
+  #user-tools { color: #e2e8f0; }
+  #branding h1 { color: #ffffff; letter-spacing: -0.025em; }
+  .module h2 { background: #334155; color: #f1f5f9; }
+  .module table th { background: #f1f5f9; color: #1e293b; }
+  .object-tools a { background: #4f46e5; }
+  .object-tools a:hover { background: #4338ca; }
+  .button, input[type=submit], input[type=button], .submit-row input { background: #4f46e5; }
+  .button:hover, input[type=submit]:hover, input[type=button]:hover { background: #4338ca; }
+  a:link, a:visited { color: #4f46e5; }
+  a:hover { color: #4338ca; }
+  #content-related { background: #f8fafc; }
+</style>
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name" class="flex items-center gap-3 my-0 py-0">
+  <a href="{% url 'admin:index' %}" class="no-underline flex items-center gap-2">
+    <svg class="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+    </svg>
+    <span class="text-2xl font-bold tracking-tight text-white">SkillBridge Admin</span>
+  </a>
+</h1>
+{% endblock %}
+
+{% block nav-global %}
+<nav class="flex items-center gap-1">
+  <a href="{% url 'admin:index' %}" class="nav-link text-slate-300 hover:text-white hover:bg-slate-700 px-3 py-2 rounded-md transition-all text-sm font-medium">
+    <i class="fas fa-gauge-high mr-1.5"></i>Dashboard
+  </a>
+  <a href="{% url 'admin:analytics_dashboard' %}" class="nav-link text-slate-300 hover:text-white hover:bg-slate-700 px-3 py-2 rounded-md transition-all text-sm font-medium">
+    <i class="fas fa-chart-line mr-1.5"></i>Analytics
+  </a>
+  <a href="{% url 'admin:bulk_verify' %}" class="nav-link text-slate-300 hover:text-white hover:bg-slate-700 px-3 py-2 rounded-md transition-all text-sm font-medium">
+    <i class="fas fa-file-import mr-1.5"></i>Bulk Verify
+  </a>
+</nav>
+{% endblock %}
+
+{% block userlinks %}
+<span class="text-slate-300 text-sm mr-3">
+  <i class="fas fa-user-circle mr-1"></i>{{ request.user.get_full_name|default:request.user.username }}
+</span>
+<a href="{% url 'admin:password_change' %}" class="text-indigo-300 hover:text-white transition-colors text-sm font-medium">
+  <i class="fas fa-key mr-1"></i>{% translate 'Change password' %}
+</a>
+{% endblock %}

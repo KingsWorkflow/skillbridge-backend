@@ -4,12 +4,14 @@
 {% block content %}
 <div class="max-w-container-max mx-auto py-lg">
     <header class="mb-lg">
-        <h1 class="font-headline-lg text-headline-lg text-on-background">Skill Verification Exam</h1>
-        <p class="font-body-lg text-body-lg text-on-surface-variant">Test your knowledge to earn verification badges.</p>
+        <h1 class="font-headline-lg text-headline-lg text-on-background">Skill Verification Exam: {{ exam.skill.name }}</h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant">Test your knowledge to earn verification badges. Time limit: {{ exam.time_limit_minutes }} minutes.</p>
     </header>
 
-    <div class="bg-white p-md rounded-xl shadow-sm border border-outline-variant">
-        <p class="text-on-surface-variant">Exam functionality coming soon.</p>
-    </div>
+    <form method="post" class="bg-white p-md rounded-xl shadow-sm border border-outline-variant space-y-md">
+        {% csrf_token %}
+        {{ form }}
+        <button type="submit" class="bg-primary text-on-primary px-lg py-md rounded-lg font-label-md text-label-md">Submit Exam</button>
+    </form>
 </div>
 {% endblock %}
