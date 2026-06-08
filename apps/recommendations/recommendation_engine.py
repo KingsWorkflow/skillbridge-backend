@@ -50,9 +50,16 @@ def build_user_feature_matrix():
         user_features.append(' '.join(skills_text) if skills_text else '')
     
     if SKLEARN_AVAILABLE:
-        # Create TF-IDF vectorizer
+        # Create TF-IDF vectorizer (handle empty or all-empty features)
         vectorizer = TfidfVectorizer()
-        feature_matrix = vectorizer.fit_transform(user_features)
+        non_empty_features = [f for f in user_features if f.strip()]
+        if non_empty_features and len(non_empty_features) > 0:
+            try:
+                feature_matrix = vectorizer.fit_transform(user_features)
+            except ValueError:
+                feature_matrix = None
+        else:
+            feature_matrix = None
         return user_ids, feature_matrix, vectorizer
     else:
         return user_ids, user_features, None
@@ -87,43 +94,47 @@ def find_exchange_partners(user_id, top_n=10):
     
     partners = []
     
-    if SKLEARN_AVAILABLE and vectorizer is not None:
-        # Calculate similarity with all other users using TF-IDF
-        target_features = features[target_idx]
-        similarities = cosine_similarity(target_features, features).flatten()
-        
-        # Get indices sorted by similarity (descending)
-        similar_indices = np.argsort(similarities)[::-1]
-        
-        for idx in similar_indices:
-            if idx == target_idx:
-                continue  # Skip the user themselves
+    # Use sklearn if available and features exist
+    if SKLEARN_AVAILABLE and features is not None:
+        try:
+            target_features = features[target_idx]
+            similarities = cosine_similarity(target_features, features).flatten()
             
-            partner_id = user_ids[idx]
-            similar_user = User.objects.prefetch_related(
-                'teachable_skills__skill',
-                'learnable_skills__skill'
-            ).get(id=partner_id)
+            # Get indices sorted by similarity (descending)
+            similar_indices = np.argsort(similarities)[::-1]
             
-            similar_teaches = set(similar_user.teachable_skills.values_list('skill_id', flat=True))
-            similar_learns = set(similar_user.learnable_skills.values_list('skill_id', flat=True))
-            
-            i_teach_they_learn = target_teaches & similar_learns
-            i_learn_they_teach = target_learns & similar_teaches
-            
-            if i_teach_they_learn or i_learn_they_teach:
-                partners.append({
-                    'partner_user': similar_user,
-                    'similarity_score': float(similarities[idx]),
-                    'mutual_match_score': len(i_teach_they_learn) + len(i_learn_they_teach),
-                    'i_teach_they_learn': list(i_teach_they_learn),
-                    'i_learn_they_teach': list(i_learn_they_teach),
-                })
-            
-            if len(partners) >= top_n:
-                break
-    else:
-        # Simple matching without sklearn
+            for idx in similar_indices:
+                if idx == target_idx:
+                    continue
+                
+                partner_id = user_ids[idx]
+                similar_user = User.objects.prefetch_related(
+                    'teachable_skills__skill',
+                    'learnable_skills__skill'
+                ).get(id=partner_id)
+                
+                similar_teaches = set(similar_user.teachable_skills.values_list('skill_id', flat=True))
+                similar_learns = set(similar_user.learnable_skills.values_list('skill_id', flat=True))
+                
+                i_teach_they_learn = target_teaches & similar_learns
+                i_learn_they_teach = target_learns & similar_teaches
+                
+                if i_teach_they_learn or i_learn_they_teach:
+                    partners.append({
+                        'partner_user': similar_user,
+                        'similarity_score': float(similarities[idx]),
+                        'mutual_match_score': len(i_teach_they_learn) + len(i_learn_they_teach),
+                        'i_teach_they_learn': list(i_teach_they_learn),
+                        'i_learn_they_teach': list(i_learn_they_teach),
+                    })
+                
+                if len(partners) >= top_n:
+                    break
+        except Exception:
+            pass
+    
+    # Simple matching fallback
+    if not partners:
         for i, partner_id in enumerate(user_ids):
             if partner_id == user_id:
                 continue
@@ -140,7 +151,6 @@ def find_exchange_partners(user_id, top_n=10):
             i_learn_they_teach = target_learns & similar_teaches
             
             if i_teach_they_learn or i_learn_they_teach:
-                # Simple similarity based on skill overlap
                 similarity = (len(i_teach_they_learn) + len(i_learn_they_teach)) / max(len(target_teaches) + len(target_learns), 1)
                 partners.append({
                     'partner_user': similar_user,
@@ -150,7 +160,6 @@ def find_exchange_partners(user_id, top_n=10):
                     'i_learn_they_teach': list(i_learn_they_teach),
                 })
     
-    # Sort by similarity score and return top N
     partners.sort(key=lambda x: x['similarity_score'], reverse=True)
     return partners[:top_n]
 
