@@ -17,9 +17,16 @@ class UserSerializer(serializers.ModelSerializer):
             'phone': {'required': False},
         }
 
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError('A user with this email already exists.')
+        return value
+
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
             raise serializers.ValidationError("Passwords don't match")
+        if len(attrs['password']) < 8:
+            raise serializers.ValidationError({"password": "Password must be at least 8 characters."})
         return attrs
 
     def create(self, validated_data):
@@ -48,5 +55,7 @@ class LoginSerializer(serializers.Serializer):
         )
         if not user:
             raise serializers.ValidationError('Invalid credentials')
+        if not user.is_active:
+            raise serializers.ValidationError('User account is disabled.')
         attrs['user'] = user
         return attrs

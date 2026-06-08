@@ -75,6 +75,9 @@
                             <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">mail</span>
                             {{ form.username }}
                         </div>
+                        {% if form.username.errors %}
+                        <p class="text-[12px] text-error mt-1">{{ form.username.errors }}</p>
+                        {% endif %}
                     </div>
                     <div class="space-y-2">
                         <div class="flex justify-between items-center">
@@ -88,6 +91,9 @@
                                 <span class="material-symbols-outlined">visibility</span>
                             </button>
                         </div>
+                        {% if form.password.errors %}
+                        <p class="text-[12px] text-error mt-1">{{ form.password.errors }}</p>
+                        {% endif %}
                     </div>
                     <button class="w-full bg-secondary text-white py-4 rounded-xl font-headline-md text-[18px] font-extrabold uppercase tracking-wider hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-2" type="submit">
                         Sign In

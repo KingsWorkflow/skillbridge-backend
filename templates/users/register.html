@@ -87,10 +87,16 @@
                     <div class="space-y-2">
                         <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.username.id_for_label }}">Username</label>
                         {{ form.username }}
+                        {% if form.username.errors %}
+                        <p class="text-[12px] text-error mt-1">{{ form.username.errors }}</p>
+                        {% endif %}
                     </div>
                     <div class="space-y-2">
                         <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.email.id_for_label }}">Email Address</label>
                         {{ form.email }}
+                        {% if form.email.errors %}
+                        <p class="text-[12px] text-error mt-1">{{ form.email.errors }}</p>
+                        {% endif %}
                     </div>
                 </div>
                 <!-- Password -->
@@ -102,6 +108,9 @@
                             <span class="material-symbols-outlined">visibility</span>
                         </button>
                     </div>
+                    {% if form.password1.errors %}
+                    <p class="text-[12px] text-error mt-1">{{ form.password1.errors }}</p>
+                    {% endif %}
                     <p class="text-[12px] text-on-surface-variant">Must be at least 8 characters with one special symbol.</p>
                 </div>
                 <div class="space-y-2">
@@ -112,11 +121,17 @@
                             <span class="material-symbols-outlined">visibility</span>
                         </button>
                     </div>
+                    {% if form.password2.errors %}
+                    <p class="text-[12px] text-error mt-1">{{ form.password2.errors }}</p>
+                    {% endif %}
                 </div>
                 <!-- Phone -->
                 <div class="space-y-2">
                     <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.phone.id_for_label }}">Phone (Optional)</label>
                     {{ form.phone }}
+                    {% if form.phone.errors %}
+                    <p class="text-[12px] text-error mt-1">{{ form.phone.errors }}</p>
+                    {% endif %}
                 </div>
                 <!-- Terms -->
                 <div class="flex items-center gap-3 py-2">

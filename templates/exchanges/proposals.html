@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Proposals | SkillBridge Nepal{% endblock %}
+
+{% block content %}
+<div class="max-w-container-max mx-auto py-lg space-y-lg">
+    <!-- Sent Proposals -->
+    <section class="space-y-md">
+        <h2 class="font-headline-md text-headline-md">Sent Proposals</h2>
+        {% for proposal in sent_proposals %}
+        <div class="bg-white p-md rounded-xl shadow-sm border border-outline-variant">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h3 class="font-label-md text-label-md text-on-surface">
+                        Offer: {{ proposal.offer_skill.skill.name }} for {{ proposal.request_skill.skill.name }}
+                    </h3>
+                    <p class="text-body-sm text-on-surface-variant">
+                        To {{ proposal.receiver.username }} • {{ proposal.proposed_hours }} hours proposed
+                    </p>
+                </div>
+                <span class="bg-primary-container/10 text-primary px-sm py-xs rounded-full text-label-sm">
+                    {{ proposal.status }}
+                </span>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-on-surface-variant">No sent proposals.</p>
+        {% endfor %}
+    </section>
+
+    <!-- Received Proposals -->
+    <section class="space-y-md mt-xl">
+        <h2 class="font-headline-md text-headline-md">Received Proposals</h2>
+        {% for proposal in received_proposals %}
+        <div class="bg-white p-md rounded-xl shadow-sm border border-outline-variant">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h3 class="font-label-md text-label-md text-on-surface">
+                        {{ proposal.proposer.username }} offers {{ proposal.offer_skill.skill.name }} for {{ proposal.request_skill.skill.name }}
+                    </h3>
+                    <p class="text-body-sm text-on-surface-variant">
+                        {{ proposal.proposed_hours }} hours proposed • {{ proposal.message|truncatechars:50 }}
+                    </p>
+                </div>
+                <div class="flex gap-xs">
+                    <a href="{% url 'exchanges:accept_proposal' proposal.id %}" class="bg-primary text-on-primary px-sm py-xs rounded-lg text-label-sm">Accept</a>
+                    <a href="{% url 'exchanges:reject_proposal' proposal.id %}" class="bg-error text-on-error px-sm py-xs rounded-lg text-label-sm">Reject</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-on-surface-variant">No received proposals.</p>
+        {% endfor %}
+    </section>
+</div>
+{% endblock %}

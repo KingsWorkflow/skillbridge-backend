@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Exchange Partners | SkillBridge Nepal{% endblock %}
+
+{% block content %}
+<div class="max-w-container-max mx-auto py-lg">
+    <header class="mb-lg">
+        <h1 class="font-headline-lg text-headline-lg text-on-background">Find Exchange Partners</h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant">Connect with users who complement your skill set.</p>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+        {% for partner in partners %}
+        <div class="bg-white p-md rounded-xl shadow-sm border border-outline-variant hover:-translate-y-1 transition-all">
+            <div class="flex items-center gap-md mb-md">
+                <div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container">
+                    <span class="material-symbols-outlined">person</span>
+                </div>
+                <div>
+                    <h3 class="font-label-md text-label-md text-on-surface">{{ partner.partner_user.username }}</h3>
+                    <p class="font-body-sm text-body-sm text-on-surface-variant">{{ partner.partner_user.skill_credits }} skill credits</p>
+                </div>
+            </div>
+            <div class="space-y-sm">
+                <div>
+                    <p class="font-label-sm text-label-sm text-primary mb-xs">They can teach you:</p>
+                    <div class="flex flex-wrap gap-xs">
+                        {% for skill_id in partner.i_learn_they_teach %}
+                        <span class="text-label-sm text-on-surface-variant bg-surface-container px-sm py-1 rounded">{{ skill_id }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div>
+                    <p class="font-label-sm text-label-sm text-primary mb-xs">They want to learn:</p>
+                    <div class="flex flex-wrap gap-xs">
+                        {% for skill_id in partner.i_teach_they_learn %}
+                        <span class="text-label-sm text-on-surface-variant bg-surface-container px-sm py-1 rounded">{{ skill_id }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <button class="w-full mt-md bg-secondary text-on-secondary py-sm rounded-lg font-label-md text-label-md">Propose Exchange</button>
+        </div>
+        {% empty %}
+        <div class="col-span-full text-center py-xl">
+            <p class="text-on-surface-variant">No exchange partners found yet. Add more skills to your profile to find matches.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

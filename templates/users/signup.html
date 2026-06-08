@@ -67,29 +67,32 @@
         <div class="p-8 md:p-12 rounded-xl bg-white border border-on-surface/10 shadow-lg flex-grow">
             <form class="space-y-6" method="post">
                 {% csrf_token %}
-                {{ form.non_field_errors }}
+                {% if form.non_field_errors %}<div class="text-error font-body-md text-body-md">{{ form.non_field_errors }}</div>{% endif %}
                 <!-- Role Toggle -->
                 <div class="mb-8">
                     <label class="font-label-md text-label-md text-primary block mb-3">I AM A:</label>
                     <div class="grid grid-cols-2 gap-4 p-1 bg-surface-container rounded-lg">
-                        <button class="py-3 rounded-md font-label-md text-label-md transition-all bg-primary text-on-primary shadow-md" id="roleStudent" onclick="setRole('student')" type="button">
+                        <button class="py-3 rounded-md font-label-md text-label-md transition-all bg-primary text-on-primary shadow-md" id="roleStudent" onclick="setRole('beginner')" type="button">
                             Student
                         </button>
-                        <button class="py-3 rounded-md font-label-md text-label-md transition-all text-on-surface-variant hover:bg-surface-variant" id="roleProfessional" onclick="setRole('professional')" type="button">
+                        <button class="py-3 rounded-md font-label-md text-label-md transition-all text-on-surface-variant hover:bg-surface-variant" id="roleProfessional" onclick="setRole('intermediate')" type="button">
                             Professional
                         </button>
-                        <input id="roleInput" name="experience_level" type="hidden" value="student"/>
                     </div>
+                    {{ form.experience_level }}
+                    {% if form.experience_level.errors %}<p class="text-[12px] text-error mt-1">{{ form.experience_level.errors.as_text }}</p>{% endif %}
                 </div>
                 <!-- Name & Email Group -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-2">
                         <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.username.id_for_label }}">Username</label>
                         {{ form.username }}
+                        {% if form.username.errors %}<p class="text-[12px] text-error mt-1">{{ form.username.errors.as_text }}</p>{% endif %}
                     </div>
                     <div class="space-y-2">
                         <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.email.id_for_label }}">Email Address</label>
                         {{ form.email }}
+                        {% if form.email.errors %}<p class="text-[12px] text-error mt-1">{{ form.email.errors.as_text }}</p>{% endif %}
                     </div>
                 </div>
                 <!-- Password -->
@@ -101,6 +104,9 @@
                             <span class="material-symbols-outlined">visibility</span>
                         </button>
                     </div>
+                    {% if form.password1.errors %}
+                    <p class="text-[12px] text-error mt-1">{{ form.password1.errors }}</p>
+                    {% endif %}
                     <p class="text-[12px] text-on-surface-variant">Must be at least 8 characters with one special symbol.</p>
                 </div>
                 <div class="space-y-2">
@@ -111,11 +117,17 @@
                             <span class="material-symbols-outlined">visibility</span>
                         </button>
                     </div>
+                    {% if form.password2.errors %}
+                    <p class="text-[12px] text-error mt-1">{{ form.password2.errors }}</p>
+                    {% endif %}
                 </div>
                 <!-- Phone -->
                 <div class="space-y-2">
                     <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.phone.id_for_label }}">Phone (Optional)</label>
                     {{ form.phone }}
+                    {% if form.phone.errors %}
+                    <p class="text-[12px] text-error mt-1">{{ form.phone.errors }}</p>
+                    {% endif %}
                 </div>
                 <!-- Terms -->
                 <div class="flex items-center gap-3 py-2">
@@ -158,20 +170,20 @@
     function setRole(role) {
         const studentBtn = document.getElementById('roleStudent');
         const professionalBtn = document.getElementById('roleProfessional');
-        const roleInput = document.getElementById('roleInput');
+        const roleInput = document.querySelector('input[name="experience_level"]');
 
-        if (role === 'student') {
+        if (role === 'beginner') {
             studentBtn.classList.add('bg-primary', 'text-on-primary', 'shadow-md');
             studentBtn.classList.remove('text-on-surface-variant', 'hover:bg-surface-variant');
             professionalBtn.classList.add('text-on-surface-variant', 'hover:bg-surface-variant');
             professionalBtn.classList.remove('bg-primary', 'text-on-primary', 'shadow-md');
-            roleInput.value = 'student';
+            roleInput.value = 'beginner';
         } else {
             professionalBtn.classList.add('bg-primary', 'text-on-primary', 'shadow-md');
             professionalBtn.classList.remove('text-on-surface-variant', 'hover:bg-surface-variant');
             studentBtn.classList.add('text-on-surface-variant', 'hover:bg-surface-variant');
             studentBtn.classList.remove('bg-primary', 'text-on-primary', 'shadow-md');
-            roleInput.value = 'professional';
+            roleInput.value = 'intermediate';
         }
     }
 

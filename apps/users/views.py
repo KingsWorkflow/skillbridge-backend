@@ -49,12 +49,43 @@ class CustomLogoutView(LogoutView):
 
 @login_required
 def dashboard_view(request):
+    # Get recent proposals (sent and received)
+    sent_proposals = request.user.sent_proposals.select_related(
+        'offer_skill', 'request_skill', 'receiver'
+    ).order_by('-created_at')[:5]
+    received_proposals = request.user.received_proposals.select_related(
+        'offer_skill', 'request_skill', 'proposer'
+    ).order_by('-created_at')[:5]
+    
+    # Get upcoming sessions
+    upcoming_sessions = []
+    for session in request.user.learning_sessions.filter(completed=False).select_related('skill_taught').order_by('scheduled_date')[:3]:
+        upcoming_sessions.append({
+            'skill': session.skill_taught.name,
+            'with_user': session.teacher.username,
+            'time': session.scheduled_date,
+        })
+    
+    # Mock recommended careers
+    recommended_careers = [
+        {'title': 'Full-Stack Developer', 'match_type': 'Hot', 'description': 'Build web applications end-to-end'},
+        {'title': 'Data Scientist', 'match_type': 'Growing', 'description': 'Extract insights from data'},
+    ]
+    
     context = {
         'skill_credits': request.user.skill_credits,
         'beginner_tokens': request.user.beginner_tokens,
         'reputation_score': request.user.reputation_score,
         'total_hours_taught': request.user.total_hours_taught,
         'total_hours_learned': request.user.total_hours_learned,
+        'recommended_careers': recommended_careers,
+        'upcoming_sessions': upcoming_sessions,
+        'gap_score': 70,
+        'priority_skill': 'System Design',
+        'recent_proposals': {
+            'sent': sent_proposals,
+            'received': received_proposals,
+        },
     }
     return render(request, 'users/dashboard.html', context)
 
