@@ -44,21 +44,18 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
             {% for project in projects|slice:":3" %}
             <div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm border border-surface-container group hover:-translate-y-1 transition-all duration-300">
-<div class="aspect-video relative overflow-hidden">
-                        <div class="w-full h-full bg-surface-container-high rounded-lg"></div>
-                        <div class="absolute inset-0 bg-primary/10 group-hover:bg-transparent transition-colors duration-300"></div>
-                    </div>
+                <div class="aspect-video relative overflow-hidden">
+                    <div class="w-full h-full bg-surface-container-high rounded-lg"></div>
+                    <div class="absolute inset-0 bg-primary/10 group-hover:bg-transparent transition-colors duration-300"></div>
+                </div>
                 <div class="p-md space-y-sm">
                     <div class="flex justify-between items-start">
                         <h3 class="font-headline-md text-headline-md text-primary">{{ project.title }}</h3>
-                        <span class="bg-tertiary/10 text-tertiary px-base py-xs rounded-full text-label-sm font-label-sm">{{ project.category }}</span>
+                        {% if project.project_url %}
+                        <a class="text-secondary text-sm flex items-center gap-1" href="{{ project.project_url }}" target="_blank">Link</a>
+                        {% endif %}
                     </div>
-                    <p class="font-body-sm text-body-sm text-on-surface-variant">{{ project.description }}</p>
-                    <div class="flex flex-wrap gap-xs pt-base">
-                        {% for tech in project.technologies.all|slice:":3" %}
-                        <span class="text-label-sm text-outline border border-outline-variant px-sm py-1 rounded-lg">{{ tech.name }}</span>
-                        {% endfor %}
-                    </div>
+                    <p class="font-body-sm text-body-sm text-on-surface-variant">{{ project.description|truncatewords:20 }}</p>
                 </div>
             </div>
             {% endfor %}
@@ -73,17 +70,17 @@
                 <div class="h-1 w-24 bg-primary rounded-full"></div>
             </div>
             <div class="space-y-base">
-                {% for cert in certifications|slice:":3" %}
-                <div class="flex items-center gap-md p-md bg-surface-container-low rounded-lg border-l-4 border-primary hover:bg-surface-container shadow-sm transition-colors cursor-default">
-                    <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center text-primary shadow-sm">
-                        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
-                    </div>
-                    <div>
-                        <h4 class="font-label-md text-label-md text-primary">{{ cert.skill.name }}</h4>
-                        <p class="font-body-sm text-body-sm text-on-surface-variant">{{ cert.issuing_organization }} • {{ cert.year }}</p>
-                    </div>
-                </div>
-                {% endfor %}
+{% for cert in certifications|slice:":3" %}
+                 <div class="flex items-center gap-md p-md bg-surface-container-low rounded-lg border-l-4 border-primary hover:bg-surface-container shadow-sm transition-colors cursor-default">
+                     <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center text-primary shadow-sm">
+                         <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+                     </div>
+                     <div>
+                         <h4 class="font-label-md text-label-md text-primary">{{ cert.name }}</h4>
+                         <p class="font-body-sm text-body-sm text-on-surface-variant">{{ cert.issuing_organization }} • {{ cert.issue_date|date:"Y" }}</p>
+                     </div>
+                 </div>
+                 {% endfor %}
             </div>
         </div>
 

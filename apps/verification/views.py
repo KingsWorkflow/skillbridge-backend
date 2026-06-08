@@ -64,7 +64,7 @@ def start_exam(request, skill_id):
     
     if request.method == 'POST':
         form = ExamAnswerForm(exam.questions, request.POST)
-        if form.cleaned_data:
+        if form.is_valid():
             score = 0
             # Simplified scoring - in real implementation would compare answers
             attempt = ExamAttempt.objects.create(
@@ -87,4 +87,4 @@ def start_exam(request, skill_id):
     else:
         form = ExamAnswerForm(exam.questions)
     
-    return render(request, 'verification/take_exam.html', {'form': form, 'exam': exam})
+    return render(request, 'verification/exam_start.html', {'form': form, 'exam': exam})

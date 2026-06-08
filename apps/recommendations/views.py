@@ -61,14 +61,21 @@ def resources(request):
 def career_recommendations(request):
     """AI-powered career recommendations."""
     return render(request, 'recommendations/career_recommendations.html', {
-        'skill_matches': [
-            {'name': 'Python', 'reason': 'High demand in Nepalese market', 'match_score': 95},
-            {'name': 'Cloud Computing', 'reason': 'Growing sector', 'match_score': 88},
-            {'name': 'UI Design', 'reason': 'Creative tech skills', 'match_score': 82},
+        'career_matches': [
+            {'title': 'Python Developer', 'reason': 'High demand in Nepalese market', 'match_score': 95, 'growth': '+25% YoY', 'skills_required': ['Python', 'Django', 'REST API']},
+            {'title': 'Cloud Computing', 'reason': 'Growing sector', 'match_score': 88, 'growth': '+30% YoY', 'skills_required': ['AWS', 'Azure', 'Docker']},
+            {'title': 'UI Design', 'reason': 'Creative tech skills', 'match_score': 82, 'growth': '+20% YoY', 'skills_required': ['Figma', 'UX', 'Prototyping']},
         ],
     })
 
 
 def skill_gap(request):
     """Skill gap analysis page."""
-    return render(request, 'recommendations/skill_gap.html', {})
+    return render(request, 'recommendations/skill_gap.html', {
+        'priority_goals': [
+            {'skill': 'System Design', 'missing': 'Architecture fundamentals', 'progress': '25', 'color': 'secondary', 'icon': 'dns'},
+        ],
+        'mentors': [
+            {'name': 'Alex Smith', 'title': 'Senior Developer', 'skills': ['Python', 'Django', 'System Design'], 'closed_gaps': 8},
+        ],
+    })

@@ -5,6 +5,13 @@ from .forms import ProjectForm, PortfolioCertificationForm
 
 
 @login_required
+def project_list(request):
+    """Display all user's projects."""
+    projects = request.user.projects.all()
+    return render(request, 'portfolio/project_list.html', {'projects': projects})
+
+
+@login_required
 def portfolio_view(request):
     if request.method == 'POST':
         if 'save_project' in request.POST:

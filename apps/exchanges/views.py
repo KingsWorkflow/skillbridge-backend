@@ -4,6 +4,75 @@ from django.contrib import messages
 from django.db.models import Q
 from .forms import ExchangeProposalForm, ExchangeSessionForm, SessionRatingForm
 from .models import ExchangeProposal, ExchangeSession, SkillCreditTransaction
+from apps.skills.models import TeachableSkill, LearnableSkill
+
+
+@login_required
+def exchange_list(request):
+    """Display user's exchanges (proposals and sessions)."""
+    proposals = ExchangeProposal.objects.filter(
+        Q(proposer=request.user) | Q(receiver=request.user)
+    ).select_related('offer_skill', 'request_skill', 'receiver', 'proposer')
+    
+    sessions = ExchangeSession.objects.filter(
+        Q(teacher=request.user) | Q(learner=request.user)
+    ).select_related('skill_taught', 'teacher', 'learner')
+    
+    session_data = []
+    for session in sessions:
+        session_data.append({
+            'skill': session.skill_taught.name,
+            'with_user': session.teacher.username if session.teacher != request.user else session.learner.username,
+            'time': session.scheduled_date,
+            'icon': 'schedule',
+        })
+    
+    return render(request, 'exchanges/exchange_list.html', {
+        'proposals': proposals,
+        'sessions': session_data,
+    })
+
+
+@login_required
+def skill_exchange(request):
+    """Display skill exchange marketplace with user's skills and available listings."""
+    tab = request.GET.get('tab', 'offer')
+    
+    # Get user's teachable and learnable skills
+    user_teachable = TeachableSkill.objects.filter(
+        user=request.user, is_active=True
+    ).select_related('skill')
+    user_learnable = LearnableSkill.objects.filter(
+        user=request.user
+    ).select_related('skill')
+    
+    # Get all active listings (teachable skills from other users)
+    listings = TeachableSkill.objects.filter(
+        is_active=True
+    ).select_related('user', 'skill').exclude(user=request.user)
+    
+    # Convert to listing format for template
+    listing_data = []
+    for item in listings[:6]:
+        listing_data.append({
+            'user': item.user,
+            'title': f'Teaching {item.skill.name}',
+            'description': f'Proficiency: {item.get_proficiency_level_display()}',
+            'category': item.skill.category,
+            'category_color': 'secondary',
+            'hours': item.hourly_commitment,
+            'rating': item.user.reputation_score,
+            'exchanges': item.user.total_hours_taught // 5,  # Approximate
+            'delivery_format': 'Remote',
+            'delivery_icon': 'handshake',
+        })
+    
+    return render(request, 'exchanges/skill_exchange.html', {
+        'listings': listing_data,
+        'user_teachable': user_teachable,
+        'user_learnable': user_learnable,
+        'active_tab': tab,
+    })
 
 
 @login_required
@@ -26,18 +95,29 @@ def proposal_list(request):
 @login_required
 def create_proposal(request, receiver_id):
     """Create an exchange proposal."""
-    # This would be called via AJAX or form submission
+    receiver = get_object_or_404(User, id=receiver_id)
+    if receiver == request.user:
+        messages.error(request, 'You cannot send a proposal to yourself.')
+        return redirect('exchanges:skill_exchange')
+    
     if request.method == 'POST':
         form = ExchangeProposalForm(request.POST)
         if form.is_valid():
             proposal = form.save(commit=False)
-            # proposer and receiver would be set based on context
+            proposal.proposer = request.user
+            proposal.receiver = receiver
             proposal.save()
             messages.success(request, 'Proposal sent successfully!')
             return redirect('exchanges:proposal_list')
     else:
         form = ExchangeProposalForm()
-    return render(request, 'exchanges/proposal_form.html', {'form': form})
+        form.fields['offer_skill'].queryset = TeachableSkill.objects.filter(user=request.user, is_active=True)
+        form.fields['request_skill'].queryset = LearnableSkill.objects.filter(user=receiver)
+    
+    return render(request, 'exchanges/proposal_form.html', {
+        'form': form,
+        'receiver': receiver,
+    })
 
 
 @login_required

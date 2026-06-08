@@ -18,9 +18,9 @@ class UserSerializer(serializers.ModelSerializer):
         }
 
     def validate_email(self, value):
-        if User.objects.filter(email=value).exists():
+        if User.objects.filter(email__iexact=value).exists():
             raise serializers.ValidationError('A user with this email already exists.')
-        return value
+        return value.lower()
 
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
@@ -45,12 +45,12 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField()
+    email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
         user = authenticate(
-            username=attrs['username'],
+            username=attrs['email'],
             password=attrs['password']
         )
         if not user:

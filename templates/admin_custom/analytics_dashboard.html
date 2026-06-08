@@ -1,0 +1,171 @@
+{% extends "admin/base_site.html" %}
+{% load static i18n admin_urls %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js">
+</script>
+{% endblock %}
+
+{% block content %}
+<div id="content" class="p-6">
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-800">{{ title }}</h1>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-5">
+      <p class="text-sm text-slate-500 mb-1">Total Users</p>
+      <p class="text-3xl font-bold text-slate-900">{{ total_users }}</p>
+    </div>
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-5">
+      <p class="text-sm text-slate-500 mb-1">Active Exchanges</p>
+      <p class="text-3xl font-bold text-indigo-600">{{ active_exchanges }}</p>
+    </div>
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-5">
+      <p class="text-sm text-slate-500 mb-1">Pending Proposals</p>
+      <p class="text-3xl font-bold text-amber-600">{{ pending_proposals }}</p>
+    </div>
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-5">
+      <p class="text-sm text-slate-500 mb-1">Pending Certificates</p>
+      <p class="text-3xl font-bold text-rose-600">{{ pending_certificates }}</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-5 lg:col-span-2">
+      <h3 class="text-lg font-semibold text-slate-800 mb-4">Weekly Activity</h3>
+      <canvas id="weeklyChart" height="120"></canvas>
+    </div>
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-5">
+      <h3 class="text-lg font-semibold text-slate-800 mb-4">Top 5 Skills Being Taught</h3>
+      <canvas id="topSkillsChart" height="200"></canvas>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-5">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-semibold text-slate-800">Top 5 Skills Being Taught</h3>
+      <a href="{% url 'admin:skills_skill_changelist' %}" class="text-sm text-indigo-600 hover:text-indigo-700">
+        View all skills <i class="fas fa-arrow-right ml-1"></i>
+      </a>
+    </div>
+    <div class="space-y-3">
+      {% for skill in top_skills %}
+      <div class="flex items-center">
+        <div class="w-2/5 text-sm text-slate-600">{{ skill.skill__name }}</div>
+        <div class="w-3/5">
+          <div class="flex items-center">
+            <div class="flex-1 bg-slate-100 rounded-full h-2">
+              <div class="bg-indigo-600 h-2 rounded-full" style="width: {{ skill.count|divisibleby:top_skills.0.count|yesno:'100,80' }}%"></div>
+            </div>
+            <span class="ml-3 text-sm text-slate-600 w-8">{{ skill.count }}</span>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <p class="text-slate-500 text-sm">No skills data available yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-5">
+      <h3 class="text-lg font-semibold text-slate-800 mb-4">Quick Actions</h3>
+      <div class="flex flex-wrap gap-3">
+        <a href="{% url 'admin:verification_certificate_changelist' %}" class="inline-flex items-center px-4 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700 transition-colors">
+          <i class="fas fa-file-circle-check mr-2"></i>Approve Pending Certificates
+        </a>
+        <a href="{% url 'admin:exchanges_exchangeproposal_changelist' %}" class="inline-flex items-center px-4 py-2 rounded-md bg-slate-800 text-white hover:bg-slate-700 transition-colors">
+          <i class="fas fa-comments mr-2"></i>Review Reported Proposals
+        </a>
+        <a href="{% url 'admin:bulk_verify' %}" class="inline-flex items-center px-4 py-2 rounded-md bg-slate-800 text-white hover:bg-slate-700 transition-colors">
+          <i class="fas fa-file-csv mr-2"></i>Bulk Verify CSV
+        </a>
+        <a href="{% url 'admin:analytics_dashboard' %}" class="inline-flex items-center px-4 py-2 rounded-md border border-slate-300 text-slate-700 hover:bg-slate-50 transition-colors">
+          <i class="fas fa-rotate mr-2"></i>Refresh Dashboard
+        </a>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-5">
+      <h3 class="text-lg font-semibold text-slate-800 mb-4">Pending Items</h3>
+      <div class="grid grid-cols-2 gap-4">
+        <div class="bg-white rounded-lg border border-slate-200 p-4">
+          <p class="text-sm text-slate-500 mb-2">Pending Proposals</p>
+          <p class="text-2xl font-bold text-slate-900">{{ pending_proposals }}</p>
+          <a href="{% url 'admin:exchanges_exchangeproposal_changelist' %}" class="text-sm text-indigo-600 hover:text-indigo-700 mt-2 inline-block">
+            Manage <i class="fas fa-arrow-right ml-1"></i>
+          </a>
+        </div>
+        <div class="bg-white rounded-lg border border-slate-200 p-4">
+          <p class="text-sm text-slate-500 mb-2">Pending Certificates</p>
+          <p class="text-2xl font-bold text-slate-900">{{ pending_certificates }}</p>
+          <a href="{% url 'admin:verification_certificate_changelist' %}" class="text-sm text-indigo-600 hover:text-indigo-700 mt-2 inline-block">
+            Manage <i class="fas fa-arrow-right ml-1"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const weeklyCtx = document.getElementById('weeklyChart').getContext('2d');
+    new Chart(weeklyCtx, {
+      type: 'bar',
+      data: {
+        labels: {{ labels_7d|safe }},
+        datasets: [
+          {
+            label: 'Signups',
+            data: {{ weekly_signups|safe }},
+            backgroundColor: 'rgba(79, 70, 229, 0.8)',
+            borderRadius: 8
+          },
+          {
+            label: 'Completed Sessions',
+            data: {{ weekly_completions|safe }},
+            backgroundColor: 'rgba(14, 165, 233, 0.8)',
+            borderRadius: 8
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: 'bottom' } },
+        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+      }
+    });
+
+    const topSkillsLabels = [{% for skill in top_skills %}'{{ skill.skill__name }}',{% endfor %}];
+    const topSkillsData = [{% for skill in top_skills %}{{ skill.count }},{% endfor %}];
+    const topSkillsCtx = document.getElementById('topSkillsChart').getContext('2d');
+    new Chart(topSkillsCtx, {
+      type: 'doughnut',
+      data: {
+        labels: topSkillsLabels,
+        datasets: [{
+          data: topSkillsData,
+          backgroundColor: [
+            'rgba(79, 70, 229, 0.85)',
+            'rgba(14, 165, 233, 0.85)',
+            'rgba(34, 197, 94, 0.85)',
+            'rgba(245, 158, 11, 0.85)',
+            'rgba(239, 68, 68, 0.85)'
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: 'bottom' } }
+      }
+    });
+  });
+</script>
+{% endblock %}

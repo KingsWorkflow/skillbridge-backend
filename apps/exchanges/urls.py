@@ -4,6 +4,8 @@ from . import views
 app_name = 'exchanges'
 
 urlpatterns = [
+    path('', views.skill_exchange, name='skill_exchange'),
+    path('exchange/', views.exchange_list, name='exchange_list'),
     path('proposals/', views.proposal_list, name='proposal_list'),
     path('proposals/create/<int:receiver_id>/', views.create_proposal, name='create_proposal'),
     path('proposals/<int:proposal_id>/accept/', views.accept_proposal, name='accept_proposal'),

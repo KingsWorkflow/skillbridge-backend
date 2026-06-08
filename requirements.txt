@@ -1,3 +1,5 @@
+django-admin-interface==0.32.0
+django-colorfield==0.14.0
 asgiref==3.11.1
 Django==6.0.6
 django-cors-headers==4.9.0

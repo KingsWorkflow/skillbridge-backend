@@ -6,13 +6,16 @@ from django.contrib import messages
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView
 from django.http import HttpResponseRedirect
+from django.conf import settings
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework.permissions import AllowAny
 from .forms import CustomUserCreationForm, UserProfileUpdateForm, CustomAuthenticationForm
 from .serializers import UserSerializer, LoginSerializer
+from .mixins import JWTResponseMixin
 
 
 class CustomLoginView(LoginView):
@@ -26,6 +29,35 @@ class CustomLoginView(LoginView):
             return next_url
         return reverse_lazy('users:dashboard')
 
+    def form_valid(self, form):
+        # Session-based login for Django templates
+        response = super().form_valid(form)
+        
+        # Also set JWT cookies for API access
+        user = form.get_user()
+        refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
+        refresh_token = str(refresh)
+        
+        response.set_cookie(
+            settings.JWT_COOKIE_NAME,
+            access_token,
+            max_age=60 * 60,  # 1 hour
+            httponly=settings.JWT_COOKIE_HTTP_ONLY,
+            secure=settings.JWT_COOKIE_SECURE,
+            samesite=settings.JWT_COOKIE_SAMESITE,
+        )
+        response.set_cookie(
+            settings.JWT_REFRESH_COOKIE_NAME,
+            refresh_token,
+            max_age=60 * 60 * 24,  # 1 day
+            httponly=settings.JWT_COOKIE_HTTP_ONLY,
+            secure=settings.JWT_COOKIE_SECURE,
+            samesite=settings.JWT_COOKIE_SAMESITE,
+        )
+        
+        return response
+
 
 class RegisterView(CreateView):
     form_class = CustomUserCreationForm
@@ -34,9 +66,9 @@ class RegisterView(CreateView):
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        username = form.cleaned_data.get('username')
+        email = form.cleaned_data.get('email')
         password = form.cleaned_data.get('password1')
-        user = authenticate(username=username, password=password)
+        user = authenticate(username=email, password=password)
         if user:
             login(self.request, user)
             messages.success(self.request, 'Account created successfully!')
@@ -45,6 +77,9 @@ class RegisterView(CreateView):
 
 class CustomLogoutView(LogoutView):
     next_page = reverse_lazy('users:login')
+
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
 
 
 @login_required
@@ -146,7 +181,7 @@ class RegisterAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class LoginAPIView(APIView):
+class LoginAPIView(JWTResponseMixin, APIView):
     permission_classes = [AllowAny]
     
     def post(self, request):
@@ -154,7 +189,10 @@ class LoginAPIView(APIView):
         if serializer.is_valid():
             user = serializer.validated_data['user']
             refresh = RefreshToken.for_user(user)
-            return Response({
+            access_token = str(refresh.access_token)
+            refresh_token = str(refresh)
+            
+            response = Response({
                 'user': {
                     'id': user.id,
                     'username': user.username,
@@ -163,13 +201,33 @@ class LoginAPIView(APIView):
                     'skill_credits': user.skill_credits,
                     'beginner_tokens': user.beginner_tokens,
                 },
-                'access': str(refresh.access_token),
-                'refresh': str(refresh),
+                'access': access_token,
+                'refresh': refresh_token,
             })
+            
+            # Set JWT cookies
+            response.set_cookie(
+                settings.JWT_COOKIE_NAME,
+                access_token,
+                max_age=60 * 60,  # 1 hour
+                httponly=settings.JWT_COOKIE_HTTP_ONLY,
+                secure=settings.JWT_COOKIE_SECURE,
+                samesite=settings.JWT_COOKIE_SAMESITE,
+            )
+            response.set_cookie(
+                settings.JWT_REFRESH_COOKIE_NAME,
+                refresh_token,
+                max_age=60 * 60 * 24,  # 1 day
+                httponly=settings.JWT_COOKIE_HTTP_ONLY,
+                secure=settings.JWT_COOKIE_SECURE,
+                samesite=settings.JWT_COOKIE_SAMESITE,
+            )
+            
+            return response
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class MeAPIView(APIView):
+class MeAPIView(JWTResponseMixin, APIView):
     def get(self, request):
         user = request.user
         return Response({
@@ -195,7 +253,7 @@ class MeAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class CreditsAPIView(APIView):
+class CreditsAPIView(JWTResponseMixin, APIView):
     def get(self, request):
         user = request.user
         return Response({
