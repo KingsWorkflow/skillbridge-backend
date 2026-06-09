@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load form_tags %}
+{% block title %}Add {{ type|capfirst }} Skill | SkillBridge Nepal{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto py-lg">
+    <div class="bg-white rounded-xl p-md shadow-sm border border-outline-variant">
+        <h2 class="font-headline-md text-headline-md text-on-surface mb-lg">Add {{ type|capfirst }} Skill</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="font-label-md text-label-md text-on-surface-variant block mb-1">Skill</label>
+                    {{ form.skill|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg" }}
+                </div>
+                
+                {% if type == 'teachable' %}
+                <div>
+                    <label class="font-label-md text-label-md text-on-surface-variant block mb-1">Proficiency Level</label>
+                    {{ form.proficiency_level|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg" }}
+                </div>
+                <div>
+                    <label class="font-label-md text-label-md text-on-surface-variant block mb-1">Hourly Commitment (hours/week)</label>
+                    {{ form.hourly_commitment|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg" }}
+                </div>
+                {% else %}
+                <div>
+                    <label class="font-label-md text-label-md text-on-surface-variant block mb-1">Urgency</label>
+                    {{ form.urgency|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg" }}
+                </div>
+                <div>
+                    <label class="font-label-md text-label-md text-on-surface-variant block mb-1">Motivation</label>
+                    {{ form.motivation|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg" }}
+                </div>
+                {% endif %}
+            </div>
+            
+            <button class="mt-lg w-full bg-primary text-on-primary py-sm rounded-lg font-label-md text-label-md hover:opacity-90 transition-all" type="submit">Add Skill</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

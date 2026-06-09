@@ -11,7 +11,7 @@ class ProjectForm(forms.ModelForm):
         }
 
 
-class PortfolioCertificationForm(forms.ModelForm):
+class CertificationForm(forms.ModelForm):
     class Meta:
         model = PortfolioCertification
         fields = ('name', 'issuing_organization', 'issue_date', 'certificate_file', 'verification_url')

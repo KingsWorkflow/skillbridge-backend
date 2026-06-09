@@ -2,9 +2,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
+from django.core.paginator import Paginator
+from django.http import JsonResponse
 from .forms import ExchangeProposalForm, ExchangeSessionForm, SessionRatingForm
 from .models import ExchangeProposal, ExchangeSession, SkillCreditTransaction
-from apps.skills.models import TeachableSkill, LearnableSkill
+from apps.skills.models import Skill, TeachableSkill, LearnableSkill
+from apps.users.models import UserProfile
 
 
 @login_required
@@ -13,11 +16,11 @@ def exchange_list(request):
     proposals = ExchangeProposal.objects.filter(
         Q(proposer=request.user) | Q(receiver=request.user)
     ).select_related('offer_skill', 'request_skill', 'receiver', 'proposer')
-    
+
     sessions = ExchangeSession.objects.filter(
         Q(teacher=request.user) | Q(learner=request.user)
     ).select_related('skill_taught', 'teacher', 'learner')
-    
+
     session_data = []
     for session in sessions:
         session_data.append({
@@ -26,52 +29,10 @@ def exchange_list(request):
             'time': session.scheduled_date,
             'icon': 'schedule',
         })
-    
+
     return render(request, 'exchanges/exchange_list.html', {
         'proposals': proposals,
         'sessions': session_data,
-    })
-
-
-@login_required
-def skill_exchange(request):
-    """Display skill exchange marketplace with user's skills and available listings."""
-    tab = request.GET.get('tab', 'offer')
-    
-    # Get user's teachable and learnable skills
-    user_teachable = TeachableSkill.objects.filter(
-        user=request.user, is_active=True
-    ).select_related('skill')
-    user_learnable = LearnableSkill.objects.filter(
-        user=request.user
-    ).select_related('skill')
-    
-    # Get all active listings (teachable skills from other users)
-    listings = TeachableSkill.objects.filter(
-        is_active=True
-    ).select_related('user', 'skill').exclude(user=request.user)
-    
-    # Convert to listing format for template
-    listing_data = []
-    for item in listings[:6]:
-        listing_data.append({
-            'user': item.user,
-            'title': f'Teaching {item.skill.name}',
-            'description': f'Proficiency: {item.get_proficiency_level_display()}',
-            'category': item.skill.category,
-            'category_color': 'secondary',
-            'hours': item.hourly_commitment,
-            'rating': item.user.reputation_score,
-            'exchanges': item.user.total_hours_taught // 5,  # Approximate
-            'delivery_format': 'Remote',
-            'delivery_icon': 'handshake',
-        })
-    
-    return render(request, 'exchanges/skill_exchange.html', {
-        'listings': listing_data,
-        'user_teachable': user_teachable,
-        'user_learnable': user_learnable,
-        'active_tab': tab,
     })
 
 
@@ -81,11 +42,11 @@ def proposal_list(request):
     sent_proposals = ExchangeProposal.objects.filter(
         proposer=request.user
     ).select_related('offer_skill', 'request_skill', 'receiver')
-    
+
     received_proposals = ExchangeProposal.objects.filter(
         receiver=request.user
     ).select_related('offer_skill', 'request_skill', 'proposer')
-    
+
     return render(request, 'exchanges/proposals.html', {
         'sent_proposals': sent_proposals,
         'received_proposals': received_proposals,
@@ -93,13 +54,96 @@ def proposal_list(request):
 
 
 @login_required
+def partner_list(request):
+    """
+    Dynamic skill-exchange partner search.
+    A partner is anyone whose teachable/learnable skills intersect with the current user's.
+    Supports filters: category, min_reputation, availability.
+    """
+    user = request.user
+    user_teachable_ids = set(user.teachable_skills.values_list('skill_id', flat=True))
+    user_learnable_ids = set(user.learnable_skills.values_list('skill_id', flat=True))
+
+    # Base queryset of other users with related skills prefetched
+    users = UserProfile.objects.exclude(pk=user.pk).prefetch_related(
+        'teachable_skills__skill',
+        'learnable_skills__skill',
+    )
+
+    partner_data = []
+    for partner in users:
+        partner_teachable_ids = set(partner.teachable_skills.values_list('skill_id', flat=True))
+        partner_learnable_ids = set(partner.learnable_skills.values_list('skill_id', flat=True))
+
+        i_teach_they_learn = user_teachable_ids & partner_learnable_ids
+        i_learn_they_teach = user_learnable_ids & partner_teachable_ids
+
+        if not i_teach_they_learn and not i_learn_they_teach:
+            continue
+
+        partner_data.append({
+            'user': partner,
+            'i_teach_they_learn_skills': Skill.objects.filter(id__in=i_teach_they_learn).values_list('name', flat=True),
+            'i_learn_they_teach_skills': Skill.objects.filter(id__in=i_learn_they_teach).values_list('name', flat=True),
+            'match_count': len(i_teach_they_learn) + len(i_learn_they_teach),
+        })
+
+    # Filters
+    category = request.GET.get('category')
+    min_reputation = request.GET.get('min_reputation')
+    availability = request.GET.get('availability')
+
+    if category:
+        partner_data = [
+            p for p in partner_data
+            if Skill.objects.filter(
+                pk__in=list(p['i_teach_they_learn']) + list(p['i_learn_they_teach']),
+                category=category
+            ).exists()
+        ]
+
+    if min_reputation:
+        try:
+            min_rep = float(min_reputation)
+            partner_data = [p for p in partner_data if p['user'].reputation_score >= min_rep]
+        except ValueError:
+            pass
+
+    if availability == 'available':
+        partner_data = [
+            p for p in partner_data
+            if p['user'].teachable_skills.filter(is_active=True, hourly_commitment__gt=0).exists()
+        ]
+
+    # Pagination
+    paginator = Paginator(partner_data, 10)
+    page_number = request.GET.get('page') or 1
+    page_obj = paginator.get_page(page_number)
+
+    categories = Skill.objects.values_list('category', flat=True).distinct().order_by('category')
+
+    context = {
+        'partners': page_obj,
+        'categories': categories,
+        'selected_category': category or '',
+        'min_reputation': min_reputation or '',
+        'availability': availability or '',
+    }
+
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return render(request, 'exchanges/partials/partner_cards.html', context)
+
+    return render(request, 'exchanges/partner_list.html', context)
+
+
+@login_required
 def create_proposal(request, receiver_id):
     """Create an exchange proposal."""
-    receiver = get_object_or_404(User, id=receiver_id)
+    receiver = get_object_or_404(UserProfile, pk=receiver_id)
     if receiver == request.user:
         messages.error(request, 'You cannot send a proposal to yourself.')
-        return redirect('exchanges:skill_exchange')
-    
+        return redirect('exchanges:partner_list')
+
     if request.method == 'POST':
         form = ExchangeProposalForm(request.POST)
         if form.is_valid():
@@ -111,9 +155,13 @@ def create_proposal(request, receiver_id):
             return redirect('exchanges:proposal_list')
     else:
         form = ExchangeProposalForm()
-        form.fields['offer_skill'].queryset = TeachableSkill.objects.filter(user=request.user, is_active=True)
-        form.fields['request_skill'].queryset = LearnableSkill.objects.filter(user=receiver)
-    
+        form.fields['offer_skill'].queryset = TeachableSkill.objects.filter(
+            user=request.user, is_active=True
+        ).select_related('skill')
+        form.fields['request_skill'].queryset = LearnableSkill.objects.filter(
+            user=receiver
+        ).select_related('skill')
+
     return render(request, 'exchanges/proposal_form.html', {
         'form': form,
         'receiver': receiver,
@@ -141,7 +189,7 @@ def reject_proposal(request, proposal_id):
 @login_required
 def schedule_session(request, proposal_id):
     proposal = get_object_or_404(ExchangeProposal, id=proposal_id, status='accepted')
-    
+
     if request.method == 'POST':
         form = ExchangeSessionForm(request.POST)
         if form.is_valid():
@@ -155,33 +203,33 @@ def schedule_session(request, proposal_id):
             return redirect('exchanges:proposal_list')
     else:
         form = ExchangeSessionForm()
-    
+
     return render(request, 'exchanges/schedule_session.html', {'form': form, 'proposal': proposal})
 
 
 @login_required
 def rate_session(request, session_id):
     session = get_object_or_404(ExchangeSession, id=session_id)
-    
+
     if request.method == 'POST':
         form = SessionRatingForm(request.POST)
         if form.is_valid():
             rating = form.cleaned_data['rating']
             feedback = form.cleaned_data.get('feedback', '')
-            
+
             if session.teacher == request.user:
                 session.teacher_rating = rating
                 session.teacher_feedback = feedback
             elif session.learner == request.user:
                 session.learner_rating = rating
                 session.learner_feedback = feedback
-            
+
             session.save()
             messages.success(request, 'Rating submitted!')
             return redirect('exchanges:proposal_list')
     else:
         form = SessionRatingForm()
-    
+
     return render(request, 'exchanges/rate_session.html', {'form': form, 'session': session})
 
 
@@ -190,23 +238,22 @@ def complete_session(request, session_id):
     session = get_object_or_404(ExchangeSession, id=session_id)
     session.completed = True
     session.save()
-    
-    # Transfer credits: teacher earns, learner spends
+
     SkillCreditTransaction.objects.create(
         user=session.teacher,
         amount=10 * session.duration_hours,
         transaction_type='teach_earn',
-        description=f'Taught {session.duration_hours} hours of {session.skill_taught.name}',
-        related_session=session
+        description=f"Taught {session.duration_hours} hours of {session.skill_taught.name}",
+        related_session=session,
     )
-    
+
     SkillCreditTransaction.objects.create(
         user=session.learner,
         amount=-10 * session.duration_hours,
         transaction_type='learn_spend',
-        description=f'Learned {session.duration_hours} hours of {session.skill_taught.name}',
-        related_session=session
+        description=f"Learned {session.duration_hours} hours of {session.skill_taught.name}",
+        related_session=session,
     )
-    
+
     messages.success(request, 'Session completed and credits transferred!')
     return redirect('exchanges:proposal_list')

@@ -1,10 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
 from django.contrib import messages
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, UpdateView
+from django.views.generic import CreateView, UpdateView, View
 from django.http import HttpResponseRedirect
 from django.conf import settings
 from rest_framework import status
@@ -16,6 +16,10 @@ from rest_framework.permissions import AllowAny
 from .forms import CustomUserCreationForm, UserProfileUpdateForm, CustomAuthenticationForm
 from .serializers import UserSerializer, LoginSerializer
 from .mixins import JWTResponseMixin
+from apps.skills.models import TeachableSkill, LearnableSkill, Skill
+from apps.skills.forms import TeachableSkillForm, LearnableSkillForm
+from apps.portfolio.models import Project, Certification as PortfolioCertification
+from apps.portfolio.forms import ProjectForm, CertificationForm
 
 
 class CustomLoginView(LoginView):
@@ -127,11 +131,141 @@ def dashboard_view(request):
 
 class ProfileUpdateView(UpdateView):
     form_class = UserProfileUpdateForm
-    template_name = 'users/profile.html'
-    success_url = reverse_lazy('users:profile')
+    template_name = 'users/profile_edit.html'
+    success_url = reverse_lazy('users:profile_edit')
 
     def get_object(self):
         return self.request.user
+
+
+@login_required
+def public_profile(request, username):
+    """View any user's public profile."""
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    profile_user = get_object_or_404(User, username=username)
+    
+    teachable_skills = TeachableSkill.objects.filter(
+        user=profile_user, is_active=True
+    ).select_related('skill', 'verification')
+    
+    learnable_skills = LearnableSkill.objects.filter(
+        user=profile_user
+    ).select_related('skill')
+    
+    projects = profile_user.projects.all()
+    certifications = profile_user.certifications.all()
+    
+    is_own_profile = request.user == profile_user
+    
+    return render(request, 'users/profile_public.html', {
+        'profile_user': profile_user,
+        'teachable_skills': teachable_skills,
+        'learnable_skills': learnable_skills,
+        'projects': projects,
+        'certifications': certifications,
+        'is_own_profile': is_own_profile,
+    })
+
+
+@login_required
+def add_teachable_skill(request):
+    """Add a teachable skill for the current user."""
+    if request.method == 'POST':
+        form = TeachableSkillForm(request.POST)
+        if form.is_valid():
+            skill = form.save(commit=False)
+            skill.user = request.user
+            skill.save()
+            messages.success(request, 'Skill added successfully!')
+            return redirect('users:profile_edit')
+    else:
+        form = TeachableSkillForm()
+    
+    return render(request, 'users/modals/add_skill.html', {'form': form, 'type': 'teachable'})
+
+
+@login_required
+def add_learnable_skill(request):
+    """Add a learnable skill for the current user."""
+    if request.method == 'POST':
+        form = LearnableSkillForm(request.POST)
+        if form.is_valid():
+            skill = form.save(commit=False)
+            skill.user = request.user
+            skill.save()
+            messages.success(request, 'Skill added successfully!')
+            return redirect('users:profile_edit')
+    else:
+        form = LearnableSkillForm()
+    
+    return render(request, 'users/modals/add_skill.html', {'form': form, 'type': 'learnable'})
+
+
+@login_required
+def add_project(request):
+    """Add a portfolio project."""
+    if request.method == 'POST':
+        form = ProjectForm(request.POST, request.FILES)
+        if form.is_valid():
+            project = form.save(commit=False)
+            project.user = request.user
+            project.save()
+            messages.success(request, 'Project added!')
+            return redirect('users:profile_edit')
+    else:
+        form = ProjectForm()
+    
+    return render(request, 'users/modals/add_project.html', {'form': form})
+
+
+@login_required
+def add_certification(request):
+    """Add a certification."""
+    if request.method == 'POST':
+        form = CertificationForm(request.POST, request.FILES)
+        if form.is_valid():
+            cert = form.save(commit=False)
+            cert.user = request.user
+            cert.save()
+            messages.success(request, 'Certification added!')
+            return redirect('users:profile_edit')
+    else:
+        form = CertificationForm()
+    
+    return render(request, 'users/modals/add_certification.html', {'form': form})
+
+
+@login_required
+def delete_teachable_skill(request, pk):
+    skill = get_object_or_404(TeachableSkill, pk=pk, user=request.user)
+    skill.delete()
+    messages.success(request, 'Skill removed.')
+    return redirect('users:profile_edit')
+
+
+@login_required
+def delete_learnable_skill(request, pk):
+    skill = get_object_or_404(LearnableSkill, pk=pk, user=request.user)
+    skill.delete()
+    messages.success(request, 'Skill removed.')
+    return redirect('users:profile_edit')
+
+
+@login_required
+def delete_project(request, pk):
+    project = get_object_or_404(Project, pk=pk, user=request.user)
+    project.delete()
+    messages.success(request, 'Project removed.')
+    return redirect('users:profile_edit')
+
+
+@login_required
+def delete_certification(request, pk):
+    cert = get_object_or_404(PortfolioCertification, pk=pk, user=request.user)
+    cert.delete()
+    messages.success(request, 'Certification removed.')
+    return redirect('users:profile_edit')
 
 
 class CustomPasswordResetView(PasswordResetView):

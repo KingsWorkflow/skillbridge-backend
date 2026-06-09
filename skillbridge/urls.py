@@ -29,6 +29,9 @@ urlpatterns = [
     
     # Frontend Pages - Portfolio
     path('portfolio/', include('apps.portfolio.urls')),
+    
+    # Frontend Pages - Careers
+    path('career/', include('apps.careers.urls')),
 ]
 
 if settings.DEBUG:

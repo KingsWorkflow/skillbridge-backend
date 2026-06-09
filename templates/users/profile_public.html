@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}{{ profile_user.username }}'s Profile | SkillBridge Nepal{% endblock %}
+
+{% block content %}
+<div class="max-w-container-max mx-auto py-lg">
+    <header class="mb-lg flex justify-between items-start">
+        <div>
+            <h1 class="font-headline-lg text-headline-lg text-on-surface mb-xs">{{ profile_user.username }}</h1>
+            <p class="font-body-lg text-body-lg text-on-surface-variant">{{ profile_user.get_experience_level_display }}</p>
+        </div>
+        {% if is_own_profile %}
+        <a href="{% url 'users:profile_edit' %}" class="bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md text-label-md hover:opacity-90 transition-all">Edit Profile</a>
+        {% endif %}
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+        <!-- Profile Card -->
+        <div class="md:col-span-1">
+            <div class="bg-white rounded-xl p-md shadow-sm border border-outline-variant mb-lg">
+                <div class="flex flex-col items-center mb-md">
+                    <div class="w-24 h-24 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container mb-sm">
+                        <span class="material-symbols-outlined text-4xl">person</span>
+                    </div>
+                    <h2 class="font-headline-md text-headline-md text-on-surface">{{ profile_user.username }}</h2>
+                </div>
+                
+                <div class="space-y-sm">
+                    <div class="flex justify-between py-sm border-b border-outline-variant">
+                        <span class="font-label-md text-label-md text-on-surface-variant">Skill Credits</span>
+                        <span class="font-label-md text-label-md text-primary">{{ profile_user.skill_credits }}</span>
+                    </div>
+                    <div class="flex justify-between py-sm border-b border-outline-variant">
+                        <span class="font-label-md text-label-md text-on-surface-variant">Hours Taught</span>
+                        <span class="font-label-md text-label-md text-primary">{{ profile_user.total_hours_taught }}</span>
+                    </div>
+                    <div class="flex justify-between py-sm border-b border-outline-variant">
+                        <span class="font-label-md text-label-md text-on-surface-variant">Hours Learned</span>
+                        <span class="font-label-md text-label-md text-primary">{{ profile_user.total_hours_learned }}</span>
+                    </div>
+                    <div class="flex justify-between py-sm">
+                        <span class="font-label-md text-label-md text-on-surface-variant">Reputation</span>
+                        <span class="font-label-md text-label-md text-primary">{{ profile_user.reputation_score }}</span>
+                    </div>
+                </div>
+
+                {% if profile_user.bio %}
+                <div class="mt-lg pt-lg border-t border-outline-variant">
+                    <h3 class="font-label-md text-label-md text-on-surface-variant mb-sm">Bio</h3>
+                    <p class="font-body-md text-body-md text-on-surface">{{ profile_user.bio }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Skills & Portfolio -->
+        <div class="md:col-span-2 space-y-md">
+            <!-- Teachable Skills -->
+            {% if teachable_skills %}
+            <div class="bg-white rounded-xl p-md shadow-sm border border-outline-variant">
+                <h2 class="font-headline-md text-headline-md text-on-surface mb-lg">Can Teach</h2>
+                <div class="flex flex-wrap gap-xs">
+                    {% for ts in teachable_skills %}
+                    <span class="px-sm py-xs bg-primary-container/10 text-primary rounded-full font-label-sm text-label-sm">{{ ts.skill.name }} ({{ ts.get_proficiency_level_display }})</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Learnable Skills -->
+            {% if learnable_skills %}
+            <div class="bg-white rounded-xl p-md shadow-sm border border-outline-variant">
+                <h2 class="font-headline-md text-headline-md text-on-surface mb-lg">Wants to Learn</h2>
+                <div class="flex flex-wrap gap-xs">
+                    {% for ls in learnable_skills %}
+                    <span class="px-sm py-xs bg-secondary-container/10 text-secondary rounded-full font-label-sm text-label-sm">{{ ls.skill.name }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Portfolio Projects -->
+            {% if projects %}
+            <div class="bg-white rounded-xl p-md shadow-sm border border-outline-variant">
+                <h2 class="font-headline-md text-headline-md text-on-surface mb-lg">Projects</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+                    {% for project in projects %}
+                    <div class="border border-outline-variant rounded-lg p-sm">
+                        <h4 class="font-label-md text-label-md text-on-surface mb-xs">{{ project.title }}</h4>
+                        <p class="font-body-sm text-body-sm text-on-surface-variant mb-sm">{{ project.description|truncatewords:30 }}</p>
+                        {% if project.project_url %}
+                        <a href="{{ project.project_url }}" class="text-primary font-label-sm text-label-sm" target="_blank">View Project</a>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Certifications -->
+            {% if certifications %}
+            <div class="bg-white rounded-xl p-md shadow-sm border border-outline-variant">
+                <h2 class="font-headline-md text-headline-md text-on-surface mb-lg">Certifications</h2>
+                <div class="space-y-sm">
+                    {% for cert in certifications %}
+                    <div class="flex items-center gap-sm p-sm bg-surface-container-lowest rounded-lg">
+                        <span class="material-symbols-outlined text-primary">workspace_premium</span>
+                        <div>
+                            <p class="font-label-md text-label-md text-on-surface">{{ cert.name }}</p>
+                            <p class="font-body-sm text-body-sm text-on-surface-variant">{{ cert.issuing_organization }} • {{ cert.issue_date|date:"Y" }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'apps.verification',
     'apps.portfolio',
     'apps.admin_custom',
+    'apps.careers',
 ]
 
 MIDDLEWARE = [
@@ -109,6 +110,15 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Cache configuration
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'skillbridge-cache',
+        'TIMEOUT': 60 * 60 * 24,
+    }
+}
 
 # Admin Interface Configuration
 ADMIN_INTERFACE = {

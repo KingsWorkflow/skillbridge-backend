@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Add Project | SkillBridge Nepal{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto py-lg">
+    <div class="bg-white rounded-xl p-md shadow-sm border border-outline-variant">
+        <h2 class="font-headline-md text-headline-md text-on-surface mb-lg">Add Portfolio Project</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="font-label-md text-label-md text-on-surface-variant block mb-1">Title</label>
+                    {{ form.title|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg" }}
+                </div>
+                
+                <div>
+                    <label class="font-label-md text-label-md text-on-surface-variant block mb-1">Description</label>
+                    {{ form.description|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg" }}
+                </div>
+                
+                <div>
+                    <label class="font-label-md text-label-md text-on-surface-variant block mb-1">Project URL</label>
+                    {{ form.project_url|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg" }}
+                </div>
+                
+                <div>
+                    <label class="font-label-md text-label-md text-on-surface-variant block mb-1">Image</label>
+                    {{ form.image }}
+                </div>
+            </div>
+            
+            <button class="mt-lg w-full bg-primary text-on-primary py-sm rounded-lg font-label-md text-label-md hover:opacity-90 transition-all" type="submit">Add Project</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

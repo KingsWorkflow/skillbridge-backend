@@ -1,0 +1,93 @@
+[
+  {
+    "model": "apps.careers.careerpath",
+    "pk": 1,
+    "fields": {
+      "title": "Full-Stack Developer",
+      "description": "Build complete web applications using frontend and backend technologies. Work across the entire stack from UI design to database architecture.",
+      "category": "Technology",
+      "required_skills": [1, 2, 3, 4],
+      "average_salary": "NPR 1,500,000 - 3,500,000 per year",
+      "growth_outlook": "+28% YoY",
+      "estimated_hours_per_skill": {"1": 40, "2": 60, "3": 50, "4": 40}
+    }
+  },
+  {
+    "model": "apps.careers.careerpath",
+    "pk": 2,
+    "fields": {
+      "title": "Data Scientist",
+      "description": "Extract insights from complex datasets, build predictive models, and drive data-informed decisions for businesses.",
+      "category": "Data",
+      "required_skills": [5, 6, 2, 7],
+      "average_salary": "NPR 1,800,000 - 4,000,000 per year",
+      "growth_outlook": "+35% YoY",
+      "estimated_hours_per_skill": {"5": 80, "6": 60, "2": 40, "7": 50}
+    }
+  },
+  {
+    "model": "apps.careers.careerpath",
+    "pk": 3,
+    "fields": {
+      "title": "Product Manager",
+      "description": "Lead product development from conception to launch. Work with cross-functional teams to deliver user-centric solutions.",
+      "category": "Management",
+      "required_skills": [8, 9, 6],
+      "average_salary": "NPR 2,000,000 - 4,500,000 per year",
+      "growth_outlook": "+22% YoY",
+      "estimated_hours_per_skill": {"8": 50, "9": 40, "6": 30}
+    }
+  },
+  {
+    "model": "apps.careers.careerpath",
+    "pk": 4,
+    "fields": {
+      "title": "Cloud Engineer",
+      "description": "Design, deploy, and manage cloud infrastructure. Ensure scalability, reliability, and security of cloud-based systems.",
+      "category": "Technology",
+      "required_skills": [10, 11, 12],
+      "average_salary": "NPR 1,600,000 - 3,800,000 per year",
+      "growth_outlook": "+30% YoY",
+      "estimated_hours_per_skill": {"10": 60, "11": 70, "12": 40}
+    }
+  },
+  {
+    "model": "apps.careers.careerpath",
+    "pk": 5,
+    "fields": {
+      "title": "UI/UX Designer",
+      "description": "Design intuitive user interfaces and seamless user experiences for digital products. Conduct user research and iterate on designs.",
+      "category": "Design",
+      "required_skills": [13, 14, 15],
+      "average_salary": "NPR 1,200,000 - 3,000,000 per year",
+      "growth_outlook": "+24% YoY",
+      "estimated_hours_per_skill": {"13": 50, "14": 60, "15": 40}
+    }
+  },
+  {
+    "model": "apps.careers.careerpath",
+    "pk": 6,
+    "fields": {
+      "title": "DevOps Engineer",
+      "description": "Bridge development and operations by automating pipelines, managing CI/CD, and ensuring system reliability at scale.",
+      "category": "Technology",
+      "required_skills": [12, 16, 17, 18],
+      "average_salary": "NPR 1,800,000 - 4,200,000 per year",
+      "growth_outlook": "+32% YoY",
+      "estimated_hours_per_skill": {"12": 40, "16": 80, "17": 60, "18": 50}
+    }
+  },
+  {
+    "model": "apps.careers.careerpath",
+    "pk": 7,
+    "fields": {
+      "title": "Digital Marketing Specialist",
+      "description": "Plan and execute online marketing campaigns. Manage SEO, SEM, social media, and content marketing to drive growth.",
+      "category": "Marketing",
+      "required_skills": [19, 20, 6],
+      "average_salary": "NPR 900,000 - 2,200,000 per year",
+      "growth_outlook": "+20% YoY",
+      "estimated_hours_per_skill": {"19": 40, "20": 50, "6": 30}
+    }
+  }
+]
