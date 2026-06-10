@@ -174,14 +174,19 @@ def add_teachable_skill(request):
     if request.method == 'POST':
         form = TeachableSkillForm(request.POST)
         if form.is_valid():
-            skill = form.save(commit=False)
-            skill.user = request.user
-            skill.save()
+            skill_obj = form.cleaned_data.get('skill')
+            proficiency = form.cleaned_data.get('proficiency_level')
+            hours = form.cleaned_data.get('hourly_commitment')
+            TeachableSkill.objects.get_or_create(
+                user=request.user,
+                skill=skill_obj,
+                defaults={'proficiency_level': proficiency, 'hourly_commitment': hours},
+            )
             messages.success(request, 'Skill added successfully!')
             return redirect('users:profile_edit')
     else:
         form = TeachableSkillForm()
-    
+
     return render(request, 'users/modals/add_skill.html', {'form': form, 'type': 'teachable'})
 
 
@@ -191,14 +196,19 @@ def add_learnable_skill(request):
     if request.method == 'POST':
         form = LearnableSkillForm(request.POST)
         if form.is_valid():
-            skill = form.save(commit=False)
-            skill.user = request.user
-            skill.save()
+            skill_obj = form.cleaned_data.get('skill')
+            motivation = form.cleaned_data.get('motivation', '')
+            urgency = form.cleaned_data.get('urgency', 'medium')
+            LearnableSkill.objects.get_or_create(
+                user=request.user,
+                skill=skill_obj,
+                defaults={'motivation': motivation, 'urgency': urgency},
+            )
             messages.success(request, 'Skill added successfully!')
             return redirect('users:profile_edit')
     else:
         form = LearnableSkillForm()
-    
+
     return render(request, 'users/modals/add_skill.html', {'form': form, 'type': 'learnable'})
 
 

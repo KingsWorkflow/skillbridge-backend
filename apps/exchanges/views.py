@@ -64,13 +64,12 @@ def partner_list(request):
     user_teachable_ids = set(user.teachable_skills.values_list('skill_id', flat=True))
     user_learnable_ids = set(user.learnable_skills.values_list('skill_id', flat=True))
 
-    # Base queryset of other users with related skills prefetched
     users = UserProfile.objects.exclude(pk=user.pk).prefetch_related(
         'teachable_skills__skill',
         'learnable_skills__skill',
     )
 
-    partner_data = []
+    partner_list_data = []
     for partner in users:
         partner_teachable_ids = set(partner.teachable_skills.values_list('skill_id', flat=True))
         partner_learnable_ids = set(partner.learnable_skills.values_list('skill_id', flat=True))
@@ -81,59 +80,57 @@ def partner_list(request):
         if not i_teach_they_learn and not i_learn_they_teach:
             continue
 
-        partner_data.append({
+        partner_list_data.append({
             'user': partner,
-            'i_teach_they_learn_skills': Skill.objects.filter(id__in=i_teach_they_learn).values_list('name', flat=True),
-            'i_learn_they_teach_skills': Skill.objects.filter(id__in=i_learn_they_teach).values_list('name', flat=True),
+            'i_teach_they_learn_skills': list(Skill.objects.filter(id__in=i_teach_they_learn).values_list('name', flat=True)),
+            'i_learn_they_teach_skills': list(Skill.objects.filter(id__in=i_learn_they_teach).values_list('name', flat=True)),
             'match_count': len(i_teach_they_learn) + len(i_learn_they_teach),
+            'categories': list(Skill.objects.filter(id__in=list(i_teach_they_learn) + list(i_learn_they_teach)).values_list('category', flat=True).distinct()),
         })
 
-    # Filters
     category = request.GET.get('category')
     min_reputation = request.GET.get('min_reputation')
     availability = request.GET.get('availability')
 
     if category:
-        partner_data = [
-            p for p in partner_data
-            if Skill.objects.filter(
-                pk__in=list(p['i_teach_they_learn']) + list(p['i_learn_they_teach']),
-                category=category
-            ).exists()
+        partner_list_data = [
+            p for p in partner_list_data
+            if any(cat.lower() == category.lower() for cat in p['categories'])
         ]
 
     if min_reputation:
         try:
             min_rep = float(min_reputation)
-            partner_data = [p for p in partner_data if p['user'].reputation_score >= min_rep]
+            partner_list_data = [
+                p for p in partner_list_data
+                if p['user'].reputation_score >= min_rep
+            ]
         except ValueError:
             pass
 
     if availability == 'available':
-        partner_data = [
-            p for p in partner_data
+        partner_list_data = [
+            p for p in partner_list_data
             if p['user'].teachable_skills.filter(is_active=True, hourly_commitment__gt=0).exists()
         ]
 
-    # Pagination
-    paginator = Paginator(partner_data, 10)
+    paginator = Paginator(partner_list_data, 9)
     page_number = request.GET.get('page') or 1
     page_obj = paginator.get_page(page_number)
 
-    categories = Skill.objects.values_list('category', flat=True).distinct().order_by('category')
+    all_categories = sorted(
+        {cat for p in partner_list_data for cat in p['categories']}
+    )
 
     context = {
         'partners': page_obj,
-        'categories': categories,
-        'selected_category': category or '',
+        'categories': all_categories,
+        'selected_category': category,
         'min_reputation': min_reputation or '',
         'availability': availability or '',
     }
 
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        return render(request, 'exchanges/partials/partner_cards.html', context)
-
-    return render(request, 'exchanges/partner_list.html', context)
+    return render(request, 'exchanges/skill_exchange.html', context)
 
 
 @login_required
@@ -162,7 +159,7 @@ def create_proposal(request, receiver_id):
             user=receiver
         ).select_related('skill')
 
-    return render(request, 'exchanges/proposal_form.html', {
+    return render(request, 'exchanges/proposal_create.html', {
         'form': form,
         'receiver': receiver,
     })

@@ -34,6 +34,8 @@ def portfolio_view(request):
         form = ProjectForm()
         cert_form = CertificationForm()
     
+    from apps.skills.models import TeachableSkill
+
     # Prepare context for template compatibility
     context = {
         'user': request.user,
@@ -43,5 +45,8 @@ def portfolio_view(request):
         'achievements': [],  # Add achievements logic if needed
         'project_form': form,
         'cert_form': cert_form,
+        'teachable_skills': TeachableSkill.objects.filter(
+            user=request.user, is_active=True
+        ).select_related('skill'),
     }
     return render(request, 'portfolio/portfolio.html', context)

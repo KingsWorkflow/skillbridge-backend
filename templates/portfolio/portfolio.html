@@ -53,6 +53,29 @@
         </div>
     </section>
 
+    <!-- Teachable Skills -->
+    {% if teachable_skills %}
+    <section class="space-y-md">
+        <div class="space-y-xs">
+            <h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-background">Skills I Teach</h2>
+            <div class="h-1 w-24 bg-secondary rounded-full"></div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+            {% for teachable in teachable_skills %}
+            <div class="bg-surface-container-lowest rounded-xl p-md shadow-sm border border-surface-container">
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="font-headline-md text-headline-md text-on-surface">{{ teachable.skill.name }}</h3>
+                    <span class="px-sm py-xs rounded-full bg-secondary-container/20 text-secondary font-label-sm text-label-sm">{{ teachable.get_proficiency_level_display }}</span>
+                </div>
+                <p class="font-body-sm text-body-sm text-on-surface-variant">
+                    Can teach up to {{ teachable.hourly_commitment }} hours/week
+                </p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
     <!-- Featured Projects -->
     <section class="space-y-md">
         <div class="flex justify-between items-end">

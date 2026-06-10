@@ -11,6 +11,7 @@ urlpatterns = [
     
     # API Endpoints - Users (JWT Authentication)
     path('api/', include('apps.users.api_urls')),
+    path('api/skills/', include('apps.skills.api_urls')),
     
     # Frontend Pages - Users
     path('', include('apps.users.urls')),
