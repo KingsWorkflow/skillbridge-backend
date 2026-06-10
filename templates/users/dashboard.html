@@ -30,45 +30,49 @@
 {% block content %}
 <div class="flex max-w-container-max mx-auto min-h-[calc(100vh-72px)]">
     <!-- SideNavBar -->
-    <aside class="hidden lg:flex flex-col h-full w-64 p-md gap-base bg-surface-container-low">
-        <div class="mb-lg">
+    <aside class="hidden lg:flex flex-col h-full w-64 flex-shrink-0 p-md gap-6 bg-surface-container-low border-r border-outline-variant/20">
+        <div class="mb-2">
             <p class="font-label-md text-label-md text-on-surface-variant">Welcome back</p>
-            <h3 class="font-headline-md text-headline-md text-primary">{{ user.get_full_name|default:user.username }}</h3>
+            <h3 class="font-headline-md text-headline-md text-primary truncate">{{ user.get_full_name|default:user.username }}</h3>
         </div>
-        <nav class="flex flex-col gap-xs flex-grow">
-            <a class="flex items-center gap-sm p-sm bg-primary-container text-on-primary-container rounded-lg font-bold transition-all duration-300" href="{% url 'users:dashboard' %}">
+        <nav class="flex flex-col gap-1 flex-grow">
+            <a class="flex items-center gap-3 px-3 py-2 bg-primary-container text-on-primary-container rounded-lg font-bold transition-all duration-200" href="{% url 'users:dashboard' %}">
                 <span class="material-symbols-outlined">dashboard</span>
                 <span class="font-label-md text-label-md">Overview</span>
             </a>
-            <a class="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-300" href="{% url 'skills:teachable_skills' %}">
+            <a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-200" href="{% url 'skills:teachable_skills' %}">
                 <span class="material-symbols-outlined">psychology</span>
                 <span class="font-label-md text-label-md">My Skills</span>
             </a>
-            <a class="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-300" href="{% url 'exchanges:exchange_list' %}">
+            <a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-200" href="{% url 'exchanges:exchange_list' %}">
                 <span class="material-symbols-outlined">groups</span>
                 <span class="font-label-md text-label-md">Mentorship</span>
             </a>
-            <a class="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-300" href="{% url 'recommendations:skill_gap' %}">
+            <a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-200" href="{% url 'recommendations:skill_gap' %}">
                 <span class="material-symbols-outlined">analytics</span>
                 <span class="font-label-md text-label-md">Analytics</span>
             </a>
-            <a class="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-300" href="#">
+            <a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-200" href="{% url 'users:profile_edit' %}">
                 <span class="material-symbols-outlined">settings</span>
                 <span class="font-label-md text-label-md">Settings</span>
             </a>
         </nav>
-        <div class="p-md bg-primary-fixed-dim/20 rounded-xl border border-primary-container/10 mb-md">
-            <p class="font-label-sm text-label-sm text-primary mb-2">Need guidance?</p>
-            <a href="{% url 'recommendations:resources' %}" class="w-full py-2 bg-primary text-on-primary rounded-lg font-label-md text-label-md text-center block">Get AI Advice</a>
+        <div class="p-4 bg-primary-fixed-dim/10 rounded-xl border border-primary-container/10 space-y-3">
+            <p class="font-label-sm text-label-sm text-primary leading-snug">Need guidance?</p>
+            <a href="{% url 'recommendations:resources' %}" class="block w-full py-2 bg-primary text-on-primary rounded-lg font-label-md text-label-md text-center hover:opacity-90 transition-all">Get AI Advice</a>
         </div>
-        <div class="flex flex-col gap-xs pt-base border-t border-outline-variant">
-            <a class="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-300" href="#">
+        <div class="flex flex-col gap-1 pt-4 border-t border-outline-variant/30">
+            <a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-200" href="{% url 'users:profile_edit' %}">
+                <span class="material-symbols-outlined">person</span>
+                <span class="font-label-md text-label-md">Profile</span>
+            </a>
+            <a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-200" href="#">
                 <span class="material-symbols-outlined">help</span>
                 <span class="font-label-md text-label-md">Help</span>
             </a>
             <form method="post" action="{% url 'users:logout' %}" class="inline">
                 {% csrf_token %}
-                <button type="submit" class="flex items-center gap-sm p-sm text-error hover:bg-surface-container-high rounded-lg transition-all duration-300">
+                <button type="submit" class="flex items-center gap-3 px-3 py-2 text-error hover:bg-surface-container-high rounded-lg transition-all duration-200 w-full">
                     <span class="material-symbols-outlined">logout</span>
                     <span class="font-label-md text-label-md">Logout</span>
                 </button>

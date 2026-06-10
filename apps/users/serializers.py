@@ -11,7 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'password', 'password2', 'phone', 'experience_level')
+        fields = ('id', 'username', 'email', 'password', 'password2', 'phone', 'title', 'experience_level')
         extra_kwargs = {
             'email': {'required': True},
             'phone': {'required': False},
@@ -36,7 +36,8 @@ class UserSerializer(serializers.ModelSerializer):
             email=validated_data['email'],
             password=validated_data['password'],
         )
-        user.phone = validated_data.get('phone', '')
+        user.phone = validated_data.get("phone", "")
+        user.title = validated_data.get("title", "")
         user.experience_level = validated_data.get('experience_level', 'beginner')
         user.skill_credits = 0
         user.beginner_tokens = 5

@@ -70,11 +70,16 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
                         <div class="space-y-2">
+                            <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.title.id_for_label }}">Title</label>
+                            {{ form.title|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary" }}
+                        </div>
+
+                        <div class="space-y-2">
                             <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.phone.id_for_label }}">Phone</label>
                             {{ form.phone|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary" }}
                         </div>
 
-                        <div class="space-y-2">
+                        <div class="space-y-2 md:col-span-2">
                             <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.experience_level.id_for_label }}">Experience Level</label>
                             {{ form.experience_level|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary" }}
                         </div>

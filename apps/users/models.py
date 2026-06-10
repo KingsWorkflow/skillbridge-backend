@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 
 
 class UserProfile(AbstractUser):
+    title = models.CharField(max_length=200, blank=True, help_text="Professional title or role, e.g. Full-Stack Developer")
     phone = models.CharField(max_length=15, blank=True, null=True)
     profile_picture = models.ImageField(upload_to='profiles/', blank=True, null=True)
     bio = models.TextField(max_length=500, blank=True)

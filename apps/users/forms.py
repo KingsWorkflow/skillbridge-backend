@@ -98,10 +98,19 @@ class CustomUserCreationForm(UserCreationForm):
 
 class UserProfileUpdateForm(UserChangeForm):
     password = None
+    title = forms.CharField(
+        max_length=200,
+        required=False,
+        help_text='Your professional title or role.',
+        widget=forms.TextInput(attrs={
+            'placeholder': 'e.g. Full-Stack Developer',
+            'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary',
+        })
+    )
 
     class Meta:
         model = User
-        fields = ('bio', 'profile_picture', 'phone', 'experience_level')
+        fields = ('title', 'bio', 'profile_picture', 'phone', 'experience_level')
         widgets = {
-            'bio': forms.Textarea(attrs={'rows': 3, 'class': 'w-full'}),
+            'bio': forms.Textarea(attrs={'rows': 3, 'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary'}),
         }
