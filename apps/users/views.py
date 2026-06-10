@@ -196,19 +196,38 @@ def dashboard_view(request):
     return render(request, 'users/dashboard.html', context)
 
 
-class ProfileUpdateView(UpdateView):
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+
+class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     form_class = UserProfileUpdateForm
     template_name = 'users/profile.html'
     success_url = reverse_lazy('users:profile_edit')
 
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            from django.contrib.auth.views import redirect_to_login
+            return redirect_to_login(self.request.get_full_path())
+        return super().dispatch(request, *args, **kwargs)
+
     def get_object(self):
         return self.request.user
+
+    def form_valid(self, form):
+        from apps.notifications.email_utils import create_password_changed_notification
+        from django.contrib.auth import update_session_auth_hash
+        old_password_hash = self.request.user.password
+        response = super().form_valid(form)
+        new_password_hash = self.object.password
+        if old_password_hash != new_password_hash:
+            create_password_changed_notification(self.request.user)
+            update_session_auth_hash(self.request, self.object)
+        return response
 
 
 @login_required
 def public_profile(request, username):
-    User = get_user_model()
-    profile_user = get_object_or_404(User, username=username)
+    profile_user = get_object_or_404(UserProfile, username=username)
     
     teachable_skills = TeachableSkill.objects.filter(
         user=profile_user, is_active=True

@@ -1,0 +1,46 @@
+{% load static %}
+{% if unread_count == 0 and notifications|length == 0 %}
+<div class="px-4 py-8 text-center">
+    <span class="material-symbols-outlined text-outline text-4xl block mb-2">notifications_off</span>
+    <p class="text-sm text-on-surface-variant">No new notifications</p>
+</div>
+{% else %}
+{% for notification in notifications %}
+<div class="px-4 py-3 flex items-start gap-3 {% if not notification.is_read %}bg-primary/5 border-l-2 border-primary{% else %}border-b border-outline-variant/10{% endif %} hover:bg-surface-container-low transition-colors"
+     data-nid="{{ notification.id }}">
+    <span class="material-symbols-outlined text-lg mt-0.5 {% if notification.is_read %}text-outline{% else %}text-primary{% endif %} flex-shrink-0">
+        {% if notification.notification_type == 'password_changed' %}lock
+        {% elif notification.notification_type == 'exchange_proposal' %}swap_horiz
+        {% elif notification.notification_type == 'proposal_accepted' %}check_circle
+        {% elif notification.notification_type == 'proposal_rejected' %}cancel
+        {% elif notification.notification_type == 'session_scheduled' %}event
+        {% elif notification.notification_type == 'session_reminder' %}alarm
+        {% elif notification.notification_type == 'session_completed' %}verified
+        {% elif notification.notification_type == 'skill_verified' %}badge
+        {% elif notification.notification_type == 'credit_earned' %}account_balance_wallet
+        {% elif notification.notification_type == 'welcome' %}celebration
+        {% else %}notifications{% endif %}
+    </span>
+    <div class="flex-1 min-w-0">
+        <p class="text-sm font-semibold {% if not notification.is_read %}text-primary{% else %}text-on-surface{% endif %} truncate">{{ notification.title }}</p>
+        <p class="text-xs text-on-surface-variant truncate">{{ notification.message }}</p>
+        <span class="text-[10px] text-outline mt-1 block">{{ notification.created_at|timesince }} ago</span>
+    </div>
+    <div class="flex items-center gap-1 flex-shrink-0">
+        {% if not notification.is_read %}
+        <button class="p-1 rounded-full hover:bg-surface-container text-on-surface-variant hover:text-primary transition-colors mark-read-btn"
+                title="Mark as read" data-nid="{{ notification.id }}">
+            <span class="material-symbols-outlined text-base">done</span>
+        </button>
+        {% endif %}
+        <button class="p-1 rounded-full hover:bg-error/10 text-on-surface-variant hover:text-error transition-colors delete-btn"
+                title="Delete" data-nid="{{ notification.id }}">
+            <span class="material-symbols-outlined text-base">close</span>
+        </button>
+    </div>
+</div>
+{% endfor %}
+{% if unread_count > 0 %}
+<a href="{% url 'notifications:notifications_page' %}" class="block text-center text-sm text-primary hover:underline py-2 border-t border-outline-variant/10">View all notifications</a>
+{% endif %}
+{% endif %}

@@ -33,18 +33,18 @@
       {% with partner_user=partner_data.user %}
       <div class="bg-white p-md rounded-[12px] shadow-[0px_4px_20px_rgba(30,111,92,0.08)] hover:-translate-y-1 transition-all group">
         <div class="flex items-start justify-between mb-md">
-          <div class="flex items-center gap-sm">
+          <a href="{% url 'users:public_profile' partner_user.username %}" class="flex items-center gap-sm group/profile-link">
             <img alt="{{ partner_user.username }}'s avatar" class="w-12 h-12 rounded-full object-cover"
                  src="{% if partner_user.profile_picture %}{{ partner_user.profile_picture.url }}{% else %}{% static 'images/avatar-placeholder.png' %}{% endif %}"
                  onerror="this.style.display='none'; this.insertAdjacentHTML('afterend', '<div class=\'w-12 h-12 rounded-full bg-surface-container flex items-center justify-center font-bold text-on-surface\'>{{ partner_user.username|slice:':1' }}</div>')">
             <div>
-              <h3 class="font-headline-md text-[18px] text-on-surface">{{ partner_user.get_full_name|default:partner_user.username }}</h3>
+              <h3 class="font-headline-md text-[18px] text-on-surface group-hover/profile-link:text-primary transition-colors">{{ partner_user.get_full_name|default:partner_user.username }}</h3>
               <div class="flex items-center gap-xs">
                 <span class="material-symbols-outlined text-secondary text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
                 <span class="text-label-sm font-label-sm text-on-surface-variant">{{ partner_user.reputation_score|floatformat:1 }} ({{ partner_data.match_count|default:0 }} matches)</span>
               </div>
             </div>
-          </div>
+          </a>
           <span class="bg-tertiary-fixed text-on-tertiary-fixed px-3 py-1 rounded-full text-label-sm font-label-sm">{{ partner_data.categories|first|default:"Other" }}</span>
         </div>
 

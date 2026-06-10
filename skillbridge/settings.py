@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'apps.portfolio',
     'apps.admin_custom',
     'apps.careers',
+    'apps.notifications',
 ]
 
 MIDDLEWARE = [
@@ -64,6 +65,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'apps.notifications.context_processors.notification_unread_count',
             ],
         },
     },

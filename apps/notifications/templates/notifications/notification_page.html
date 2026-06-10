@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>{{ title }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen">
+    <!-- Header -->
+    <header class="bg-surface shadow-[0px_4px_20px_rgba(30,111,92,0.08)]">
+        <nav class="flex justify-between items-center px-8 py-4 max-w-7xl mx-auto">
+            <a href="{% url 'home' %}" class="font-headline text-xl font-extrabold text-primary">SkillBridge Nepal</a>
+            <div class="flex items-center gap-4">
+                <a href="{% url 'notifications:notifications_page' %}" class="relative text-on-surface-variant hover:text-primary transition-colors">
+                    <span class="material-symbols-outlined text-3xl">notifications</span>
+                    {% if unread_count > 0 %}
+                    <span class="absolute -top-1 -right-2 bg-error text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">{{ unread_count }}</span>
+                    {% endif %}
+                </a>
+                <a href="{% url 'users:profile_edit' %}" class="text-on-surface-variant hover:text-primary">
+                    <span class="material-symbols-outlined text-3xl">person</span>
+                </a>
+                <form method="post" action="{% url 'users:logout' %}" class="inline">
+                    {% csrf_token %}
+                    <button type="submit" class="bg-secondary-container text-on-secondary-container px-6 py-2 rounded-lg font-medium hover:scale-95 transition-transform">Logout</button>
+                </form>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Content -->
+    <main class="max-w-3xl mx-auto px-8 py-12">
+        <h1 class="text-2xl font-bold mb-6">All Notifications</h1>
+
+        {% if notifications %}
+        <div class="space-y-3">
+            {% for notification in notifications %}
+            <div class="flex items-start gap-4 p-4 rounded-xl border {% if not notification.is_read %}border-primary/30 bg-primary/5{% else %}border-outline-variant/30 bg-surface{% endif %} hover:bg-surface-container-low transition-colors">
+                <span class="material-symbols-outlined text-3xl mt-0.5 {% if notification.is_read %}text-outline{% else %}text-primary{% endif %}">
+                    {% if notification.notification_type == 'password_changed' %}lock
+                    {% elif notification.notification_type == 'exchange_proposal' %}swap_horiz
+                    {% elif notification.notification_type == 'proposal_accepted' %}check_circle
+                    {% elif notification.notification_type == 'proposal_rejected' %}cancel
+                    {% elif notification.notification_type == 'session_scheduled' %}event
+                    {% elif notification.notification_type == 'session_reminder' %}alarm
+                    {% elif notification.notification_type == 'session_completed' %}verified
+                    {% elif notification.notification_type == 'skill_verified' %}badge
+                    {% elif notification.notification_type == 'credit_earned' %}account_balance_wallet
+                    {% elif notification.notification_type == 'welcome' %}celebration
+                    {% else %}notifications{% endif %}
+                </span>
+                <div class="flex-1">
+                    <h3 class="font-semibold {% if not notification.is_read %}text-primary{% else %}text-on-surface{% endif %}">{{ notification.title }}</h3>
+                    <p class="text-sm text-on-surface-variant mt-1">{{ notification.message }}</p>
+                    <span class="text-xs text-outline mt-2 block">{{ notification.created_at|timesince }} ago</span>
+                </div>
+                {% if notification.link_url %}
+                <a href="{{ notification.link_url }}" class="text-sm text-primary hover:underline whitespace-nowrap">View</a>
+                {% endif %}
+                {% if not notification.is_read %}
+                <form method="post" action="{% url 'notifications:mark_as_read' notification.id %}" class="inline">
+                    {% csrf_token %}
+                    <button type="submit" class="text-xs text-on-surface-variant hover:text-primary">
+                        <span class="material-symbols-outlined text-lg">done</span>
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-center text-on-surface-variant py-12">No notifications yet.</p>
+        {% endif %}
+
+        <div class="mt-8 text-center">
+            <a href="{% url 'users:dashboard' %}" class="text-primary hover:underline">← Back to Dashboard</a>
+        </div>
+    </main>
+</body>
+</html>

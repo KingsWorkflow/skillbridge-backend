@@ -33,6 +33,9 @@ urlpatterns = [
     
     # Frontend Pages - Careers
     path('career/', include('apps.careers.urls')),
+    
+    # Frontend Pages - Notifications
+    path('notifications/', include('apps.notifications.urls')),
 ]
 
 if settings.DEBUG:

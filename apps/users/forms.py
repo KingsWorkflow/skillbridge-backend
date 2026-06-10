@@ -132,20 +132,49 @@ class OTPVerificationForm(forms.Form):
 
 
 class UserProfileUpdateForm(UserChangeForm):
-    password = None
-    title = forms.CharField(
-        max_length=200,
+    password = forms.CharField(
         required=False,
-        help_text='Your professional title or role.',
-        widget=forms.TextInput(attrs={
-            'placeholder': 'e.g. Full-Stack Developer',
+        help_text='Leave blank to keep current password. Enter a new password to change it.',
+        widget=forms.PasswordInput(attrs={
+            'placeholder': 'New password (optional)',
             'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary',
+            'autocomplete': 'new-password',
+        })
+    )
+    password_confirm = forms.CharField(
+        required=False,
+        help_text='Confirm your new password.',
+        widget=forms.PasswordInput(attrs={
+            'placeholder': 'Confirm new password',
+            'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary',
+            'autocomplete': 'new-password',
         })
     )
 
     class Meta:
         model = User
-        fields = ('title', 'bio', 'profile_picture', 'phone', 'experience_level')
+        fields = ('title', 'bio', 'profile_picture', 'phone', 'experience_level', 'password', 'password_confirm')
         widgets = {
             'bio': forms.Textarea(attrs={'rows': 3, 'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary'}),
         }
+
+    def clean(self):
+        cleaned = super().clean()
+        pwd = cleaned.get('password')
+        pwd2 = cleaned.get('password_confirm')
+        if pwd and not pwd2:
+            self.add_error('password_confirm', 'Please confirm your new password.')
+        elif pwd2 and not pwd:
+            self.add_error('password', 'Please enter a new password.')
+        elif pwd and pwd2 and pwd != pwd2:
+            self.add_error('password_confirm', 'Passwords do not match.')
+        return cleaned
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        new_password = self.cleaned_data.get('password')
+        if new_password:
+            user.set_password(new_password)
+        if commit:
+            user.save()
+        return user
