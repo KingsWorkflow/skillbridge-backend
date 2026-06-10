@@ -131,7 +131,7 @@ def dashboard_view(request):
 
 class ProfileUpdateView(UpdateView):
     form_class = UserProfileUpdateForm
-    template_name = 'users/profile_edit.html'
+    template_name = 'users/profile.html'
     success_url = reverse_lazy('users:profile_edit')
 
     def get_object(self):

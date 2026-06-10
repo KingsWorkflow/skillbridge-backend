@@ -136,9 +136,9 @@
         <div class="flex items-center gap-4">
             {% if user.is_authenticated %}
             <button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high/50 p-2 rounded-full transition-all" data-icon="notifications">notifications</button>
-            <button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high/50 p-2 rounded-full transition-all" title="Profile">
+            <a class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high/50 p-2 rounded-full transition-all inline-flex items-center justify-center" href="{% url 'users:profile_edit' %}" title="Profile">
                 <span class="material-symbols-outlined">person</span>
-            </button>
+            </a>
             <form method="post" action="{% url 'users:logout' %}" class="inline">
                 {% csrf_token %}
                 <button type="submit" class="bg-secondary-container text-on-secondary-container px-6 py-2 rounded-lg font-label-md text-label-md hover:scale-95 transition-transform active:scale-90">Logout</button>

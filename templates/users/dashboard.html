@@ -19,9 +19,9 @@
         </div>
         <div class="flex items-center gap-md">
             <button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">notifications</button>
-            <button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high/50 p-2 rounded-full transition-all" title="Profile">
+            <a class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high/50 p-2 rounded-full transition-all inline-flex items-center justify-center" href="{% url 'users:profile_edit' %}" title="Profile">
                 <span class="material-symbols-outlined">person</span>
-            </button>
+            </a>
         </div>
     </div>
 </nav>
