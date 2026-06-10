@@ -2,45 +2,7 @@
 {% load static %}
 {% block title %}Skill Exchange Marketplace | SkillBridge Nepal{% endblock %}
 
-{% block extra_css %}
-<style>
-  .material-symbols-outlined {
-    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-    display: inline-block;
-    vertical-align: middle;
-  }
-</style>
-{% endblock %}
-
 {% block content %}
-<header class="sticky top-0 w-full z-50 bg-surface shadow-[0px_4px_20px_rgba(30,111,92,0.08)]">
-  <nav class="flex justify-between items-center px-margin-desktop py-4 max-w-container-max mx-auto">
-    <div class="flex items-center gap-md">
-      <span class="font-headline-md text-headline-md text-primary">SkillBridge Nepal</span>
-      <div class="hidden md:flex items-center gap-base ml-lg">
-        <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="{% url 'users:dashboard' %}">Dashboard</a>
-        <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="{% url 'careers:career_recommendations' %}">Career</a>
-        <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="{% url 'recommendations:skill_gap' %}">Skill Gap</a>
-        <a class="font-body-md text-body-md text-primary font-bold border-b-2 border-primary transition-colors" href="{% url 'exchanges:skill_exchange' %}">Exchange</a>
-        <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="{% url 'portfolio:portfolio' %}">Portfolio</a>
-        <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="{% url 'recommendations:resources' %}">Resources</a>
-      </div>
-    </div>
-    <div class="flex items-center gap-md">
-      <div class="hidden md:flex bg-surface-container-low rounded-full px-4 py-2 items-center gap-xs">
-        <span class="material-symbols-outlined text-outline">search</span>
-        <input class="bg-transparent border-none focus:ring-0 text-body-sm w-48" placeholder="Search skills..." type="text"/>
-      </div>
-      <button class="material-symbols-outlined text-on-surface-variant" aria-label="Notifications">notifications</button>
-      <a class="inline-flex items-center justify-center" href="{% url 'users:profile_edit' %}" title="Profile">
-        <img alt="User profile photo" class="w-10 h-10 rounded-full border-2 border-primary/10 object-cover"
-             src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'images/avatar-placeholder.png' %}{% endif %}"
-             onerror="this.style.display='none'; this.insertAdjacentHTML('afterend', '<div class=\'w-10 h-10 rounded-full border-2 border-primary/10 bg-surface-container flex items-center justify-center font-bold text-on-surface\'>{{ user.username|slice:':1' }}</div>')">
-      </a>
-    </div>
-  </nav>
-</header>
-
 <main class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-lg min-h-screen">
   <section class="mb-lg">
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-md mb-lg">

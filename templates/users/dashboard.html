@@ -3,30 +3,6 @@
 {% block title %}Dashboard | SkillBridge Nepal{% endblock %}
 {% block html_class %}light{% endblock %}
 
-{% block header %}
-<nav class="sticky top-0 w-full z-50 bg-surface shadow-[0px_4px_20px_rgba(30,111,92,0.08)]">
-    <div class="flex justify-between items-center px-margin-desktop py-4 max-w-container-max mx-auto">
-        <div class="flex items-center gap-lg">
-            <span class="text-headline-md font-headline-md text-primary">SkillBridge Nepal</span>
-            <div class="hidden md:flex gap-md">
-                <a class="font-body-md text-body-md text-primary font-bold border-b-2 border-primary active:scale-95 duration-200" href="{% url 'users:dashboard' %}">Dashboard</a>
-                <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors active:scale-95 duration-200" href="{% url 'careers:career_recommendations' %}">Career</a>
-                <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors active:scale-95 duration-200" href="{% url 'recommendations:skill_gap' %}">Skill Gap</a>
-                <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors active:scale-95 duration-200" href="{% url 'exchanges:skill_exchange' %}">Exchange</a>
-                <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors active:scale-95 duration-200" href="{% url 'portfolio:portfolio' %}">Portfolio</a>
-                <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors active:scale-95 duration-200" href="{% url 'recommendations:resources' %}">Resources</a>
-            </div>
-        </div>
-        <div class="flex items-center gap-md">
-            <button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">notifications</button>
-            <a class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high/50 p-2 rounded-full transition-all inline-flex items-center justify-center" href="{% url 'users:profile_edit' %}" title="Profile">
-                <span class="material-symbols-outlined">person</span>
-            </a>
-        </div>
-    </div>
-</nav>
-{% endblock %}
-
 {% block content %}
 <div class="flex max-w-container-max mx-auto min-h-[calc(100vh-72px)]">
     <!-- SideNavBar -->
