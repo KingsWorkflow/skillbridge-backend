@@ -7,15 +7,18 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, View
 from django.http import HttpResponseRedirect
 from django.conf import settings
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework.permissions import AllowAny
-from .forms import CustomUserCreationForm, UserProfileUpdateForm, CustomAuthenticationForm
+from .forms import CustomUserCreationForm, UserProfileUpdateForm, CustomAuthenticationForm, OTPVerificationForm
 from .serializers import UserSerializer, LoginSerializer
 from .mixins import JWTResponseMixin
+from .email_utils import send_otp_email, verify_otp_for_user
+from .models import UserProfile
 from apps.skills.models import TeachableSkill, LearnableSkill, Skill
 from apps.skills.forms import TeachableSkillForm, LearnableSkillForm
 from apps.portfolio.models import Project, Certification as PortfolioCertification
@@ -34,19 +37,19 @@ class CustomLoginView(LoginView):
         return reverse_lazy('users:dashboard')
 
     def form_valid(self, form):
-        # Session-based login for Django templates
-        response = super().form_valid(form)
-        
-        # Also set JWT cookies for API access
         user = form.get_user()
+        if not user.email_verified:
+            messages.error(self.request, 'Please verify your email before logging in. Check your inbox for the OTP code.')
+            logout(self.request)
+            return redirect('users:verify_email')
+        response = super().form_valid(form)
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
         refresh_token = str(refresh)
-        
         response.set_cookie(
             settings.JWT_COOKIE_NAME,
             access_token,
-            max_age=60 * 60,  # 1 hour
+            max_age=60 * 60,
             httponly=settings.JWT_COOKIE_HTTP_ONLY,
             secure=settings.JWT_COOKIE_SECURE,
             samesite=settings.JWT_COOKIE_SAMESITE,
@@ -54,29 +57,96 @@ class CustomLoginView(LoginView):
         response.set_cookie(
             settings.JWT_REFRESH_COOKIE_NAME,
             refresh_token,
-            max_age=60 * 60 * 24,  # 1 day
+            max_age=60 * 60 * 24,
             httponly=settings.JWT_COOKIE_HTTP_ONLY,
             secure=settings.JWT_COOKIE_SECURE,
             samesite=settings.JWT_COOKIE_SAMESITE,
         )
-        
         return response
 
 
 class RegisterView(CreateView):
     form_class = CustomUserCreationForm
     template_name = 'users/signup.html'
-    success_url = reverse_lazy('users:dashboard')
+    success_url = reverse_lazy('users:verify_email')
 
     def form_valid(self, form):
-        response = super().form_valid(form)
-        email = form.cleaned_data.get('email')
-        password = form.cleaned_data.get('password1')
-        user = authenticate(username=email, password=password)
-        if user:
-            login(self.request, user)
-            messages.success(self.request, 'Account created successfully!')
-        return response
+        user = form.save()
+        user.is_active = False
+        user.email_verified = False
+        user.save(update_fields=['is_active', 'email_verified'])
+        send_otp_email(user)
+        self.request.session['pending_verify_user_id'] = user.id
+        messages.success(self.request, 'Account created! Please check your email for the verification code.')
+        return redirect('users:verify_email')
+
+
+class VerifyEmailView(View):
+    template_name = 'users/verify_email.html'
+
+    def _get_verify_user(self, request):
+        if request.user.is_authenticated and not request.user.is_anonymous:
+            return request.user
+        user_id = request.session.get('pending_verify_user_id')
+        if not user_id:
+            return None
+        try:
+            return UserProfile.objects.get(pk=user_id)
+        except UserProfile.DoesNotExist:
+            return None
+
+    def get(self, request, *args, **kwargs):
+        user = self._get_verify_user(request)
+        if user and user.email_verified:
+            if request.user.is_authenticated:
+                return redirect('users:dashboard')
+            user.backend = 'apps.users.backends.EmailBackend'
+            login(request, user)
+            return redirect('users:dashboard')
+            user.backend = 'apps.users.backends.EmailBackend'
+            login(request, user)
+            return redirect('users:dashboard')
+        form = OTPVerificationForm()
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request, *args, **kwargs):
+        user = self._get_verify_user(request)
+        if not user:
+            messages.error(request, 'Session expired. Please sign up again.')
+            return redirect('users:register')
+        form = OTPVerificationForm(request.POST)
+        if form.is_valid():
+            otp_code = form.cleaned_data['otp_code']
+            success, message = verify_otp_for_user(user, otp_code)
+            if success:
+                messages.success(request, message)
+                request.session.pop('pending_verify_user_id', None)
+                user.backend = 'apps.users.backends.EmailBackend'
+                login(request, user)
+                return redirect('users:dashboard')
+            else:
+                messages.error(request, message)
+        return render(request, self.template_name, {'form': form})
+
+
+class ResendOTPView(View):
+    def _get_verify_user(self, request):
+        if request.user.is_authenticated and not request.user.is_anonymous:
+            return request.user
+        user_id = request.session.get('pending_verify_user_id')
+        if not user_id:
+            return None
+        try:
+            return UserProfile.objects.get(pk=user_id)
+        except UserProfile.DoesNotExist:
+            return None
+
+    def get(self, request):
+        user = self._get_verify_user(request)
+        if user and not user.email_verified:
+            send_otp_email(user)
+            messages.info(request, 'A new verification code has been sent to your email.')
+        return redirect('users:verify_email')
 
 
 class CustomLogoutView(LogoutView):
@@ -88,7 +158,6 @@ class CustomLogoutView(LogoutView):
 
 @login_required
 def dashboard_view(request):
-    # Get recent proposals (sent and received)
     sent_proposals = request.user.sent_proposals.select_related(
         'offer_skill', 'request_skill', 'receiver'
     ).order_by('-created_at')[:5]
@@ -96,7 +165,6 @@ def dashboard_view(request):
         'offer_skill', 'request_skill', 'proposer'
     ).order_by('-created_at')[:5]
     
-    # Get upcoming sessions
     upcoming_sessions = []
     for session in request.user.learning_sessions.filter(completed=False).select_related('skill_taught').order_by('scheduled_date')[:3]:
         upcoming_sessions.append({
@@ -105,7 +173,6 @@ def dashboard_view(request):
             'time': session.scheduled_date,
         })
     
-    # Mock recommended careers
     recommended_careers = [
         {'title': 'Full-Stack Developer', 'match_type': 'Hot', 'description': 'Build web applications end-to-end'},
         {'title': 'Data Scientist', 'match_type': 'Growing', 'description': 'Extract insights from data'},
@@ -140,14 +207,12 @@ class ProfileUpdateView(UpdateView):
 
 @login_required
 def public_profile(request, username):
-    """View any user's public profile."""
-    from django.contrib.auth import get_user_model
     User = get_user_model()
     profile_user = get_object_or_404(User, username=username)
     
     teachable_skills = TeachableSkill.objects.filter(
         user=profile_user, is_active=True
-    ).select_related('skill', 'verification')
+    ).select_related('skill')
     
     learnable_skills = LearnableSkill.objects.filter(
         user=profile_user
@@ -170,7 +235,6 @@ def public_profile(request, username):
 
 @login_required
 def add_teachable_skill(request):
-    """Add a teachable skill for the current user."""
     if request.method == 'POST':
         form = TeachableSkillForm(request.POST)
         if form.is_valid():
@@ -186,13 +250,11 @@ def add_teachable_skill(request):
             return redirect('users:profile_edit')
     else:
         form = TeachableSkillForm()
-
     return render(request, 'users/modals/add_skill.html', {'form': form, 'type': 'teachable'})
 
 
 @login_required
 def add_learnable_skill(request):
-    """Add a learnable skill for the current user."""
     if request.method == 'POST':
         form = LearnableSkillForm(request.POST)
         if form.is_valid():
@@ -208,13 +270,11 @@ def add_learnable_skill(request):
             return redirect('users:profile_edit')
     else:
         form = LearnableSkillForm()
-
     return render(request, 'users/modals/add_skill.html', {'form': form, 'type': 'learnable'})
 
 
 @login_required
 def add_project(request):
-    """Add a portfolio project."""
     if request.method == 'POST':
         form = ProjectForm(request.POST, request.FILES)
         if form.is_valid():
@@ -225,13 +285,11 @@ def add_project(request):
             return redirect('users:profile_edit')
     else:
         form = ProjectForm()
-    
     return render(request, 'users/modals/add_project.html', {'form': form})
 
 
 @login_required
 def add_certification(request):
-    """Add a certification."""
     if request.method == 'POST':
         form = CertificationForm(request.POST, request.FILES)
         if form.is_valid():
@@ -242,7 +300,6 @@ def add_certification(request):
             return redirect('users:profile_edit')
     else:
         form = CertificationForm()
-    
     return render(request, 'users/modals/add_certification.html', {'form': form})
 
 
@@ -327,7 +384,7 @@ class RegisterAPIView(APIView):
 
 class LoginAPIView(JWTResponseMixin, APIView):
     permission_classes = [AllowAny]
-    
+
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
@@ -349,11 +406,10 @@ class LoginAPIView(JWTResponseMixin, APIView):
                 'refresh': refresh_token,
             })
             
-            # Set JWT cookies
             response.set_cookie(
                 settings.JWT_COOKIE_NAME,
                 access_token,
-                max_age=60 * 60,  # 1 hour
+                max_age=60 * 60,
                 httponly=settings.JWT_COOKIE_HTTP_ONLY,
                 secure=settings.JWT_COOKIE_SECURE,
                 samesite=settings.JWT_COOKIE_SAMESITE,
@@ -361,7 +417,7 @@ class LoginAPIView(JWTResponseMixin, APIView):
             response.set_cookie(
                 settings.JWT_REFRESH_COOKIE_NAME,
                 refresh_token,
-                max_age=60 * 60 * 24,  # 1 day
+                max_age=60 * 60 * 24,
                 httponly=settings.JWT_COOKIE_HTTP_ONLY,
                 secure=settings.JWT_COOKIE_SECURE,
                 samesite=settings.JWT_COOKIE_SAMESITE,

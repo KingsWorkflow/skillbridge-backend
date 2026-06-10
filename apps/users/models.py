@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+import uuid
 
 
 class UserProfile(AbstractUser):
@@ -7,6 +8,9 @@ class UserProfile(AbstractUser):
     phone = models.CharField(max_length=15, blank=True, null=True)
     profile_picture = models.ImageField(upload_to='profiles/', blank=True, null=True)
     bio = models.TextField(max_length=500, blank=True)
+    is_active = models.BooleanField(default=False)
+    email_verified = models.BooleanField(default=False)
+    email_verification_token = models.UUIDField(default=uuid.uuid4, editable=False)
     
     EXPERIENCE_CHOICES = [
         ('beginner', 'Beginner (0-1 years)'),
@@ -41,3 +45,17 @@ class UserProfile(AbstractUser):
 
     class Meta:
         db_table = 'users'
+
+
+class EmailVerificationOTP(models.Model):
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='email_otps')
+    otp_code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"OTP for {self.user.email}"

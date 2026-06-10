@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load static %}
+{% load form_tags %}
+{% block title %}Verify Email | SkillBridge Nepal{% endblock %}
+{% block header %}{% endblock %}
+
+{% block content %}
+<div class="flex-grow flex items-center justify-center p-margin-mobile md:p-margin-desktop">
+  <div class="max-w-md w-full">
+    <div class="p-8 md:p-10 rounded-xl bg-white border border-outline-variant shadow-lg">
+      <div class="text-center mb-6">
+        <span class="material-symbols-outlined text-primary text-4xl mb-2" style="font-variation-settings: 'FILL' 1;">mark_email_read</span>
+        <h1 class="font-headline-lg text-headline-lg text-on-surface">Verify your email</h1>
+        <p class="font-body-md text-body-md text-on-surface-variant mt-2">Enter the 6-digit code sent to your email address.</p>
+      </div>
+
+      <form method="post" class="space-y-6">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <div class="space-y-2">
+          <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.otp_code.id_for_label }}">Verification Code</label>
+          {{ form.otp_code|add_class:"text-center tracking-widest" }}
+        </div>
+
+        {% if messages %}
+        <div class="space-y-2">
+          {% for message in messages %}
+          <div class="rounded-lg px-4 py-3 text-sm border-l-4 {% if message.tags == 'error' %}bg-red-50 border-red-500 text-red-800{% elif message.tags == 'success' %}bg-green-50 border-green-500 text-green-800{% else %}bg-blue-50 border-blue-500 text-blue-800{% endif %}">
+            {{ message }}
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <button type="submit" class="w-full bg-primary text-on-primary py-3 rounded-lg font-label-md text-label-md hover:opacity-90 transition-all">Verify Email</button>
+      </form>
+
+      <div class="mt-6 text-center">
+        <a href="{% url 'users:resend_otp' %}" class="font-label-md text-label-md text-primary hover:underline">Resend code</a>
+      </div>
+
+      <p class="text-body-sm text-body-sm text-on-surface-variant text-center mt-6">
+        Already verified?
+        <a href="{% url 'users:login' %}" class="text-primary font-bold hover:underline">Sign in</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

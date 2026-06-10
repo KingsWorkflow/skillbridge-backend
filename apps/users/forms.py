@@ -61,12 +61,14 @@ class CustomUserCreationForm(UserCreationForm):
         fields = ('username', 'email', 'password1', 'password2', 'phone', 'experience_level', 'accept_terms')
 
     def clean_email(self):
-        """Normalize email to lowercase and check for duplicates (case-insensitive)."""
+        """Normalize email to lowercase and allow reuse for unverified/inactive accounts."""
         email = self.cleaned_data.get('email')
         if email:
             email = email.lower()
-            if User.objects.filter(email__iexact=email).exists():
-                raise forms.ValidationError('A user with this email already exists.')
+            existing = User.objects.filter(email__iexact=email).first()
+            if existing:
+                if existing.is_active and existing.email_verified:
+                    raise forms.ValidationError('A user with this email already exists.')
         return email
 
     def clean_username(self):
@@ -85,15 +87,48 @@ class CustomUserCreationForm(UserCreationForm):
         return cleaned
 
     def save(self, commit=True):
-        user = super().save(commit=False)
-        user.email = self.cleaned_data['email']
-        user.phone = self.cleaned_data.get('phone', '')
-        user.experience_level = self.cleaned_data.get('experience_level', 'beginner')
-        user.skill_credits = 0
-        user.beginner_tokens = 5
+        email = self.cleaned_data['email']
+        user, created = User.objects.get_or_create(
+            email__iexact=email,
+            defaults={
+                'username': self.cleaned_data['username'],
+                'email': email,
+                'phone': self.cleaned_data.get('phone', ''),
+                'experience_level': self.cleaned_data.get('experience_level', 'beginner'),
+                'skill_credits': 0,
+                'beginner_tokens': 5,
+                'is_active': False,
+                'email_verified': False,
+            },
+        )
+        if not created:
+            user.is_active = False
+            user.email_verified = False
         if commit:
             user.save()
         return user
+
+
+class OTPVerificationForm(forms.Form):
+    otp_code = forms.CharField(
+        max_length=6,
+        min_length=6,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Enter 6-digit code',
+            'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary font-body-md text-center tracking-widest',
+            'maxlength': '6',
+            'inputmode': 'numeric',
+            'pattern': '[0-9]{6}',
+            'autocomplete': 'one-time-code',
+        })
+    )
+
+    def clean_otp_code(self):
+        code = self.cleaned_data.get('otp_code')
+        if code and not code.isdigit():
+            raise forms.ValidationError('Enter a valid 6-digit code.')
+        return code
 
 
 class UserProfileUpdateForm(UserChangeForm):
