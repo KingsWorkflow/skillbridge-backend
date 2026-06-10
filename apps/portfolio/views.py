@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import ProjectForm, PortfolioCertificationForm
+from .forms import ProjectForm, CertificationForm
 
 
 @login_required
@@ -23,7 +23,7 @@ def portfolio_view(request):
                 messages.success(request, 'Project added to portfolio!')
                 return redirect('portfolio:portfolio')
         elif 'save_cert' in request.POST:
-            cert_form = PortfolioCertificationForm(request.POST, request.FILES)
+            cert_form = CertificationForm(request.POST, request.FILES)
             if cert_form.is_valid():
                 cert = cert_form.save(commit=False)
                 cert.user = request.user
@@ -32,8 +32,10 @@ def portfolio_view(request):
                 return redirect('portfolio:portfolio')
     else:
         form = ProjectForm()
-        cert_form = PortfolioCertificationForm()
+        cert_form = CertificationForm()
     
+    from apps.skills.models import TeachableSkill
+
     # Prepare context for template compatibility
     context = {
         'user': request.user,
@@ -43,5 +45,8 @@ def portfolio_view(request):
         'achievements': [],  # Add achievements logic if needed
         'project_form': form,
         'cert_form': cert_form,
+        'teachable_skills': TeachableSkill.objects.filter(
+            user=request.user, is_active=True
+        ).select_related('skill'),
     }
     return render(request, 'portfolio/portfolio.html', context)

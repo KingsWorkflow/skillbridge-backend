@@ -31,6 +31,8 @@
   a:link, a:visited { color: #4f46e5; }
   a:hover { color: #4338ca; }
   #content-related { background: #f8fafc; }
+  .nav-link { text-decoration: none; }
+  .nav-link.active { background: #4f46e5; color: #ffffff; }
 </style>
 {% endblock %}
 
@@ -47,13 +49,13 @@
 
 {% block nav-global %}
 <nav class="flex items-center gap-1">
-  <a href="{% url 'admin:index' %}" class="nav-link text-slate-300 hover:text-white hover:bg-slate-700 px-3 py-2 rounded-md transition-all text-sm font-medium">
+  <a href="{% url 'admin:index' %}" class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %} text-slate-300 hover:text-white hover:bg-slate-700 px-3 py-2 rounded-md transition-all text-sm font-medium">
     <i class="fas fa-gauge-high mr-1.5"></i>Dashboard
   </a>
-  <a href="{% url 'admin:analytics_dashboard' %}" class="nav-link text-slate-300 hover:text-white hover:bg-slate-700 px-3 py-2 rounded-md transition-all text-sm font-medium">
+  <a href="{% url 'admin:analytics_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'analytics_dashboard' %}active{% endif %} text-slate-300 hover:text-white hover:bg-slate-700 px-3 py-2 rounded-md transition-all text-sm font-medium">
     <i class="fas fa-chart-line mr-1.5"></i>Analytics
   </a>
-  <a href="{% url 'admin:bulk_verify' %}" class="nav-link text-slate-300 hover:text-white hover:bg-slate-700 px-3 py-2 rounded-md transition-all text-sm font-medium">
+  <a href="{% url 'admin:bulk_verify' %}" class="nav-link {% if request.resolver_match.url_name == 'bulk_verify' %}active{% endif %} text-slate-300 hover:text-white hover:bg-slate-700 px-3 py-2 rounded-md transition-all text-sm font-medium">
     <i class="fas fa-file-import mr-1.5"></i>Bulk Verify
   </a>
 </nav>

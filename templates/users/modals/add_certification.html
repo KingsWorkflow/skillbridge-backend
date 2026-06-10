@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Add Certification | SkillBridge Nepal{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto py-lg">
+    <div class="bg-white rounded-xl p-md shadow-sm border border-outline-variant">
+        <h2 class="font-headline-md text-headline-md text-on-surface mb-lg">Add Certification</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="font-label-md text-label-md text-on-surface-variant block mb-1">Name</label>
+                    {{ form.name|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg" }}
+                </div>
+                
+                <div>
+                    <label class="font-label-md text-label-md text-on-surface-variant block mb-1">Issuing Organization</label>
+                    {{ form.issuing_organization|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg" }}
+                </div>
+                
+                <div>
+                    <label class="font-label-md text-label-md text-on-surface-variant block mb-1">Issue Date</label>
+                    {{ form.issue_date|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg" }}
+                </div>
+                
+                <div>
+                    <label class="font-label-md text-label-md text-on-surface-variant block mb-1">Certificate File</label>
+                    {{ form.certificate_file }}
+                </div>
+                
+                <div>
+                    <label class="font-label-md text-label-md text-on-surface-variant block mb-1">Verification URL</label>
+                    {{ form.verification_url|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg" }}
+                </div>
+            </div>
+            
+            <button class="mt-lg w-full bg-primary text-on-primary py-sm rounded-lg font-label-md text-label-md hover:opacity-90 transition-all" type="submit">Add Certification</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

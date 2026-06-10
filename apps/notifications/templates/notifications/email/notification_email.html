@@ -1,0 +1,36 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>SkillBridge - {{ notification.title }}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: #f9f9f9; color: #1a1c1c; }
+    </style>
+</head>
+<body>
+    <div style="max-width: 600px; margin: 40px auto; padding: 0 20px;">
+        <div style="background: #fff; border-radius: 24px; border: 1px solid #e2e2e2; padding: 40px; box-shadow: 0px 4px 20px rgba(30,111,92,0.06);">
+            <div style="text-align: center; margin-bottom: 24px;">
+                <span style="font-size: 48px; color: #005645;">ⓘ</span>
+            </div>
+            <h1 style="font-size: 22px; font-weight: 700; color: #005645; margin-bottom: 8px;">{{ title }}</h1>
+            <p style="color: #3f4945; line-height: 1.6;">{{ message }}</p>
+            {% if link_url %}
+            <div style="text-align: center; margin-top: 32px;">
+                <a href="{{ request.scheme }}://{{ request.get_host }}{{ link_url }}"
+                   style="display: inline-block; background: #005645; color: #fff; padding: 12px 32px; border-radius: 12px; text-decoration: none; font-weight: 600;">
+                    Open SkillBridge
+                </a>
+            </div>
+            {% endif %}
+            <p style="text-align: center; color: #6f7975; font-size: 12px; margin-top: 24px;">
+                You received this email because you have a SkillBridge account.<br/>
+                © 2024 SkillBridge Nepal
+            </p>
+        </div>
+    </div>
+</body>
+</html>

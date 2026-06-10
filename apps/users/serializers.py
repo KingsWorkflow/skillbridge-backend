@@ -11,14 +11,15 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'password', 'password2', 'phone', 'experience_level')
+        fields = ('id', 'username', 'email', 'password', 'password2', 'phone', 'title', 'experience_level')
         extra_kwargs = {
             'email': {'required': True},
             'phone': {'required': False},
         }
 
     def validate_email(self, value):
-        if User.objects.filter(email__iexact=value).exists():
+        existing = User.objects.filter(email__iexact=value).first()
+        if existing and existing.is_active and existing.email_verified:
             raise serializers.ValidationError('A user with this email already exists.')
         return value.lower()
 
@@ -36,7 +37,8 @@ class UserSerializer(serializers.ModelSerializer):
             email=validated_data['email'],
             password=validated_data['password'],
         )
-        user.phone = validated_data.get('phone', '')
+        user.phone = validated_data.get("phone", "")
+        user.title = validated_data.get("title", "")
         user.experience_level = validated_data.get('experience_level', 'beginner')
         user.skill_credits = 0
         user.beginner_tokens = 5

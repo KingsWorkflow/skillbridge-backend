@@ -1,70 +1,137 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}Skill Exchange | SkillBridge Nepal{% endblock %}
+{% block title %}Skill Exchange Marketplace | SkillBridge Nepal{% endblock %}
 
 {% block content %}
-<div class="max-w-container-max mx-auto px-md py-lg">
-    <!-- Header -->
-    <header class="mb-lg flex flex-col md:flex-row md:items-end justify-between gap-md">
-        <div>
-            <h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-background mb-base">Skill Exchange Marketplace</h1>
-            <p class="font-body-lg text-body-lg text-on-surface-variant">Connect with peers to trade expertise. No currency, just kinetic growth through shared knowledge.</p>
-        </div>
-        <div class="flex bg-surface-container p-1 rounded-xl self-start md:self-auto">
-            <a href="{% url 'exchanges:skill_exchange' %}?tab=offer" class="px-md py-sm rounded-lg font-label-md text-label-md bg-white shadow-sm text-primary transition-all">Offer a Skill</a>
-            <a href="{% url 'exchanges:skill_exchange' %}?tab=request" class="px-md py-sm rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high transition-all">Request a Skill</a>
-        </div>
-    </header>
-
-    <!-- Filters -->
-    <div class="flex flex-wrap gap-sm mb-lg">
-        <button class="px-4 py-2 rounded-full bg-primary-container text-on-primary-container font-label-md text-label-md">All Skills</button>
-        <button class="px-4 py-2 rounded-full bg-surface-container-low border border-outline-variant text-on-surface-variant font-label-md text-label-md hover:bg-surface-container transition-colors">Technology</button>
-        <button class="px-4 py-2 rounded-full bg-surface-container-low border border-outline-variant text-on-surface-variant font-label-md text-label-md hover:bg-surface-container transition-colors">Design</button>
-        <button class="px-4 py-2 rounded-full bg-surface-container-low border border-outline-variant text-on-surface-variant font-label-md text-label-md hover:bg-surface-container transition-colors">Business</button>
-        <button class="px-4 py-2 rounded-full bg-surface-container-low border border-outline-variant text-on-surface-variant font-label-md text-label-md hover:bg-surface-container transition-colors">Language</button>
+<main class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-lg min-h-screen">
+  <section class="mb-lg">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-md mb-lg">
+      <div class="max-w-2xl">
+        <h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary mb-base">Skill Exchange Marketplace</h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant">Connect with peers to trade expertise. No currency, just kinetic growth through shared knowledge.</p>
+      </div>
+      <div class="flex bg-surface-container-high p-xs rounded-xl self-start md:self-auto">
+        <!-- This should go to a page where the user adds a new teachable skill, NOT a proposal -->
+        <a href="{% url 'users:add_teachable_skill' %}" class="px-md py-sm rounded-lg font-label-md text-label-md bg-white shadow-sm text-primary transition-all">Offer a Skill</a>
+        <a href="{% url 'users:add_learnable_skill' %}" class="px-md py-sm rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-highest transition-all">Request a Skill</a>
+      </div>
     </div>
 
-    <!-- Listings Grid -->
-    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
-        {% for listing in listings|slice:":6" %}
-        <div class="bg-white rounded-xl p-md shadow-sm border border-outline-variant hover:-translate-y-1 transition-all duration-300">
-            <div class="flex items-start justify-between mb-md">
-                <div class="flex items-center gap-sm">
-                    <img class="w-12 h-12 rounded-full object-cover" src="{% if listing.user.avatar %}{{ listing.user.avatar.url }}{% else %}{% static 'images/avatar-placeholder.png' %}{% endif %}" alt="{{ listing.user.username }}"/>
-                    <div>
-                        <h3 class="font-headline-md text-headline-md text-on-surface">{{ listing.user.get_full_name|default:listing.user.username }}</h3>
-                        <div class="flex items-center gap-xs">
-                            <span class="material-symbols-outlined text-secondary text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
-                            <span class="text-label-sm font-label-sm text-on-surface-variant">{{ listing.rating }} ({{ listing.exchanges }} exchanges)</span>
-                        </div>
-                    </div>
-                </div>
-                <span class="bg-{{ listing.category_color|default:'tertiary' }}/10 text-{{ listing.category_color|default:'tertiary' }} px-3 py-1 rounded-full text-label-sm font-label-sm">{{ listing.category }}</span>
-            </div>
-            <h2 class="font-headline-md text-headline-md text-primary mb-sm">{{ listing.title }}</h2>
-            <p class="font-body-sm text-body-sm text-on-surface-variant mb-md">{{ listing.description }}</p>
-            <div class="flex items-center gap-md border-t border-outline-variant pt-md mb-md">
-                <div class="flex items-center gap-xs">
-                    <span class="material-symbols-outlined text-on-surface-variant text-[20px]">schedule</span>
-                    <span class="text-label-md font-label-md text-on-surface-variant">{{ listing.hours }} hrs/week</span>
-                </div>
-                <div class="flex items-center gap-xs">
-                    <span class="material-symbols-outlined text-on-surface-variant text-[20px]">{{ listing.delivery_icon|default:'handshake' }}</span>
-                    <span class="text-label-md font-label-md text-on-surface-variant">{{ listing.delivery_format }}</span>
-                </div>
-            </div>
-            <button class="w-full h-12 rounded-xl bg-[#F4A261] text-white font-label-md text-label-md hover:opacity-90 transition-all flex items-center justify-center gap-xs">
-                Connect
-                <span class="material-symbols-outlined">chevron_right</span>
-            </button>
-        </div>
-        {% endfor %}
-    </section>
+    <form method="get" class="flex flex-wrap gap-sm mb-lg">
+      <button type="submit" name="category" value="" class="px-4 py-2 rounded-full {% if not selected_category %}bg-primary-container text-on-primary-container{% else %}bg-surface-container-low border border-outline-variant text-on-surface-variant hover:bg-surface-container-high{% endif %} font-label-md text-label-md transition-colors">All Skills</button>
+      {% for cat in categories %}
+      <button type="submit" name="category" value="{{ cat }}" class="px-4 py-2 rounded-full {% if selected_category == cat %}bg-primary-container text-on-primary-container{% else %}bg-surface-container-low border border-outline-variant text-on-surface-variant hover:bg-surface-container-high{% endif %} font-label-md text-label-md transition-colors">{{ cat }}</button>
+      {% endfor %}
+      <input type="hidden" name="min_reputation" value="{{ min_reputation }}" />
+      <input type="hidden" name="availability" value="{{ availability }}" />
+    </form>
+  </section>
 
-    <!-- Load More -->
-    <div class="mt-lg flex justify-center">
-        <button class="px-lg h-14 rounded-full border-2 border-primary text-primary font-label-md text-label-md hover:bg-primary/5 transition-all">Load More Opportunities</button>
+  <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+    {% if partners %}
+      {% for partner_data in partners %}
+      {% with partner_user=partner_data.user %}
+      <div class="bg-white p-md rounded-[12px] shadow-[0px_4px_20px_rgba(30,111,92,0.08)] hover:-translate-y-1 transition-all group">
+        <div class="flex items-start justify-between mb-md">
+          <a href="{% url 'users:public_profile' partner_user.username %}" class="flex items-center gap-sm group/profile-link">
+            <img alt="{{ partner_user.username }}'s avatar" class="w-12 h-12 rounded-full object-cover"
+                 src="{% if partner_user.profile_picture %}{{ partner_user.profile_picture.url }}{% else %}{% static 'images/avatar-placeholder.png' %}{% endif %}"
+                 onerror="this.style.display='none'; this.insertAdjacentHTML('afterend', '<div class=\'w-12 h-12 rounded-full bg-surface-container flex items-center justify-center font-bold text-on-surface\'>{{ partner_user.username|slice:':1' }}</div>')">
+            <div>
+              <h3 class="font-headline-md text-[18px] text-on-surface group-hover/profile-link:text-primary transition-colors">{{ partner_user.get_full_name|default:partner_user.username }}</h3>
+              <div class="flex items-center gap-xs">
+                <span class="material-symbols-outlined text-secondary text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                <span class="text-label-sm font-label-sm text-on-surface-variant">{{ partner_user.reputation_score|floatformat:1 }} ({{ partner_data.match_count|default:0 }} matches)</span>
+              </div>
+            </div>
+          </a>
+          <span class="bg-tertiary-fixed text-on-tertiary-fixed px-3 py-1 rounded-full text-label-sm font-label-sm">{{ partner_data.categories|first|default:"Other" }}</span>
+        </div>
+
+        <h2 class="font-headline-md text-headline-md text-primary mb-sm">
+          {% if partner_data.i_teach_they_learn_skills %}{{ partner_data.i_teach_they_learn_skills|join:", " }}{% else %}{{ partner_data.i_learn_they_teach_skills|join:", " }}{% endif %}
+        </h2>
+        <p class="font-body-sm text-body-sm text-on-surface-variant mb-md">
+          {% if partner_data.i_teach_they_learn_skills %}
+            Can teach{% if partner_data.i_learn_they_teach_skills %} and learn{% endif %}.
+          {% elif partner_data.i_learn_they_teach_skills %}
+            Wants to learn.
+          {% endif %}
+        </p>
+
+        <div class="flex items-center gap-md border-t border-outline-variant pt-md mb-md">
+          {% if partner_user.teachable_skills.first %}
+          <div class="flex items-center gap-xs">
+            <span class="material-symbols-outlined text-on-surface-variant text-[20px]">schedule</span>
+            <span class="text-label-md font-label-md text-on-surface-variant">{{ partner_user.teachable_skills.first.hourly_commitment }} hrs/week</span>
+          </div>
+          {% endif %}
+          <div class="flex items-center gap-xs">
+            <span class="material-symbols-outlined text-on-surface-variant text-[20px]">handshake</span>
+            <span class="text-label-md font-label-md text-on-surface-variant">Remote</span>
+          </div>
+        </div>
+
+        <!-- Connect button now correctly points to the partner's ID -->
+        <a href="{% url 'exchanges:create_proposal' receiver_id=partner_user.pk %}" class="w-full h-12 rounded-[12px] bg-[#F4A261] text-white font-label-md text-label-md hover:opacity-90 transition-all flex items-center justify-center gap-xs">
+          Connect
+          <span class="material-symbols-outlined">chevron_right</span>
+        </a>
+      </div>
+      {% endwith %}
+      {% endfor %}
+    {% else %}
+      <div class="col-span-full text-center py-xl">
+        <span class="material-symbols-outlined text-on-surface-variant/40 text-5xl mb-base block">search_off</span>
+        <p class="text-on-surface-variant font-body-md">No matching skill exchange partners found.</p>
+      </div>
+    {% endif %}
+  </section>
+
+  {% if partners.paginator.num_pages > 1 %}
+  <div class="mt-lg flex justify-center">
+    {% if partners.has_next %}
+    <a href="?page={{ partners.next_page_number }}&category={{ selected_category }}&min_reputation={{ min_reputation }}&availability={{ availability }}" class="px-lg h-14 rounded-full border-2 border-primary text-primary font-label-md text-label-md hover:bg-primary/5 transition-all">Load More Opportunities</a>
+    {% endif %}
+  </div>
+  {% endif %}
+</main>
+
+<footer class="w-full py-lg bg-surface-container-highest border-t border-outline-variant">
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-desktop max-w-container-max mx-auto">
+    <div class="flex flex-col gap-base">
+      <span class="font-headline-md text-headline-md text-on-surface">SkillBridge Nepal</span>
+      <p class="font-body-sm text-body-sm text-on-surface-variant">Empowering the workforce through kinetic growth. Peer-to-peer knowledge sharing for a modern world.</p>
     </div>
-</div>
+    <div class="flex flex-col gap-base">
+      <span class="font-label-md text-label-md text-primary">Mission</span>
+      <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-secondary opacity-80 hover:opacity-100 transition-opacity" href="#">Our Story</a>
+      <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-secondary opacity-80 hover:opacity-100 transition-opacity" href="#">Community Guidelines</a>
+      <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-secondary opacity-80 hover:opacity-100 transition-opacity" href="#">Impact Report</a>
+    </div>
+    <div class="flex flex-col gap-base">
+      <span class="font-label-md text-label-md text-primary">Quick Links</span>
+      <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-secondary opacity-80 hover:opacity-100 transition-opacity" href="#">Find a Mentor</a>
+      <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-secondary opacity-80 hover:opacity-100 transition-opacity" href="#">Offer Expertise</a>
+      <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-secondary opacity-80 hover:opacity-100 transition-opacity" href="#">Skill Gap Analysis</a>
+    </div>
+    <div class="flex flex-col gap-base">
+      <span class="font-label-md text-label-md text-primary">Contact</span>
+      <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-secondary opacity-80 hover:opacity-100 transition-opacity" href="#">Support Center</a>
+      <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-secondary opacity-80 hover:opacity-100 transition-opacity" href="#">Partnerships</a>
+      <div class="flex gap-sm mt-xs">
+        <span class="material-symbols-outlined text-on-surface-variant">share</span>
+        <span class="material-symbols-outlined text-on-surface-variant">mail</span>
+      </div>
+    </div>
+  </div>
+  <div class="mt-lg text-center px-margin-desktop max-w-container-max mx-auto pt-md border-t border-outline-variant/30">
+    <p class="font-body-sm text-body-sm text-on-surface-variant opacity-60">© SkillBridge Nepal. Empowering the workforce through kinetic growth.</p>
+  </div>
+</footer>
+
+<!-- FAB: This should go to a page where user offers a new teachable skill, NOT a proposal -->
+<a href="{% url 'users:add_teachable_skill' %}" class="fixed bottom-md right-md md:bottom-lg md:right-lg w-16 h-16 rounded-full bg-primary text-white shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-all z-40" aria-label="Add new teachable skill">
+  <span class="material-symbols-outlined text-[32px]">add</span>
+</a>
 {% endblock %}

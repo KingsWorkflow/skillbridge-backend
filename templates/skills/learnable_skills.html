@@ -1,26 +1,89 @@
 {% extends "base.html" %}
+{% load static %}
+{% load form_tags %}
 {% block title %}My Learnable Skills | SkillBridge Nepal{% endblock %}
+
+{% block extra_css %}
+<style>
+.learnable-card {
+    transition: all 0.3s ease;
+}
+.learnable-card:hover {
+    transform: translateX(4px);
+}
+.urgency-badge {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="max-w-container-max mx-auto py-lg space-y-lg">
-    <header class="mb-lg">
-        <h1 class="font-headline-lg text-headline-lg text-on-background">My Learnable Skills</h1>
-        <p class="font-body-lg text-body-lg text-on-surface-variant">Skills you want to learn.</p>
+    <header class="mb-lg flex justify-between items-end">
+        <div>
+            <h1 class="font-headline-lg text-headline-lg text-on-background">My Learnable Skills</h1>
+            <p class="font-body-lg text-body-lg text-on-surface-variant">Skills you want to learn next.</p>
+        </div>
+        <a href="{% url 'skills:skill_list' %}" class="bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md text-label-md hover:opacity-90 transition-all">Browse Skills</a>
     </header>
 
-    <div class="space-y-gutter">
-        {% for skill in learnable_skills %}
-        <div class="bg-white p-md rounded-xl shadow-sm border border-outline-variant flex justify-between items-center">
-            <div>
-                <h3 class="font-label-md text-label-md text-on-surface">{{ skill.name }}</h3>
-                <p class="text-body-sm text-on-surface-variant">{{ skill.motivation|truncatechars:50 }} • {{ skill.urgency }} priority</p>
+    <section class="bg-surface-container-low/30 rounded-xl p-md border border-outline-variant/30">
+        <h3 class="font-headline-md text-headline-md text-on-surface mb-md">Add Learnable Skill</h3>
+        <form method="post" class="grid grid-cols-1 md:grid-cols-3 gap-md items-start">
+            {% csrf_token %}
+            <div class="md:col-span-1 space-y-2">
+                <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.skill.id_for_label }}">Skill</label>
+                {{ form.skill|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary" }}
             </div>
-            <span class="material-symbols-outlined text-primary">edit</span>
+            <div class="space-y-2">
+                <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.motivation.id_for_label }}">Motivation</label>
+                {{ form.motivation|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary" }}
+            </div>
+            <div class="space-y-2">
+                <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.urgency.id_for_label }}">Priority</label>
+                {{ form.urgency|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary" }}
+            </div>
+            <div class="md:col-span-3">
+                <button class="bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md text-label-md hover:opacity-90 transition-all" type="submit">Add Skill</button>
+            </div>
+        </form>
+    </section>
+
+    <div class="space-y-base">
+        {% for skill in learnable_skills %}
+        <div class="learnable-card bg-white p-md rounded-xl shadow-sm border border-outline-variant flex flex-col md:flex-row justify-between items-start md:items-center gap-md">
+            <div class="flex items-start gap-md flex-grow">
+                <div class="w-12 h-12 rounded-full bg-secondary-fixed-dim/20 flex items-center justify-center text-secondary flex-shrink-0">
+                    <span class="material-symbols-outlined">auto_stories</span>
+                </div>
+                <div class="flex-grow">
+                    <div class="flex items-center gap-sm flex-wrap">
+                        <h3 class="font-label-md text-label-md text-on-surface">{{ skill.skill.name }}</h3>
+                        <span class="urgency-badge px-2 py-0.5 rounded-full {% if skill.urgency == 'high' %}bg-red-100 text-red-700{% elif skill.urgency == 'medium' %}bg-yellow-100 text-yellow-700{% else %}bg-blue-100 text-blue-700{% endif %}">
+                            {{ skill.get_urgency_display }}
+                        </span>
+                    </div>
+                    {% if skill.motivation %}
+                    <p class="text-body-sm text-on-surface-variant mt-xs">{{ skill.motivation|truncatechars:80 }}</p>
+                    {% endif %}
+                    <p class="text-body-sm text-on-surface-variant mt-xs opacity-70">Added {{ skill.created_at|date:"M d, Y" }}</p>
+                </div>
+            </div>
+            <form method="post" action="{% url 'skills:learnable_delete' pk=skill.pk %}" class="inline" onsubmit="return confirm('Remove this learnable skill?')">
+                {% csrf_token %}
+                <button type="submit" class="p-2 rounded-full hover:bg-error/10 transition-colors" title="Delete">
+                    <span class="material-symbols-outlined text-error">delete</span>
+                </button>
+            </form>
         </div>
         {% empty %}
-        <div class="text-center py-xl">
-            <p class="text-on-surface-variant">You haven't added any learnable skills yet.</p>
-            <a href="#" class="inline-block mt-md bg-primary text-white px-lg py-sm rounded-lg">Add Skill</a>
+        <div class="text-center py-xl bg-surface-container-low/30 rounded-xl border border-dashed border-outline-variant">
+            <span class="material-symbols-outlined text-on-surface-variant/40 text-5xl mb-base block">auto_stories</span>
+            <p class="text-on-surface-variant font-body-md">You haven't added any learnable skills yet.</p>
+            <a href="{% url 'skills:skill_list' %}" class="inline-block mt-md bg-primary text-white px-lg py-sm rounded-lg font-label-md text-label-md hover:opacity-90 transition-all">Browse Skills Catalog</a>
         </div>
         {% endfor %}
     </div>

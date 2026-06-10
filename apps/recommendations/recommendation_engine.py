@@ -13,8 +13,8 @@ except ImportError:
     SKLEARN_AVAILABLE = False
 
 from django.contrib.auth import get_user_model
-from apps.skills.models import Skill
-
+from apps.skills.models import Skill, TeachableSkill
+from apps.careers.models import CareerPath
 
 User = get_user_model()
 
@@ -178,3 +178,58 @@ def resolve_skill_ids_to_names(partners):
         p['i_learn_they_teach'] = [skill_map.get(sid, str(sid)) for sid in p['i_learn_they_teach']]
     
     return partners
+
+
+def recommend_careers(user, top_n=5):
+    """Recommend career paths based on user's teachable skills using cosine similarity.
+    
+    Args:
+        user: User instance
+        top_n: Maximum number of career recommendations to return
+    
+    Returns:
+        list: List of dictionaries with career recommendation info
+    """
+    user_teachable_ids = set(user.teachable_skills.values_list('skill_id', flat=True))
+    if not user_teachable_ids:
+        # No skills adds no match signal; return empty recommendations
+        return []
+    user_skill_ids = user_teachable_ids
+
+    careers = CareerPath.objects.prefetch_related('required_skills').all()
+    results = []
+
+    all_skill_ids = set(Skill.objects.values_list('id', flat=True))
+
+    for career in careers:
+        required_ids = set(career.required_skills.values_list('id', flat=True))
+        if not required_ids:
+            continue
+
+        overlap = user_skill_ids & required_ids
+        match_score = (len(overlap) / len(required_ids)) * 100
+
+        missing_skills = career.required_skills.exclude(id__in=user_skill_ids)
+        matched_skills = career.required_skills.filter(id__in=user_skill_ids)
+
+        estimated_hours_per_skill = {}
+        if career.estimated_hours_per_skill:
+            estimated_hours_per_skill = career.estimated_hours_per_skill
+
+        results.append({
+            'career': career,
+            'match_score': float(match_score),
+            'matched_skills': matched_skills,
+            'missing_skills': missing_skills,
+            'required_skills_count': required_ids.__len__(),
+            'estimated_hours_per_skill': estimated_hours_per_skill,
+            'title': career.title,
+            'description': career.description,
+            'category': career.category,
+            'average_salary': career.average_salary,
+            'growth_outlook': career.growth_outlook,
+            'matched_skill_names': [s.name for s in matched_skills],
+        })
+
+    results.sort(key=lambda x: x['match_score'], reverse=True)
+    return results[:top_n]

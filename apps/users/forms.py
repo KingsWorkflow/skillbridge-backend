@@ -61,12 +61,14 @@ class CustomUserCreationForm(UserCreationForm):
         fields = ('username', 'email', 'password1', 'password2', 'phone', 'experience_level', 'accept_terms')
 
     def clean_email(self):
-        """Normalize email to lowercase and check for duplicates (case-insensitive)."""
+        """Normalize email to lowercase and allow reuse for unverified/inactive accounts."""
         email = self.cleaned_data.get('email')
         if email:
             email = email.lower()
-            if User.objects.filter(email__iexact=email).exists():
-                raise forms.ValidationError('A user with this email already exists.')
+            existing = User.objects.filter(email__iexact=email).first()
+            if existing:
+                if existing.is_active and existing.email_verified:
+                    raise forms.ValidationError('A user with this email already exists.')
         return email
 
     def clean_username(self):
@@ -85,23 +87,94 @@ class CustomUserCreationForm(UserCreationForm):
         return cleaned
 
     def save(self, commit=True):
-        user = super().save(commit=False)
-        user.email = self.cleaned_data['email']
-        user.phone = self.cleaned_data.get('phone', '')
-        user.experience_level = self.cleaned_data.get('experience_level', 'beginner')
-        user.skill_credits = 0
-        user.beginner_tokens = 5
+        email = self.cleaned_data['email']
+        user, created = User.objects.get_or_create(
+            email__iexact=email,
+            defaults={
+                'username': self.cleaned_data['username'],
+                'email': email,
+                'phone': self.cleaned_data.get('phone', ''),
+                'experience_level': self.cleaned_data.get('experience_level', 'beginner'),
+                'skill_credits': 0,
+                'beginner_tokens': 5,
+                'is_active': False,
+                'email_verified': False,
+            },
+        )
+        if not created:
+            user.is_active = False
+            user.email_verified = False
         if commit:
             user.save()
         return user
 
 
+class OTPVerificationForm(forms.Form):
+    otp_code = forms.CharField(
+        max_length=6,
+        min_length=6,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Enter 6-digit code',
+            'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary font-body-md text-center tracking-widest',
+            'maxlength': '6',
+            'inputmode': 'numeric',
+            'pattern': '[0-9]{6}',
+            'autocomplete': 'one-time-code',
+        })
+    )
+
+    def clean_otp_code(self):
+        code = self.cleaned_data.get('otp_code')
+        if code and not code.isdigit():
+            raise forms.ValidationError('Enter a valid 6-digit code.')
+        return code
+
+
 class UserProfileUpdateForm(UserChangeForm):
-    password = None
+    password = forms.CharField(
+        required=False,
+        help_text='Leave blank to keep current password. Enter a new password to change it.',
+        widget=forms.PasswordInput(attrs={
+            'placeholder': 'New password (optional)',
+            'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary',
+            'autocomplete': 'new-password',
+        })
+    )
+    password_confirm = forms.CharField(
+        required=False,
+        help_text='Confirm your new password.',
+        widget=forms.PasswordInput(attrs={
+            'placeholder': 'Confirm new password',
+            'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary',
+            'autocomplete': 'new-password',
+        })
+    )
 
     class Meta:
         model = User
-        fields = ('bio', 'profile_picture', 'phone', 'experience_level')
+        fields = ('title', 'bio', 'profile_picture', 'phone', 'experience_level', 'password', 'password_confirm')
         widgets = {
-            'bio': forms.Textarea(attrs={'rows': 3, 'class': 'w-full'}),
+            'bio': forms.Textarea(attrs={'rows': 3, 'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary'}),
         }
+
+    def clean(self):
+        cleaned = super().clean()
+        pwd = cleaned.get('password')
+        pwd2 = cleaned.get('password_confirm')
+        if pwd and not pwd2:
+            self.add_error('password_confirm', 'Please confirm your new password.')
+        elif pwd2 and not pwd:
+            self.add_error('password', 'Please enter a new password.')
+        elif pwd and pwd2 and pwd != pwd2:
+            self.add_error('password_confirm', 'Passwords do not match.')
+        return cleaned
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        new_password = self.cleaned_data.get('password')
+        if new_password:
+            user.set_password(new_password)
+        if commit:
+            user.save()
+        return user

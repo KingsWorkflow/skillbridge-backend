@@ -11,6 +11,7 @@ urlpatterns = [
     
     # API Endpoints - Users (JWT Authentication)
     path('api/', include('apps.users.api_urls')),
+    path('api/skills/', include('apps.skills.api_urls')),
     
     # Frontend Pages - Users
     path('', include('apps.users.urls')),
@@ -29,6 +30,12 @@ urlpatterns = [
     
     # Frontend Pages - Portfolio
     path('portfolio/', include('apps.portfolio.urls')),
+    
+    # Frontend Pages - Careers
+    path('career/', include('apps.careers.urls')),
+    
+    # Frontend Pages - Notifications
+    path('notifications/', include('apps.notifications.urls')),
 ]
 
 if settings.DEBUG:

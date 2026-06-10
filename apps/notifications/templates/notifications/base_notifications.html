@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>{% block title %}SkillBridge Nepal{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .animate-fade-in { animation: fadeIn 0.15s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-out { animation: fadeOut 0.3s ease-in forwards; }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen flex flex-col">
+    <header class="sticky top-0 w-full z-50 bg-surface shadow-[0px_4px_20px_rgba(30,111,92,0.08)]">
+        <nav class="flex justify-between items-center px-margin-desktop py-4 max-w-container-max mx-auto">
+            <div class="flex items-center gap-md">
+                <span class="font-headline-md text-headline-md text-primary">SkillBridge Nepal</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="relative">
+                    <button id="notification-bell" class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high/50 p-2 rounded-full transition-all">
+                        notifications_active
+                    </button>
+                    {% if unread_count > 0 %}
+                    <span id="unread-badge" class="absolute -top-1 -right-1 bg-error text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">{{ unread_count }}</span>
+                    {% endif %}
+                    <div id="notification-dropdown" class="hidden absolute right-0 top-12 w-96 bg-surface border border-outline-variant/30 rounded-2xl shadow-2xl z-50 max-h-[480px] overflow-y-auto"></div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div id="messages-banner" class="fixed top-20 left-0 right-0 z-40 flex justify-center pointer-events-none">
+        <div class="max-w-md w-full mx-4 space-y-2">
+            {% for message in messages %}
+            <div class="rounded-lg px-4 py-3 flex items-center gap-3 pointer-events-auto animate-fade-in shadow-lg border-l-4 {% if message.tags == 'error' or message.tags == 'danger' %}bg-red-50 border-red-500 text-red-800{% elif message.tags == 'success' %}bg-green-50 border-green-500 text-green-800{% elif message.tags == 'warning' %}bg-yellow-50 border-yellow-500 text-yellow-800{% else %}bg-blue-50 border-blue-500 text-blue-800{% endif %}">
+                <span class="material-symbols-outlined {% if message.tags == 'error' or message.tags == 'danger' %}text-red-500{% elif message.tags == 'success' %}text-green-500{% elif message.tags == 'warning' %}text-yellow-500{% else %}text-blue-500{% endif %}">
+                    {% if message.tags == 'error' or message.tags == 'danger' %}error{% elif message.tags == 'success' %}check_circle{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}
+                </span>
+                <span class="font-body-md text-body-md">{{ message }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <main class="flex-grow max-w-container-max mx-auto px-margin-desktop py-lg">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-surface-container-highest border-t border-outline-variant/30 mt-auto">
+        <div class="max-w-container-max mx-auto px-margin-desktop py-10 text-center text-on-surface-variant text-body-sm">
+            © 2024 SkillBridge Nepal. Empowering the workforce through kinetic growth.
+        </div>
+    </footer>
+
+    <script src="{% static 'notifications/js/notifications.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,26 +1,90 @@
 {% extends "base.html" %}
+{% load static %}
+{% load form_tags %}
 {% block title %}My Teachable Skills | SkillBridge Nepal{% endblock %}
+
+{% block extra_css %}
+<style>
+.teachable-card {
+    transition: all 0.3s ease;
+}
+.teachable-card:hover {
+    transform: translateX(4px);
+}
+.teachable-card.inactive {
+    opacity: 0.6;
+    background: #f5f5f5;
+}
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="max-w-container-max mx-auto py-lg space-y-lg">
-    <header class="mb-lg">
-        <h1 class="font-headline-lg text-headline-lg text-on-background">My Teachable Skills</h1>
-        <p class="font-body-lg text-body-lg text-on-surface-variant">Skills you can teach others.</p>
+    <header class="mb-lg flex justify-between items-end">
+        <div>
+            <h1 class="font-headline-lg text-headline-lg text-on-background">My Teachable Skills</h1>
+            <p class="font-body-lg text-body-lg text-on-surface-variant">Skills you can teach others.</p>
+        </div>
+        <a href="{% url 'skills:skill_list' %}" class="bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md text-label-md hover:opacity-90 transition-all">Browse Skills</a>
     </header>
 
-    <div class="space-y-gutter">
-        {% for skill in teachable_skills %}
-        <div class="bg-white p-md rounded-xl shadow-sm border border-outline-variant flex justify-between items-center">
-            <div>
-                <h3 class="font-label-md text-label-md text-on-surface">{{ skill.name }}</h3>
-                <p class="text-body-sm text-on-surface-variant">{{ skill.proficiency_level }} • {{ skill.hourly_commitment }} hrs/week</p>
+    <section class="bg-surface-container-low/30 rounded-xl p-md border border-outline-variant/30">
+        <h3 class="font-headline-md text-headline-md text-on-surface mb-md">Add Teachable Skill</h3>
+        <form method="post" class="grid grid-cols-1 md:grid-cols-4 gap-md items-start">
+            {% csrf_token %}
+            <div class="md:col-span-2 space-y-2">
+                <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.skill.id_for_label }}">Skill</label>
+                {{ form.skill|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary" }}
             </div>
-            <span class="material-symbols-outlined text-primary">edit</span>
+            <div class="space-y-2">
+                <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.proficiency_level.id_for_label }}">Proficiency</label>
+                {{ form.proficiency_level|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary" }}
+            </div>
+            <div class="space-y-2">
+                <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.hourly_commitment.id_for_label }}">Hours/Week</label>
+                {{ form.hourly_commitment|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary" }}
+            </div>
+            <div class="md:col-span-4">
+                <button class="bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md text-label-md hover:opacity-90 transition-all" type="submit">Add Skill</button>
+            </div>
+        </form>
+    </section>
+
+    <div class="space-y-base">
+        {% for skill in teachable_skills %}
+        <div class="teachable-card bg-white p-md rounded-xl shadow-sm border border-outline-variant flex justify-between items-center {% if not skill.is_active %}inactive{% endif %}">
+            <div class="flex items-center gap-md">
+                <div class="w-12 h-12 rounded-full {% if skill.is_active %}bg-primary-container{% else %}bg-surface-container{% endif %} flex items-center justify-center text-on-primary-container">
+                    <span class="material-symbols-outlined">school</span>
+                </div>
+                <div>
+                    <h3 class="font-label-md text-label-md text-on-surface">{{ skill.skill.name }}</h3>
+                    <p class="text-body-sm text-on-surface-variant">{{ skill.get_proficiency_level_display }} • {{ skill.hourly_commitment }} hrs/week</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-xs">
+                <span class="font-label-sm text-label-sm px-2 py-1 rounded-full {% if skill.is_active %}bg-primary-container/10 text-primary{% else %}bg-surface-container text-on-surface-variant{% endif %}">
+                    {% if skill.is_active %}Active{% else %}Paused{% endif %}
+                </span>
+                <form method="post" action="{% url 'skills:teachable_toggle' pk=skill.pk %}" class="inline">
+                    {% csrf_token %}
+                    <button type="submit" class="p-2 rounded-full hover:bg-surface-container-high transition-colors" title="{% if skill.is_active %}Pause{% else %}Activate{% endif %}">
+                        <span class="material-symbols-outlined text-on-surface-variant">{% if skill.is_active %}pause{% else %}play_arrow{% endif %}</span>
+                    </button>
+                </form>
+                <form method="post" action="{% url 'skills:teachable_delete' pk=skill.pk %}" class="inline" onsubmit="return confirm('Remove this skill?')">
+                    {% csrf_token %}
+                    <button type="submit" class="p-2 rounded-full hover:bg-error/10 transition-colors" title="Delete">
+                        <span class="material-symbols-outlined text-error">delete</span>
+                    </button>
+                </form>
+            </div>
         </div>
         {% empty %}
-        <div class="text-center py-xl">
-            <p class="text-on-surface-variant">You haven't added any teachable skills yet.</p>
-            <a href="#" class="inline-block mt-md bg-primary text-white px-lg py-sm rounded-lg">Add Skill</a>
+        <div class="text-center py-xl bg-surface-container-low/30 rounded-xl border border-dashed border-outline-variant">
+            <span class="material-symbols-outlined text-on-surface-variant/40 text-5xl mb-base block">school</span>
+            <p class="text-on-surface-variant font-body-md">You haven't added any teachable skills yet.</p>
+            <a href="{% url 'skills:skill_list' %}" class="inline-block mt-md bg-primary text-white px-lg py-sm rounded-lg font-label-md text-label-md hover:opacity-90 transition-all">Browse Skills Catalog</a>
         </div>
         {% endfor %}
     </div>

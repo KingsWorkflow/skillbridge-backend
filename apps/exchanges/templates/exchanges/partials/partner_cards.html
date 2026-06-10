@@ -1,0 +1,41 @@
+{% for partner in partners %}
+<div class="partner-card bg-white p-md rounded-xl shadow-[0px_4px_20px_rgba(30,111,92,0.08)] border border-outline-variant flex flex-col">
+    <div class="flex items-center gap-md mb-lg">
+        <div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container">
+            <span class="material-symbols-outlined">person</span>
+        </div>
+        <div>
+            <h3 class="font-headline-md text-headline-md text-on-surface">{{ partner.user.username }}</h3>
+            <div class="flex items-center gap-1 text-secondary font-label-md text-label-md">
+                <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+                <span>{{ partner.user.reputation_score }}</span>
+            </div>
+        </div>
+    </div>
+    {% if partner.i_teach_they_learn_skills %}
+    <div class="mb-md">
+        <span class="font-label-md text-label-md text-on-surface-variant block mb-1">You teach them:</span>
+        <div class="flex flex-wrap gap-xs">
+            {% for skill_name in partner.i_teach_they_learn_skills %}
+            <span class="px-2 py-1 bg-primary-container/10 text-primary rounded-full text-label-sm">{{ skill_name }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    {% if partner.i_learn_they_teach_skills %}
+    <div class="mb-md">
+        <span class="font-label-md text-label-md text-on-surface-variant block mb-1">You learn from them:</span>
+        <div class="flex flex-wrap gap-xs">
+            {% for skill_name in partner.i_learn_they_teach_skills %}
+            <span class="px-2 py-1 bg-secondary-container/10 text-secondary rounded-full text-label-sm">{{ skill_name }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    <a href="{% url 'exchanges:create_proposal' partner.user.id %}" class="mt-auto w-full py-2 border-2 border-primary text-primary rounded-lg font-label-md text-label-md text-center hover:bg-primary hover:text-on-primary transition-all">Connect</a>
+</div>
+{% empty %}
+<div class="col-span-3 text-center py-lg">
+    <p class="font-body-lg text-body-lg text-on-surface-variant">No exchange partners found matching your criteria.</p>
+</div>
+{% endfor %}

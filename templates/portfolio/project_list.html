@@ -14,7 +14,15 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
         {% for project in projects %}
         <div class="bg-white rounded-xl p-md shadow-sm border border-outline-variant">
-            <div class="aspect-video bg-surface-container-high rounded-lg mb-sm"></div>
+            {% if project.image %}
+            <div class="aspect-video mb-sm rounded-lg overflow-hidden bg-surface-container-high">
+                <img class="w-full h-full object-cover" src="{{ project.image.url }}" alt="{{ project.title }}"/>
+            </div>
+            {% else %}
+            <div class="aspect-video bg-surface-container-high rounded-lg mb-sm flex items-center justify-center">
+                <span class="material-symbols-outlined text-on-surface-variant/40" style="font-variation-settings: 'FILL' 1;">image</span>
+            </div>
+            {% endif %}
             <h3 class="font-label-md text-label-md text-on-surface">{{ project.title }}</h3>
             <p class="text-body-sm text-on-surface-variant">{{ project.description|truncatechars:80 }}</p>
         </div>

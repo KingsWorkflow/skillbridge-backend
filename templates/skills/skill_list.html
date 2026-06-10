@@ -1,25 +1,75 @@
 {% extends "base.html" %}
-{% block title %}Skill Catalog | SkillBridge Nepal{% endblock %}
+{% load static %}
+{% block title %}Skills | SkillBridge Nepal{% endblock %}
 
 {% block content %}
-<div class="max-w-container-max mx-auto py-lg space-y-lg">
-    <header class="mb-lg">
-        <h1 class="font-headline-lg text-headline-lg text-on-background">Skill Catalog</h1>
-        <p class="font-body-lg text-body-lg text-on-surface-variant">Browse all available skills for exchange.</p>
-    </header>
-
-    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-gutter">
-        {% for skill in skills %}
-        <a href="#" class="bg-white p-md rounded-xl shadow-sm border border-outline-variant hover:-translate-y-1 transition-all text-center">
-            <span class="material-symbols-outlined text-primary text-4xl mb-2">code</span>
-            <h3 class="font-label-md text-label-md text-on-surface">{{ skill.name }}</h3>
-            <p class="text-body-sm text-on-surface-variant">{{ skill.category }}</p>
-        </a>
-        {% empty %}
-        <div class="col-span-full text-center py-xl">
-            <p class="text-on-surface-variant">No skills available yet. Check back later!</p>
-        </div>
-        {% endfor %}
+<div class="max-w-container-max mx-auto py-lg">
+    <div class="flex mb-lg">
+        <header class="mb-lg">
+            <h1 class="font-headline-lg text-headline-lg text-on-surface mb-xs">Skills</h1>
+            <p class="font-body-lg text-body-lg text-on-surface-variant">Browse and manage your skill portfolio</p>
+        </header>
     </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter mb-lg">
+        <a href="{% url 'skills:teachable' %}" class="bg-white p-md rounded-xl shadow-sm border border-outline-variant hover:shadow-md hover:-translate-y-1 transition-all group">
+            <div class="flex items-center gap-base mb-sm">
+                <span class="material-symbols-outlined text-primary text-3xl">school</span>
+                <h2 class="font-headline-md text-headline-md text-on-surface">My Teachable Skills</h2>
+            </div>
+            <p class="font-body-sm text-body-sm text-on-surface-variant">Skills you can teach to others.</p>
+            <span class="inline-flex items-center gap-xs mt-md text-secondary font-label-md text-label-md">
+                Manage teachable skills
+                <span class="material-symbols-outlined text-sm transition-transform group-hover:translate-x-1">arrow_forward</span>
+            </span>
+        </a>
+
+        <a href="{% url 'skills:learnable' %}" class="bg-white p-md rounded-xl shadow-sm border border-outline-variant hover:shadow-md hover:-translate-y-1 transition-all group">
+            <div class="flex items-center gap-base mb-sm">
+                <span class="material-symbols-outlined text-secondary text-3xl">auto_stories</span>
+                <h2 class="font-headline-md text-headline-md text-on-surface">My Learnable Skills</h2>
+            </div>
+            <p class="font-body-sm text-body-sm text-on-surface-variant">Skills you want to learn.</p>
+            <span class="inline-flex items-center gap-xs mt-md text-secondary font-label-md text-label-md">
+                Manage learnable skills
+                <span class="material-symbols-outlined text-sm transition-transform group-hover:translate-x-1">arrow_forward</span>
+            </span>
+        </a>
+    </div>
+
+    <section class="bg-white rounded-xl shadow-sm border border-outline-variant p-md">
+        <div class="flex justify-between items-center mb-md">
+            <h2 class="font-headline-md text-headline-md text-on-surface">Skill Catalog</h2>
+            <span class="font-body-sm text-body-sm text-on-surface-variant">{{ skills|length }} skills available</span>
+        </div>
+        {% if categories %}
+        <div class="flex flex-wrap gap-xs mb-lg">
+            <a href="{% url 'skills:skill_list' %}" class="px-sm py-xs rounded-full font-label-sm text-label-sm {% if not request.GET.category %}bg-primary text-on-primary{% else %}bg-surface-container text-on-surface-variant hover:bg-surface-container-high{% endif %} transition-colors">All</a>
+            {% for cat in categories %}
+            <a href="?category={{ cat }}" class="px-sm py-xs rounded-full font-label-sm text-label-sm {% if request.GET.category == cat %}bg-primary text-on-primary{% else %}bg-surface-container text-on-surface-variant hover:bg-surface-container-high{% endif %} transition-colors">{{ cat }}</a>
+            {% endfor %}
+        </div>
+        {% endif %}
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-gutter">
+            {% for skill in skills %}
+            <div class="bg-surface-container-low/50 p-md rounded-xl border border-outline-variant/50 hover:border-primary/30 transition-colors">
+                <div class="flex items-center gap-sm mb-sm">
+                    <span class="material-symbols-outlined text-primary text-2xl">code</span>
+                    <h3 class="font-label-md text-label-md text-on-surface">{{ skill.name }}</h3>
+                </div>
+                <p class="font-body-sm text-body-sm text-on-surface-variant mb-sm">{{ skill.category }}</p>
+                <div class="flex items-center gap-xs text-body-sm text-on-surface-variant">
+                    <span class="material-symbols-outlined text-sm">star</span>
+                    <span>{{ skill.popularity_score|floatformat:1 }}</span>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-xl">
+                <span class="material-symbols-outlined text-on-surface-variant/40 text-5xl mb-base">search_off</span>
+                <p class="text-on-surface-variant font-body-md">No skills found matching your criteria.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
 </div>
 {% endblock %}

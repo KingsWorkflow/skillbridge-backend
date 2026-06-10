@@ -1,31 +1,47 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Create Proposal | SkillBridge Nepal{% endblock %}
 
 {% block content %}
 <div class="max-w-container-max mx-auto py-lg">
     <header class="mb-lg">
         <h1 class="font-headline-lg text-headline-lg text-on-background">Create Exchange Proposal</h1>
-        <p class="font-body-lg text-body-lg text-on-surface-variant">Propose a skill exchange to another user.</p>
+        <p class="font-body-lg text-body-lg text-on-surface-variant">
+            Send a skill exchange proposal to
+            <a href="{% url 'users:public_profile' receiver.username %}" class="text-primary font-semibold hover:underline">{{ receiver.get_full_name|default:receiver.username }}</a>.
+        </p>
     </header>
 
-    <form class="space-y-md max-w-2xl">
+    <form method="post" class="space-y-md max-w-2xl">
+        {% csrf_token %}
+
         <div class="space-y-2">
-            <label class="font-label-md">Skill to Offer</label>
-            <select class="w-full p-sm border border-outline-variant rounded-lg">
-                <option>Select your skill</option>
-            </select>
+            <label for="{{ form.offer_skill.id_for_label }}" class="font-label-md text-label-md text-on-surface">Skill to Offer</label>
+            {{ form.offer_skill }}
         </div>
+
         <div class="space-y-2">
-            <label class="font-label-md">Skill to Request</label>
-            <select class="w-full p-sm border border-outline-variant rounded-lg">
-                <option>Select skill you want</option>
-            </select>
+            <label for="{{ form.request_skill.id_for_label }}" class="font-label-md text-label-md text-on-surface">Skill to Request</label>
+            {{ form.request_skill }}
         </div>
+
+        {% if form.non_field_errors %}
+        <div class="rounded-lg px-4 py-3 bg-red-50 border border-red-500 text-red-800">{{ form.non_field_errors }}</div>
+        {% endif %}
+
         <div class="space-y-2">
-            <label class="font-label-md">Message</label>
-            <textarea class="w-full p-sm border border-outline-variant rounded-lg" rows="3"></textarea>
+            <label for="{{ form.proposed_hours.id_for_label }}" class="font-label-md text-label-md text-on-surface">Proposed Hours</label>
+            {{ form.proposed_hours }}
         </div>
-        <button class="bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md">Send Proposal</button>
+
+        <div class="space-y-2">
+            <label for="{{ form.message.id_for_label }}" class="font-label-md text-label-md text-on-surface">Message</label>
+            {{ form.message }}
+        </div>
+
+        <button type="submit" class="bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md text-label-md hover:opacity-90 transition-all">
+            Send Proposal
+        </button>
     </form>
 </div>
 {% endblock %}
