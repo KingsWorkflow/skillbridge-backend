@@ -356,7 +356,8 @@ def delete_certification(request, pk):
 
 class CustomPasswordResetView(PasswordResetView):
     template_name = 'users/password_reset.html'
-    email_template_name = 'users/password_reset_email.html'
+    email_template_name = 'users/password_reset_email_plain.txt'
+    html_email_template_name = 'users/password_reset_email.html'
     subject_template_name = 'users/password_reset_subject.txt'
     success_url = reverse_lazy('users:password_reset_done')
 
@@ -368,6 +369,12 @@ class CustomPasswordResetDoneView(PasswordResetDoneView):
 class CustomPasswordResetConfirmView(PasswordResetConfirmView):
     template_name = 'users/password_reset_confirm.html'
     success_url = reverse_lazy('users:password_reset_complete')
+
+    def form_valid(self, form):
+        from apps.notifications.email_utils import create_password_changed_notification
+        response = super().form_valid(form)
+        create_password_changed_notification(self.user)
+        return response
 
 
 class CustomPasswordResetCompleteView(PasswordResetCompleteView):

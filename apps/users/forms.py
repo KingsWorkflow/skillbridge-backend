@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, AuthenticationForm
 from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import check_password
 from django.core.validators import RegexValidator
 
 User = get_user_model()
@@ -168,6 +169,11 @@ class UserProfileUpdateForm(UserChangeForm):
             self.add_error('password', 'Please enter a new password.')
         elif pwd and pwd2 and pwd != pwd2:
             self.add_error('password_confirm', 'Passwords do not match.')
+        else:
+            instance = getattr(self, 'instance', None)
+            if pwd and instance and getattr(instance, 'pk', None):
+                if check_password(pwd, instance.password):
+                    self.add_error('password', 'New password must be different from your current password.')
         return cleaned
 
     def save(self, commit=True):
