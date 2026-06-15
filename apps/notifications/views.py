@@ -51,7 +51,10 @@ def delete_notification(request, notification_id):
     notification = get_object_or_404(Notification, id=notification_id, recipient=request.user)
     notification.delete()
     unread_count = request.user.notifications.filter(is_read=False).count()
-    return JsonResponse({'success': True, 'unread_count': unread_count})
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'success': True, 'unread_count': unread_count})
+    messages.success(request, 'Notification deleted successfully.')
+    return redirect('notifications:notification_list')
 
 
 @login_required

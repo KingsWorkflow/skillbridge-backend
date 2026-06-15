@@ -1,4 +1,6 @@
-{% extends 'notifications/base_notifications.html' %}
+{% extends 'base.html' %}
+{% block title %}Notifications | SkillBridge Nepal{% endblock %}
+
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -9,19 +11,93 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => { messagesBanner.style.display = 'none'; }, 300);
         }, 5000);
     }
+
+    function showToast(message, type) {
+        const toast = document.createElement('div');
+        toast.className = 'fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl shadow-lg border border-outline-variant/30 bg-surface text-sm font-medium text-on-surface flex items-center gap-2 animate-fade-in';
+        toast.innerHTML = '<span class="material-symbols-outlined text-primary">check_circle</span>' + message;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.classList.add('animate-fade-out');
+            setTimeout(() => toast.remove(), 300);
+        }, 2200);
+    }
+
+    window.enhanceNotifications = function() {
+        document.querySelectorAll('.mark-read-btn').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const nid = btn.dataset.nid;
+                fetch('/notifications/' + nid + '/read/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': (function(){ var v='; '+document.cookie; var p=v.split('; csrftoken='); return p.length===2 ? p.pop().split(';').shift() : ''; })(),
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    credentials: 'same-origin',
+                }).then(function(r){ return r.json(); }).then(function(d) {
+                    if (d && d.success) {
+                        const row = btn.closest('[data-nid]');
+                        if (row) {
+                            row.classList.add('opacity-60');
+                            const badge = row.querySelector('.unread-dot');
+                            if (badge) badge.remove();
+                        }
+                    }
+                });
+            });
+        });
+
+        document.querySelectorAll('.delete-btn').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const nid = btn.dataset.nid;
+                const row = btn.closest('[data-nid]');
+                fetch('/notifications/' + nid + '/delete/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': (function(){ var v='; '+document.cookie; var p=v.split('; csrftoken='); return p.length===2 ? p.pop().split(';').shift() : ''; })(),
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    credentials: 'same-origin',
+                }).then(function(r){ return r.json(); }).then(function(d) {
+                    if (d && d.success) {
+                        showToast('Notification deleted');
+                        if (row) {
+                            row.style.transition = 'all 0.2s ease';
+                            row.style.opacity = '0';
+                            row.style.transform = 'translateX(20px)';
+                            setTimeout(function() { row.remove(); }, 220);
+                        }
+                    }
+                }).catch(function(){
+                    showToast('Something went wrong', 'error');
+                });
+            });
+        });
+    };
+
+    enhanceNotifications();
 });
 </script>
 {% endblock %}
+
 {% block content %}
-<style>
-    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-</style>
 <div class="max-w-3xl mx-auto py-12">
-    <h1 class="text-2xl font-bold text-primary mb-8">All Notifications</h1>
+    <div class="flex items-center justify-between mb-8">
+        <h1 class="text-2xl font-bold text-primary">All Notifications</h1>
+        {% if unread_count > 0 %}
+        <form method="post" action="{% url 'notifications:mark_all_as_read' %}" class="inline">
+            {% csrf_token %}
+            <button type="submit" class="text-sm text-primary hover:underline">Mark all as read</button>
+        </form>
+        {% endif %}
+    </div>
     {% if notifications %}
     <div class="space-y-3">
         {% for notification in notifications %}
-        <div class="flex items-start gap-4 p-4 rounded-xl border {% if not notification.is_read %}border-primary/30 bg-primary/5{% else %}border-outline-variant/30 bg-surface{% endif %} hover:bg-surface-container-low transition-colors">
+        <div class="flex items-start gap-4 p-4 rounded-xl border {% if not notification.is_read %}border-primary/30 bg-primary/5{% else %}border-outline-variant/30 bg-surface{% endif %} hover:bg-surface-container-low transition-colors"
+             data-nid="{{ notification.id }}">
             <span class="material-symbols-outlined text-3xl mt-0.5 {% if notification.is_read %}text-outline{% else %}text-primary{% endif %}">
                 {% if notification.notification_type == 'password_changed' %}lock
                 {% elif notification.notification_type == 'exchange_proposal' %}swap_horiz
@@ -40,17 +116,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 <p class="text-sm text-on-surface-variant mt-1">{{ notification.message }}</p>
                 <span class="text-xs text-outline mt-2 block">{{ notification.created_at|timesince }} ago</span>
             </div>
-            {% if notification.link_url %}
-            <a href="{{ notification.link_url }}" class="text-sm text-primary hover:underline whitespace-nowrap">View</a>
-            {% endif %}
-            {% if not notification.is_read %}
-            <form method="post" action="{% url 'notifications:mark_as_read' notification.id %}" class="inline">
-                {% csrf_token %}
-                <button type="submit" class="text-xs text-on-surface-variant hover:text-primary">
-                    <span class="material-symbols-outlined text-lg">done</span>
+            <div class="flex items-center gap-2 flex-shrink-0">
+                {% if notification.link_url %}
+                <a href="{{ notification.link_url }}" class="text-sm text-primary hover:underline whitespace-nowrap">View</a>
+                {% endif %}
+                <button class="text-xs text-on-surface-variant hover:text-error delete-btn" title="Delete" data-nid="{{ notification.id }}">
+                    <span class="material-symbols-outlined text-lg">delete</span>
                 </button>
-            </form>
-            {% endif %}
+            </div>
         </div>
         {% endfor %}
     </div>
