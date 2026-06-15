@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, AuthenticationForm
 from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import check_password
 from django.core.validators import RegexValidator
 
 User = get_user_model()
@@ -132,6 +133,82 @@ class OTPVerificationForm(forms.Form):
 
 
 class UserProfileUpdateForm(UserChangeForm):
+    first_name = forms.CharField(
+        required=False,
+        max_length=150,
+        widget=forms.TextInput(attrs={
+            'placeholder': 'First name',
+            'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary',
+        })
+    )
+    last_name = forms.CharField(
+        required=False,
+        max_length=150,
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Last name',
+            'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary',
+        })
+    )
+    phone = forms.CharField(
+        required=False,
+        max_length=15,
+        widget=forms.TextInput(attrs={
+            'placeholder': '+977-98XXXXXXXX',
+            'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary',
+        })
+    )
+    location = forms.CharField(
+        required=False,
+        max_length=100,
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Kathmandu, Nepal',
+            'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary',
+        })
+    )
+    experience_level = forms.ChoiceField(
+        choices=User.EXPERIENCE_CHOICES,
+        widget=forms.Select(attrs={
+            'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary',
+        })
+    )
+    bio = forms.CharField(
+        required=False,
+        max_length=500,
+        widget=forms.Textarea(attrs={
+            'placeholder': 'Tell us about yourself...',
+            'rows': 4,
+            'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary resize-none',
+        })
+    )
+    linkedin = forms.URLField(
+        required=False,
+        widget=forms.URLInput(attrs={
+            'placeholder': 'https://linkedin.com/in/username',
+            'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary',
+        })
+    )
+    github = forms.URLField(
+        required=False,
+        widget=forms.URLInput(attrs={
+            'placeholder': 'https://github.com/username',
+            'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary',
+        })
+    )
+    website = forms.URLField(
+        required=False,
+        widget=forms.URLInput(attrs={
+            'placeholder': 'https://yourportfolio.com',
+            'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary',
+        })
+    )
+    profile_picture = forms.ImageField(
+        required=False,
+        widget=forms.FileInput(attrs={
+            'class': 'hidden',
+            'accept': 'image/*',
+            'id': 'avatar-upload',
+        })
+    )
     password = forms.CharField(
         required=False,
         help_text='Leave blank to keep current password. Enter a new password to change it.',
@@ -153,22 +230,10 @@ class UserProfileUpdateForm(UserChangeForm):
 
     class Meta:
         model = User
-        fields = ('title', 'bio', 'profile_picture', 'phone', 'experience_level', 'password', 'password_confirm')
+        fields = ('first_name', 'last_name', 'phone', 'location', 'experience_level', 'bio', 'profile_picture', 'linkedin', 'github', 'website')
         widgets = {
-            'bio': forms.Textarea(attrs={'rows': 3, 'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary'}),
+            'bio': forms.Textarea(attrs={'rows': 4, 'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary resize-none'}),
         }
-
-    def clean(self):
-        cleaned = super().clean()
-        pwd = cleaned.get('password')
-        pwd2 = cleaned.get('password_confirm')
-        if pwd and not pwd2:
-            self.add_error('password_confirm', 'Please confirm your new password.')
-        elif pwd2 and not pwd:
-            self.add_error('password', 'Please enter a new password.')
-        elif pwd and pwd2 and pwd != pwd2:
-            self.add_error('password_confirm', 'Passwords do not match.')
-        return cleaned
 
     def save(self, commit=True):
         user = super().save(commit=False)

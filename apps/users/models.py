@@ -24,7 +24,12 @@ class UserProfile(AbstractUser):
     reputation_score = models.FloatField(default=0.0)
     total_hours_taught = models.IntegerField(default=0)
     total_hours_learned = models.IntegerField(default=0)
-    
+
+    linkedin = models.URLField(blank=True, help_text="LinkedIn profile URL")
+    github = models.URLField(blank=True, help_text="GitHub profile URL")
+    website = models.URLField(blank=True, help_text="Personal portfolio or website URL")
+    location = models.CharField(max_length=100, blank=True, help_text="City, Country")
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

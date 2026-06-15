@@ -114,6 +114,10 @@
         }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .animate-fade-in { animation: fadeIn 0.2s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-out { animation: fadeOut 0.25s ease-in forwards; }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
     </style>
 </head>
 <body class="bg-background text-on-surface font-body-md topo-bg min-h-screen flex flex-col">
@@ -165,27 +169,44 @@
       <div class="hidden md:flex bg-surface-container-low rounded-full px-4 py-2 items-center gap-xs">
         <span class="material-symbols-outlined text-outline">search</span>
         <input class="bg-transparent border-none focus:ring-0 text-body-sm w-48" placeholder="Search skills..." type="text"/>
-    </div>
-    <div class="flex items-center gap-4">
-      {% if user.is_authenticated %}
-      <div class="relative">
-        <button id="notification-bell" class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high/50 p-2 rounded-full transition-all">
-          notifications_active
-        </button>
-        {% if unread_count > 0 %}
-        <span id="unread-badge" class="absolute -top-1 -right-1 bg-error text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">{{ unread_count }}</span>
-        {% endif %}
-        <div id="notification-dropdown" class="hidden absolute right-0 top-12 w-96 bg-surface border border-outline-variant/30 rounded-2xl shadow-2xl z-50 max-h-[480px] overflow-y-auto"></div>
       </div>
-       <a class="inline-flex items-center justify-center" href="{% url 'users:profile_edit' %}" title="Profile">
-        <img alt="User profile photo" class="w-10 h-10 rounded-full border-2 border-primary/10 object-cover"
-             src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'images/avatar-placeholder.png' %}{% endif %}"
-             onerror="this.style.display='none'; this.insertAdjacentHTML('afterend', '<div class=\'w-10 h-10 rounded-full border-2 border-primary/10 bg-surface-container flex items-center justify-center font-bold text-on-surface\'>{{ user.username|slice:':1' }}</div>')">
-      </a>
-            <form method="post" action="{% url 'users:logout' %}" class="inline">
-                {% csrf_token %}
-                <button type="submit" class="bg-secondary-container text-on-secondary-container px-6 py-2 rounded-lg font-label-md text-label-md hover:scale-95 transition-transform active:scale-90">Logout</button>
-            </form>
+      <div class="flex items-center gap-4">
+      {% if user.is_authenticated %}
+      <div class="relative group" id="notification-wrapper">
+        <a id="notification-bell" href="{% url 'notifications:notification_list' %}" class="relative material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high/50 p-2 rounded-full transition-all">notifications_active
+          {% if unread_count > 0 %}
+          <span id="unread-badge" class="absolute -top-1 -right-1 bg-error text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">{{ unread_count }}</span>
+          {% endif %}
+        </a>
+        <div id="notification-dropdown" class="hidden absolute right-0 top-12 w-96 bg-surface border border-outline-variant/30 rounded-2xl shadow-2xl z-50"></div>
+      </div>
+      <a href="{% url 'users:profile_edit' %}" class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high/50 p-2 rounded-full transition-all" title="Settings">settings</a>
+      <div class="relative" id="profile-dropdown-container">
+       <a class="inline-flex items-center justify-center cursor-pointer" id="profile-dropdown-trigger" title="Profile">
+         {% if user.profile_picture %}
+         <img alt="User profile photo" class="w-10 h-10 rounded-full border-2 border-primary/10 object-cover" src="{{ user.profile_picture.url }}"/>
+         {% else %}
+         <div class="w-10 h-10 rounded-full border-2 border-primary/10 bg-surface-container flex items-center justify-center font-bold text-on-primary">{{ user.first_name|default:user.username|slice:":1"|upper }}</div>
+         {% endif %}
+       </a>
+       <div id="profile-dropdown" class="hidden absolute right-0 top-12 w-56 bg-surface border border-outline-variant/30 rounded-2xl shadow-2xl z-50 overflow-hidden">
+         <div class="px-4 py-3 border-b border-outline-variant/30">
+           <p class="font-label-md text-label-md text-on-surface font-bold">{{ user.first_name }} {{ user.last_name|default:'' }}</p>
+           <p class="font-body-sm text-body-sm text-on-surface-variant">{{ user.email }}</p>
+         </div>
+         <div class="py-1">
+           <a href="{% url 'users:profile_edit' %}" class="block px-4 py-2 font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-high transition-colors">Edit Profile</a>
+           <a href="{% url 'portfolio:portfolio' %}" class="block px-4 py-2 font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-high transition-colors">My Portfolio</a>
+           <a href="{% url 'notifications:notification_list' %}" class="block px-4 py-2 font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-high transition-colors">Notifications</a>
+         </div>
+         <div class="border-t border-outline-variant/30 py-1">
+           <form method="post" action="{% url 'users:logout' %}">
+             {% csrf_token %}
+             <button type="submit" class="w-full text-left px-4 py-2 font-body-md text-body-md text-error hover:bg-surface-container-high transition-colors">Logout</button>
+           </form>
+         </div>
+       </div>
+      </div>
             {% else %}
             <a href="{% url 'users:login' %}" class="bg-secondary-container text-on-secondary-container px-6 py-2 rounded-lg font-label-md text-label-md hover:scale-95 transition-transform active:scale-90">Sign In</a>
             {% endif %}
@@ -258,6 +279,20 @@
                         messagesBanner.style.display = 'none';
                     }, 300);
                 }, 5000);
+            }
+
+            const profileTrigger = document.getElementById('profile-dropdown-trigger');
+            const profileDropdown = document.getElementById('profile-dropdown');
+            if (profileTrigger && profileDropdown) {
+                profileTrigger.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    profileDropdown.classList.toggle('hidden');
+                });
+                document.addEventListener('click', function(e) {
+                    if (!profileTrigger.contains(e.target) && !profileDropdown.contains(e.target)) {
+                        profileDropdown.classList.add('hidden');
+                    }
+                });
             }
         });
     </script>

@@ -1,50 +1,223 @@
 {% extends "base.html" %}
 {% load static %}
 {% load form_tags %}
-{% block title %}Verify Email | SkillBridge Nepal{% endblock %}
+{% block title %}Verify Your Account | SkillBridge Nepal{% endblock %}
 {% block header %}{% endblock %}
 
+{% block extra_css %}
+<style>
+.glass-panel {
+    background: rgba(252, 249, 248, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(18, 18, 18, 0.1);
+    box-shadow: inset 0 2px 4px rgba(18, 18, 18, 0.05);
+}
+
+.otp-input {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.otp-input:focus {
+    border-bottom: 2px solid #E0A354;
+    box-shadow: inset 0 2px 4px rgba(224, 163, 84, 0.1);
+    outline: none;
+}
+
+.liquid-gold-btn {
+    background: #E0A354;
+    color: #121212;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.liquid-gold-btn:hover {
+    transform: scale(1.02) translateY(-2px);
+    box-shadow: 0 4px 15px rgba(224, 163, 84, 0.3);
+}
+
+.liquid-gold-btn:active {
+    transform: scale(0.98);
+}
+
+.liquid-gold-btn::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+    transform: rotate(45deg);
+    transition: 0.5s;
+}
+
+.liquid-gold-btn:hover::after {
+    left: 100%;
+}
+
+.himalayan-bg {
+    background-color: #fcf9f8;
+    background-image: radial-gradient(circle at 2px 2px, rgba(18, 18, 18, 0.05) 1px, transparent 0);
+    background-size: 40px 40px;
+}
+
+.topo-shape {
+    opacity: 0.05;
+    position: absolute;
+    z-index: 0;
+    pointer-events: none;
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="flex-grow flex items-center justify-center p-margin-mobile md:p-margin-desktop">
-  <div class="max-w-md w-full">
-    <div class="p-8 md:p-10 rounded-xl bg-white border border-outline-variant shadow-lg">
-      <div class="text-center mb-6">
-        <span class="material-symbols-outlined text-primary text-4xl mb-2" style="font-variation-settings: 'FILL' 1;">mark_email_read</span>
-        <h1 class="font-headline-lg text-headline-lg text-on-surface">Verify your email</h1>
-        <p class="font-body-md text-body-md text-on-surface-variant mt-2">Enter the 6-digit code sent to your email address.</p>
-      </div>
+<div class="himalayan-bg font-body-md text-on-surface antialiased h-[100dvh] flex items-center justify-center p-3 md:p-6 overflow-hidden relative">
+    <!-- Decorative Topography Background Element -->
+    <svg class="topo-shape top-0 left-0 w-full h-full" viewbox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,500 C150,400 350,600 500,500 C650,400 850,600 1000,500 L1000,1000 L0,1000 Z" fill="#00352a"></path>
+    </svg>
 
-      <form method="post" class="space-y-6">
-        {% csrf_token %}
-        {{ form.non_field_errors }}
+    <!-- Main Content Canvas -->
+    <main class="relative z-10 w-full max-w-[28rem]">
+        <!-- Bento-style Verification Card -->
+        <div class="glass-panel rounded-xl p-6 md:p-8 border border-on-surface/10 flex flex-col items-center text-center">
+            <!-- Brand Identity Anchor -->
+            <div class="mb-6 flex flex-col items-center">
+                <div class="w-14 h-14 bg-primary rounded-full flex items-center justify-center mb-3">
+                    <span class="material-symbols-outlined text-white text-2xl" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+                </div>
+                <h1 class="font-headline-md text-headline-md text-on-surface mb-2">Verify Your Account</h1>
+                <p class="font-body-md text-on-surface-variant text-sm max-w-xs leading-relaxed">
+                    We've sent a 6-digit code to your email. Please enter it below to continue your journey with SkillBridge Nepal.
+                </p>
+            </div>
 
-        <div class="space-y-2">
-          <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.otp_code.id_for_label }}">Verification Code</label>
-          {{ form.otp_code|add_class:"text-center tracking-widest" }}
+            <!-- OTP Input Section -->
+            <form method="post" class="w-full space-y-5" id="otp-form">
+                {% csrf_token %}
+                <!-- {{ form.non_field_errors }} -->
+
+                <!-- {% if messages %}
+                <div class="space-y-2">
+                    {% for message in messages %}
+                    <div class="rounded-lg px-4 py-3 text-sm border-l-4 {% if message.tags == 'error' %}bg-red-50 border-red-500 text-red-800{% elif message.tags == 'success' %}bg-green-50 border-green-500 text-green-800{% else %}bg-blue-50 border-blue-500 text-blue-800{% endif %}">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %} -->
+
+                {{ form.otp_code|add_class:"hidden" }}
+                {% if form.otp_code.errors %}
+                <div class="text-red-500 text-sm">{{ form.otp_code.errors }}</div>
+                {% endif %}
+
+                <div class="flex justify-between gap-2 md:gap-3" id="otp-inputs-container">
+                    <input autocomplete="one-time-code" class="otp-input w-9 h-12 md:w-10 md:h-14 bg-white border border-on-surface/10 rounded-lg text-center text-lg md:text-xl font-bold text-on-surface focus:ring-0 transition-all" inputmode="numeric" maxlength="1" pattern="\d*" required type="text" />
+                    <input class="otp-input w-9 h-12 md:w-10 md:h-14 bg-white border border-on-surface/10 rounded-lg text-center text-lg md:text-xl font-bold text-on-surface focus:ring-0 transition-all" inputmode="numeric" maxlength="1" pattern="\d*" required type="text" />
+                    <input class="otp-input w-9 h-12 md:w-10 md:h-14 bg-white border border-on-surface/10 rounded-lg text-center text-lg md:text-xl font-bold text-on-surface focus:ring-0 transition-all" inputmode="numeric" maxlength="1" pattern="\d*" required type="text" />
+                    <input class="otp-input w-9 h-12 md:w-10 md:h-14 bg-white border border-on-surface/10 rounded-lg text-center text-lg md:text-xl font-bold text-on-surface focus:ring-0 transition-all" inputmode="numeric" maxlength="1" pattern="\d*" required type="text" />
+                    <input class="otp-input w-9 h-12 md:w-10 md:h-14 bg-white border border-on-surface/10 rounded-lg text-center text-lg md:text-xl font-bold text-on-surface focus:ring-0 transition-all" inputmode="numeric" maxlength="1" pattern="\d*" required type="text" />
+                    <input class="otp-input w-9 h-12 md:w-10 md:h-14 bg-white border border-on-surface/10 rounded-lg text-center text-lg md:text-xl font-bold text-on-surface focus:ring-0 transition-all" inputmode="numeric" maxlength="1" pattern="\d*" required type="text" />
+                </div>
+
+                <!-- Action Section -->
+                <div class="space-y-3">
+                    <button class="liquid-gold-btn w-full py-3 px-4 rounded-lg font-semibold text-base shadow-sm" type="submit">
+                        Verify &amp; Continue
+                    </button>
+                    <div class="flex flex-col items-center space-y-1">
+                        <p class="font-medium text-xs text-on-surface-variant">Didn't receive the code?</p>
+                        <a href="{% url 'users:resend_otp' %}" class="text-secondary font-semibold hover:underline decoration-2 underline-offset-4 transition-all inline-flex items-center gap-1.5 group">
+                            Resend Code
+                            <span class="material-symbols-outlined text-xs group-hover:translate-x-1 transition-transform">refresh</span>
+                        </a>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Security Trust Signifier -->
+            <div class="mt-6 pt-5 border-t border-on-surface/5 w-full flex justify-center items-center gap-1.5 text-on-surface-variant/60 text-xs font-medium">
+                <span class="material-symbols-outlined text-sm">lock</span>
+                <span>Secure 256-bit AES Encryption</span>
+            </div>
         </div>
 
-        {% if messages %}
-        <div class="space-y-2">
-          {% for message in messages %}
-          <div class="rounded-lg px-4 py-3 text-sm border-l-4 {% if message.tags == 'error' %}bg-red-50 border-red-500 text-red-800{% elif message.tags == 'success' %}bg-green-50 border-green-500 text-green-800{% else %}bg-blue-50 border-blue-500 text-blue-800{% endif %}">
-            {{ message }}
-          </div>
-          {% endfor %}
+        <!-- Footer Link -->
+        <div class="mt-6 text-center">
+            <a href="{% url 'users:login' %}" class="text-on-surface-variant hover:text-primary transition-colors text-xs font-medium inline-flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm">arrow_back</span>
+                Back to Login
+            </a>
         </div>
-        {% endif %}
-
-        <button type="submit" class="w-full bg-primary text-on-primary py-3 rounded-lg font-label-md text-label-md hover:opacity-90 transition-all">Verify Email</button>
-      </form>
-
-      <div class="mt-6 text-center">
-        <a href="{% url 'users:resend_otp' %}" class="font-label-md text-label-md text-primary hover:underline">Resend code</a>
-      </div>
-
-      <p class="text-body-sm text-body-sm text-on-surface-variant text-center mt-6">
-        Already verified?
-        <a href="{% url 'users:login' %}" class="text-primary font-bold hover:underline">Sign in</a>
-      </p>
-    </div>
-  </div>
+    </main>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const inputs = document.querySelectorAll('.otp-input');
+        const form = document.getElementById('otp-form');
+        const hiddenField = document.getElementById('{{ form.otp_code.id_for_label }}');
+
+        function updateHiddenField() {
+            if (!hiddenField) return;
+            hiddenField.value = Array.from(inputs).map(i => i.value).join('');
+        }
+
+        inputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                if (e.target.value.length === 1 && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+                updateHiddenField();
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                    inputs[index - 1].focus();
+                }
+                updateHiddenField();
+            });
+
+            input.addEventListener('paste', (e) => {
+                e.preventDefault();
+                const data = e.clipboardData.getData('text').slice(0, 6);
+                if (/^\d+$/.test(data)) {
+                    data.split('').forEach((digit, i) => {
+                        if (inputs[i]) inputs[i].value = digit;
+                    });
+                    if (data.length < 6) {
+                        inputs[data.length].focus();
+                    } else {
+                        inputs[5].focus();
+                    }
+                    updateHiddenField();
+                }
+            });
+        });
+
+        form.addEventListener('submit', (e) => {
+            updateHiddenField();
+            const code = hiddenField ? hiddenField.value : '';
+            if (code.length !== 6) {
+                e.preventDefault();
+                inputs.forEach(inp => {
+                    if (!inp.value) { inp.focus(); return false; }
+                });
+                return;
+            }
+            const btn = form.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="flex items-center justify-center gap-2"><span class="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></span> Verifying...</span>';
+            setTimeout(() => {
+                btn.innerHTML = '<span class="flex items-center justify-center gap-2"><span class="material-symbols-outlined">check_circle</span> Verified</span>';
+                btn.classList.replace('bg-[#E0A354]', 'bg-on-primary-fixed-variant');
+                btn.style.color = '#ffffff';
+            }, 1500);
+        });
+    });
+</script>
 {% endblock %}
