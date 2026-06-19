@@ -5,88 +5,179 @@
 
 {% block extra_css %}
 <style>
-.teachable-card {
-    transition: all 0.3s ease;
-}
-.teachable-card:hover {
-    transform: translateX(4px);
-}
-.teachable-card.inactive {
-    opacity: 0.6;
-    background: #f5f5f5;
-}
+    .liquid-gold-btn {
+        background-color: #E0A354;
+        color: #121212;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .liquid-gold-btn:hover {
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 8px 16px -4px rgba(224, 163, 84, 0.4);
+        background: linear-gradient(135deg, #E0A354 0%, #f4c07d 100%);
+    }
+    .emerald-input {
+        border: none;
+        border-bottom: 1px solid rgba(0, 53, 42, 0.2);
+        background: transparent;
+        transition: border-color 0.3s;
+    }
+    .emerald-input:focus {
+        outline: none;
+        border-bottom: 2px solid #E0A354;
+        box-shadow: none;
+    }
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(18, 18, 18, 0.1);
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    .teachable-card {
+        transition: all 0.3s ease;
+    }
+    .teachable-card:hover {
+        transform: translateX(4px);
+    }
+    .teachable-card.inactive {
+        opacity: 0.6;
+        background: #f5f5f5;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-container-max mx-auto py-lg space-y-lg">
-    <header class="mb-lg flex justify-between items-end">
-        <div>
-            <h1 class="font-headline-lg text-headline-lg text-on-background">My Teachable Skills</h1>
-            <p class="font-body-lg text-body-lg text-on-surface-variant">Skills you can teach others.</p>
-        </div>
-        <a href="{% url 'skills:skill_list' %}" class="bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md text-label-md hover:opacity-90 transition-all">Browse Skills</a>
-    </header>
-
-    <section class="bg-surface-container-low/30 rounded-xl p-md border border-outline-variant/30">
-        <h3 class="font-headline-md text-headline-md text-on-surface mb-md">Add Teachable Skill</h3>
-        <form method="post" class="grid grid-cols-1 md:grid-cols-4 gap-md items-start">
-            {% csrf_token %}
-            <div class="md:col-span-2 space-y-2">
-                <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.skill.id_for_label }}">Skill</label>
-                {{ form.skill|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary" }}
+<main class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-12 min-h-screen">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+        <!-- Left Side: Instructional Content -->
+        <div class="lg:col-span-5 flex flex-col justify-center gap-8">
+            <div>
+                <h1 class="font-headline-lg text-headline-lg text-primary mb-4">Share Your Expertise</h1>
+                <p class="font-body-lg text-on-surface-variant max-w-md">
+                    Join our knowledge exchange ecosystem. By teaching others, you not only earn rewards but also master your own craft within the Himalayan professional network.
+                </p>
             </div>
-            <div class="space-y-2">
-                <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.proficiency_level.id_for_label }}">Proficiency</label>
-                {{ form.proficiency_level|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary" }}
-            </div>
-            <div class="space-y-2">
-                <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.hourly_commitment.id_for_label }}">Hours/Week</label>
-                {{ form.hourly_commitment|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary" }}
-            </div>
-            <div class="md:col-span-4">
-                <button class="bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md text-label-md hover:opacity-90 transition-all" type="submit">Add Skill</button>
-            </div>
-        </form>
-    </section>
-
-    <div class="space-y-base">
-        {% for skill in teachable_skills %}
-        <div class="teachable-card bg-white p-md rounded-xl shadow-sm border border-outline-variant flex justify-between items-center {% if not skill.is_active %}inactive{% endif %}">
-            <div class="flex items-center gap-md">
-                <div class="w-12 h-12 rounded-full {% if skill.is_active %}bg-primary-container{% else %}bg-surface-container{% endif %} flex items-center justify-center text-on-primary-container">
-                    <span class="material-symbols-outlined">school</span>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="glass-panel p-4 rounded-xl flex items-center gap-3">
+                    <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+                    <span class="font-label-md text-on-surface">Verified Mentor</span>
                 </div>
-                <div>
-                    <h3 class="font-label-md text-label-md text-on-surface">{{ skill.skill.name }}</h3>
-                    <p class="text-body-sm text-on-surface-variant">{{ skill.get_proficiency_level_display }} • {{ skill.hourly_commitment }} hrs/week</p>
+                <div class="glass-panel p-4 rounded-xl flex items-center gap-3">
+                    <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">payments</span>
+                    <span class="font-label-md text-on-surface">Earn Credits</span>
                 </div>
             </div>
-            <div class="flex items-center gap-xs">
-                <span class="font-label-sm text-label-sm px-2 py-1 rounded-full {% if skill.is_active %}bg-primary-container/10 text-primary{% else %}bg-surface-container text-on-surface-variant{% endif %}">
-                    {% if skill.is_active %}Active{% else %}Paused{% endif %}
-                </span>
-                <form method="post" action="{% url 'skills:teachable_toggle' pk=skill.pk %}" class="inline">
+        </div>
+
+        <!-- Right Side: The Form Card -->
+        <div class="lg:col-span-7">
+            <div class="glass-panel p-8 md:p-12 rounded-2xl mb-8">
+                <div class="flex items-center gap-4 mb-10">
+                    <div class="w-12 h-12 rounded-lg bg-primary flex items-center justify-center">
+                        <span class="material-symbols-outlined text-white">school</span>
+                    </div>
+                    <div>
+                        <h2 class="font-headline-md text-primary">Add Teachable Skill</h2>
+                        <p class="font-label-md text-on-surface-variant">Define the parameters of your mentorship</p>
+                    </div>
+                </div>
+
+                <form method="post" class="space-y-8" id="skill-form">
                     {% csrf_token %}
-                    <button type="submit" class="p-2 rounded-full hover:bg-surface-container-high transition-colors" title="{% if skill.is_active %}Pause{% else %}Activate{% endif %}">
-                        <span class="material-symbols-outlined text-on-surface-variant">{% if skill.is_active %}pause{% else %}play_arrow{% endif %}</span>
-                    </button>
-                </form>
-                <form method="post" action="{% url 'skills:teachable_delete' pk=skill.pk %}" class="inline" onsubmit="return confirm('Remove this skill?')">
-                    {% csrf_token %}
-                    <button type="submit" class="p-2 rounded-full hover:bg-error/10 transition-colors" title="Delete">
-                        <span class="material-symbols-outlined text-error">delete</span>
-                    </button>
+
+                    {% if form.non_field_errors %}
+                    <div class="rounded-lg px-4 py-3 bg-red-50 border border-red-500 text-red-800">
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
+
+                    <!-- Skill Selection -->
+                    <div class="space-y-2">
+                        <label class="block font-label-md text-primary uppercase tracking-wider" for="{{ form.skill.id_for_label }}">What Skill do you want to teach?</label>
+                        <div class="relative">
+                            {{ form.skill|add_class:"emerald-input w-full py-4 text-body-lg text-on-surface appearance-none" }}
+                            <span class="material-symbols-outlined absolute right-0 top-4 pointer-events-none text-on-surface-variant">expand_more</span>
+                        </div>
+                        {% if form.skill.errors %}
+                        <p class="text-red-600 text-sm mt-1">{{ form.skill.errors }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Proficiency Level -->
+                    <div class="space-y-2">
+                        <label class="block font-label-md text-primary uppercase tracking-wider" for="{{ form.proficiency_level.id_for_label }}">Your Proficiency Level</label>
+                        <div class="relative">
+                            {{ form.proficiency_level|add_class:"emerald-input w-full py-4 text-body-lg text-on-surface appearance-none" }}
+                            <span class="material-symbols-outlined absolute right-0 top-4 pointer-events-none text-on-surface-variant">stars</span>
+                        </div>
+                        {% if form.proficiency_level.errors %}
+                        <p class="text-red-600 text-sm mt-1">{{ form.proficiency_level.errors }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Hourly Commitment -->
+                    <div class="space-y-2">
+                        <label class="block font-label-md text-primary uppercase tracking-wider" for="{{ form.hourly_commitment.id_for_label }}">Weekly Hourly Commitment</label>
+                        <div class="relative">
+                            {{ form.hourly_commitment|add_class:"emerald-input w-full py-4 text-body-lg text-on-surface pr-16" }}
+                            <span class="absolute right-0 top-4 font-label-md text-on-surface-variant">Hrs / Week</span>
+                        </div>
+                        {% if form.hourly_commitment.errors %}
+                        <p class="text-red-600 text-sm mt-1">{{ form.hourly_commitment.errors }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="pt-6 flex flex-col md:flex-row items-center gap-6">
+                        <button class="liquid-gold-btn w-full md:w-auto px-12 py-4 rounded-full font-label-md uppercase tracking-widest shadow-lg" type="submit">
+                            Add Skill
+                        </button>
+                        <a href="{% url 'skills:skill_list' %}" class="text-on-surface-variant hover:text-primary transition-colors font-label-md border-b-2 border-transparent hover:border-primary pb-1">
+                            Browse Skills Catalog
+                        </a>
+                    </div>
                 </form>
             </div>
+
+            <!-- Existing Teachable Skills List -->
+            <div class="space-y-base">
+                {% for skill in teachable_skills %}
+                <div class="teachable-card bg-white p-md rounded-xl shadow-sm border border-outline-variant flex justify-between items-center {% if not skill.is_active %}inactive{% endif %}">
+                    <div class="flex items-center gap-md">
+                        <div class="w-12 h-12 rounded-full {% if skill.is_active %}bg-primary-container{% else %}bg-surface-container{% endif %} flex items-center justify-center text-on-primary-container">
+                            <span class="material-symbols-outlined">school</span>
+                        </div>
+                        <div>
+                            <h3 class="font-label-md text-label-md text-on-surface">{{ skill.skill.name }}</h3>
+                            <p class="text-body-sm text-on-surface-variant">{{ skill.get_proficiency_level_display }} • {{ skill.hourly_commitment }} hrs/week</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-xs">
+                        <span class="font-label-sm text-label-sm px-2 py-1 rounded-full {% if skill.is_active %}bg-primary-container/10 text-primary{% else %}bg-surface-container text-on-surface-variant{% endif %}">
+                            {% if skill.is_active %}Active{% else %}Paused{% endif %}
+                        </span>
+                        <form method="post" action="{% url 'skills:teachable_toggle' pk=skill.pk %}" class="inline">
+                            {% csrf_token %}
+                            <button type="submit" class="p-2 rounded-full hover:bg-surface-container-high transition-colors" title="{% if skill.is_active %}Pause{% else %}Activate{% endif %}">
+                                <span class="material-symbols-outlined text-on-surface-variant">{% if skill.is_active %}pause{% else %}play_arrow{% endif %}</span>
+                            </button>
+                        </form>
+                        <form method="post" action="{% url 'skills:teachable_delete' pk=skill.pk %}" class="inline" onsubmit="return confirm('Remove this skill?')">
+                            {% csrf_token %}
+                            <button type="submit" class="p-2 rounded-full hover:bg-error/10 transition-colors" title="Delete">
+                                <span class="material-symbols-outlined text-error">delete</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-xl bg-surface-container-low/30 rounded-xl border border-dashed border-outline-variant">
+                    <span class="material-symbols-outlined text-on-surface-variant/40 text-5xl mb-base block">school</span>
+                    <p class="text-on-surface-variant font-body-md">You haven't added any teachable skills yet.</p>
+                    <a href="{% url 'skills:skill_list' %}" class="inline-block mt-md bg-primary text-white px-lg py-sm rounded-lg font-label-md text-label-md hover:opacity-90 transition-all">Browse Skills Catalog</a>
+                </div>
+                {% endfor %}
+            </div>
         </div>
-        {% empty %}
-        <div class="text-center py-xl bg-surface-container-low/30 rounded-xl border border-dashed border-outline-variant">
-            <span class="material-symbols-outlined text-on-surface-variant/40 text-5xl mb-base block">school</span>
-            <p class="text-on-surface-variant font-body-md">You haven't added any teachable skills yet.</p>
-            <a href="{% url 'skills:skill_list' %}" class="inline-block mt-md bg-primary text-white px-lg py-sm rounded-lg font-label-md text-label-md hover:opacity-90 transition-all">Browse Skills Catalog</a>
-        </div>
-        {% endfor %}
     </div>
-</div>
+</main>
 {% endblock %}

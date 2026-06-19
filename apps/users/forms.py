@@ -132,44 +132,75 @@ class OTPVerificationForm(forms.Form):
         return code
 
 
+class PasswordChangeForm(forms.Form):
+    new_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'placeholder': 'New password',
+            'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary',
+            'autocomplete': 'new-password',
+        })
+    )
+    confirm_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'placeholder': 'Confirm new password',
+            'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary',
+            'autocomplete': 'new-password',
+        })
+    )
+
+    def clean(self):
+        cleaned = super().clean()
+        new = cleaned.get('new_password')
+        confirm = cleaned.get('confirm_password')
+        if new and new != confirm:
+            raise forms.ValidationError('New passwords do not match.')
+        if new and len(new) < 8:
+            raise forms.ValidationError('New password must be at least 8 characters.')
+        if new and not any(ch.isdigit() for ch in new):
+            raise forms.ValidationError('Password must include at least one digit.')
+        if not any(ch.isalpha() for ch in new):
+            raise forms.ValidationError('Password must include at least one letter.')
+        return cleaned
+
+
 class UserProfileUpdateForm(UserChangeForm):
     first_name = forms.CharField(
-        required=False,
         max_length=150,
+        required=False,
         widget=forms.TextInput(attrs={
             'placeholder': 'First name',
             'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary',
-        })
+        }),
     )
     last_name = forms.CharField(
-        required=False,
         max_length=150,
+        required=False,
         widget=forms.TextInput(attrs={
             'placeholder': 'Last name',
             'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary',
-        })
+        }),
     )
     phone = forms.CharField(
-        required=False,
         max_length=15,
+        required=False,
         widget=forms.TextInput(attrs={
             'placeholder': '+977-98XXXXXXXX',
             'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary',
-        })
+        }),
     )
     location = forms.CharField(
-        required=False,
         max_length=100,
+        required=False,
         widget=forms.TextInput(attrs={
             'placeholder': 'Kathmandu, Nepal',
             'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary',
-        })
+        }),
     )
     experience_level = forms.ChoiceField(
         choices=User.EXPERIENCE_CHOICES,
         widget=forms.Select(attrs={
             'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary',
-        })
+        }),
     )
     bio = forms.CharField(
         required=False,
@@ -178,28 +209,28 @@ class UserProfileUpdateForm(UserChangeForm):
             'placeholder': 'Tell us about yourself...',
             'rows': 4,
             'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary resize-none',
-        })
+        }),
     )
     linkedin = forms.URLField(
         required=False,
         widget=forms.URLInput(attrs={
             'placeholder': 'https://linkedin.com/in/username',
             'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary',
-        })
+        }),
     )
     github = forms.URLField(
         required=False,
         widget=forms.URLInput(attrs={
             'placeholder': 'https://github.com/username',
             'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary',
-        })
+        }),
     )
     website = forms.URLField(
         required=False,
         widget=forms.URLInput(attrs={
             'placeholder': 'https://yourportfolio.com',
             'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary',
-        })
+        }),
     )
     profile_picture = forms.ImageField(
         required=False,
@@ -207,39 +238,26 @@ class UserProfileUpdateForm(UserChangeForm):
             'class': 'hidden',
             'accept': 'image/*',
             'id': 'avatar-upload',
-        })
-    )
-    password = forms.CharField(
-        required=False,
-        help_text='Leave blank to keep current password. Enter a new password to change it.',
-        widget=forms.PasswordInput(attrs={
-            'placeholder': 'New password (optional)',
-            'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary',
-            'autocomplete': 'new-password',
-        })
-    )
-    password_confirm = forms.CharField(
-        required=False,
-        help_text='Confirm your new password.',
-        widget=forms.PasswordInput(attrs={
-            'placeholder': 'Confirm new password',
-            'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary',
-            'autocomplete': 'new-password',
-        })
+        }),
     )
 
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'phone', 'location', 'experience_level', 'bio', 'profile_picture', 'linkedin', 'github', 'website')
+        fields = (
+            'first_name',
+            'last_name',
+            'phone',
+            'location',
+            'experience_level',
+            'bio',
+            'profile_picture',
+            'linkedin',
+            'github',
+            'website',
+        )
         widgets = {
             'bio': forms.Textarea(attrs={'rows': 4, 'class': 'w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary resize-none'}),
         }
 
     def save(self, commit=True):
-        user = super().save(commit=False)
-        new_password = self.cleaned_data.get('password')
-        if new_password:
-            user.set_password(new_password)
-        if commit:
-            user.save()
-        return user
+        return super().save(commit=commit)

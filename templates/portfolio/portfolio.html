@@ -164,10 +164,34 @@
 
             {% if teachable_skills %}
             <div class="md:col-span-2 glass-panel p-8 rounded-xl bento-tile">
-                <h3 class="font-headline-md text-headline-md text-primary mb-4">Teaching Skills</h3>
+                <h3 class="font-headline-md text-headline-md text-primary mb-4">Skills I Teach</h3>
                 <div class="flex flex-wrap gap-2">
                     {% for skill in teachable_skills %}
                     <span class="inline-flex items-center gap-2 bg-on-primary-fixed-variant text-white px-3 py-1 rounded-full font-label-md">{{ skill.skill.name }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if learnable_skills %}
+            <div class="md:col-span-2 glass-panel p-8 rounded-xl bento-tile">
+                <h3 class="font-headline-md text-headline-md text-primary mb-4">Skills I'm Learning</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% for skill in learnable_skills %}
+                    <div class="border border-outline-variant rounded-lg p-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="material-symbols-outlined text-secondary">auto_stories</span>
+                            <h4 class="font-headline-md text-headline-md text-on-surface">{{ skill.skill.name }}</h4>
+                        </div>
+                        <div class="flex flex-wrap gap-1">
+                            {% if skill.motivation %}
+                            <span class="text-xs text-on-surface-variant bg-surface-container-high px-2 py-0.5 rounded-full">{{ skill.motivation }}</span>
+                            {% endif %}
+                            {% if skill.urgency %}
+                            <span class="text-xs text-on-surface-variant bg-surface-container-high px-2 py-0.5 rounded-full">{{ skill.get_urgency_display }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
                     {% endfor %}
                 </div>
             </div>

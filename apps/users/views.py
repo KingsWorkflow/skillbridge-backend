@@ -14,13 +14,13 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework.permissions import AllowAny
-from .forms import CustomUserCreationForm, UserProfileUpdateForm, CustomAuthenticationForm, OTPVerificationForm
+from .forms import CustomUserCreationForm, UserProfileUpdateForm, CustomAuthenticationForm, OTPVerificationForm, PasswordChangeForm
+from apps.skills.forms import TeachableSkillForm, LearnableSkillForm
 from .serializers import UserSerializer, LoginSerializer
 from .mixins import JWTResponseMixin
 from .email_utils import send_otp_email, verify_otp_for_user
 from .models import UserProfile
 from apps.skills.models import TeachableSkill, LearnableSkill, Skill
-from apps.skills.forms import TeachableSkillForm, LearnableSkillForm
 from apps.portfolio.models import Project, Certification as PortfolioCertification
 from apps.portfolio.forms import ProjectForm, CertificationForm
 
@@ -213,6 +213,15 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     def get_object(self):
         return self.request.user
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['teachable_skills'] = self.request.user.teachable_skills.select_related('skill').all()
+        context['learnable_skills'] = self.request.user.learnable_skills.select_related('skill').all()
+        context['form_teachable'] = TeachableSkillForm(user=self.request.user)
+        context['form_learnable'] = LearnableSkillForm(user=self.request.user)
+        context['password_form'] = PasswordChangeForm()
+        return context
+
     def form_valid(self, form):
         from apps.notifications.email_utils import create_password_changed_notification
         from django.contrib.auth import update_session_auth_hash
@@ -255,7 +264,7 @@ def public_profile(request, username):
 @login_required
 def add_teachable_skill(request):
     if request.method == 'POST':
-        form = TeachableSkillForm(request.POST)
+        form = TeachableSkillForm(request.POST, user=request.user)
         if form.is_valid():
             skill_obj = form.cleaned_data.get('skill')
             proficiency = form.cleaned_data.get('proficiency_level')
@@ -268,14 +277,14 @@ def add_teachable_skill(request):
             messages.success(request, 'Skill added successfully!')
             return redirect('users:profile_edit')
     else:
-        form = TeachableSkillForm()
+        form = TeachableSkillForm(user=request.user)
     return render(request, 'users/modals/add_skill.html', {'form': form, 'type': 'teachable'})
 
 
 @login_required
 def add_learnable_skill(request):
     if request.method == 'POST':
-        form = LearnableSkillForm(request.POST)
+        form = LearnableSkillForm(request.POST, user=request.user)
         if form.is_valid():
             skill_obj = form.cleaned_data.get('skill')
             motivation = form.cleaned_data.get('motivation', '')
@@ -285,10 +294,10 @@ def add_learnable_skill(request):
                 skill=skill_obj,
                 defaults={'motivation': motivation, 'urgency': urgency},
             )
-            messages.success(request, 'Skill added successfully!')
+            messages.success(request, 'Skill added successfully to your roadmap!')
             return redirect('users:profile_edit')
     else:
-        form = LearnableSkillForm()
+        form = LearnableSkillForm(user=request.user)
     return render(request, 'users/modals/add_skill.html', {'form': form, 'type': 'learnable'})
 
 
@@ -486,3 +495,23 @@ class CreditsAPIView(JWTResponseMixin, APIView):
             'skill_credits': user.skill_credits,
             'beginner_tokens': user.beginner_tokens,
         })
+
+
+@login_required
+def change_password(request):
+    from .forms import PasswordChangeForm
+    from django.contrib.auth import update_session_auth_hash
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.POST)
+        if form.is_valid():
+            request.user.set_password(form.cleaned_data['new_password'])
+            request.user.save()
+            update_session_auth_hash(request, request.user)
+            from apps.notifications.email_utils import create_password_changed_notification
+            create_password_changed_notification(request.user)
+            from django.contrib import messages
+            messages.success(request, 'Password has been changed successfully.')
+            return redirect('users:profile_edit')
+    else:
+        form = PasswordChangeForm()
+    return render(request, 'users/password_change.html', {'form': form})

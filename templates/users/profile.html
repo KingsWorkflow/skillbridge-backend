@@ -1,85 +1,37 @@
 {% extends "base.html" %}
 {% load static %}
 {% load form_tags %}
-{% block title %}Profile | SkillBridge Nepal{% endblock %}
+{% block title %}Edit Profile | SkillBridge Nepal{% endblock %}
 
 {% block extra_css %}
 <style>
-.avatar-upload-wrapper {
-    position: relative;
-    display: inline-block;
+.glass-card {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(18, 18, 18, 0.08);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.04);
 }
-.avatar-circle {
-    width: 140px;
-    height: 140px;
-    border-radius: 9999px;
-    overflow: hidden;
-    border: 3px solid rgba(79, 70, 229, 0.25);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-    cursor: pointer;
-    position: relative;
-    background: #f3f4f6;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.liquid-gold-btn {
+    background: #E0A354;
+    color: #121212;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.avatar-circle img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
+.liquid-gold-btn:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 10px 20px rgba(224, 163, 84, 0.3);
 }
-.avatar-circle:hover {
-    transform: translateY(-2px);
-    border-color: rgba(79, 70, 229, 0.55);
-    box-shadow: 0 16px 35px rgba(79, 70, 229, 0.18);
+.skill-chip {
+    background: #00352a;
+    color: #ffffff;
+    transition: all 0.2s ease;
 }
-.avatar-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.42);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    color: #fff;
-    opacity: 0;
-    transition: opacity 0.18s ease;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    border-radius: 9999px;
+.skill-chip:hover {
+    filter: brightness(1.2);
 }
-.avatar-circle:hover .avatar-overlay {
-    opacity: 1;
-}
-.avatar-upload-hint {
-    margin-top: 10px;
-    color: #6b7280;
-    font-size: 13px;
-    line-height: 1.4;
-    text-align: center;
-}
-.profile-actions {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    margin-top: 8px;
-}
-.btn-ghost {
-    border: 1px solid #e5e7eb;
-    background: #fff;
-    color: #111827;
-    padding: 8px 14px;
-    border-radius: 12px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.15s ease, border-color 0.15s ease;
-}
-.btn-ghost:hover {
-    background: #f9fafb;
-    border-color: #d1d5db;
+.input-focus:focus {
+    border-bottom-color: #E0A354;
+    outline: none;
+    box-shadow: inset 0 -1px 0 #E0A354;
 }
 </style>
 {% endblock %}
@@ -87,145 +39,319 @@
 {% block content %}
 <div class="max-w-container-max mx-auto py-lg">
     <header class="mb-lg">
-        <h1 class="font-headline-lg text-headline-lg text-on-surface mb-xs">Your Profile</h1>
+        <h1 class="font-headline-lg text-headline-lg text-on-surface mb-xs">Edit Profile</h1>
         <p class="font-body-lg text-body-lg text-on-surface-variant">Manage your account settings and skills.</p>
     </header>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
-        <!-- Profile Info -->
-        <div class="md:col-span-1">
-            <div class="bg-white rounded-xl p-md shadow-sm border border-outline-variant">
-                <div class="flex flex-col items-center mb-md">
-                    <div class="avatar-upload-wrapper">
-                        <label class="avatar-circle" for="{{ form.profile_picture.id_for_label }}">
-                            {% if user.profile_picture %}
-                            <img src="{{ user.profile_picture.url }}" alt="{{ user.username }}" />
-                            {% else %}
-                            <span class="text-4xl font-bold text-gray-500">{{ user.username|slice:":1" }}</span>
-                            {% endif %}
-                            <div class="avatar-overlay">
-                                <span>Camera</span>
-                            </div>
-                        </label>
-                        <input accept="image/*" class="hidden" id="avatar-upload" name="profile_picture" type="file" />
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+            <!-- Left Sidebar -->
+            <aside class="lg:col-span-4 space-y-gutter">
+                <div class="glass-card rounded-xl p-8 text-center">
+                    <div class="w-32 h-32 mx-auto mb-6 rounded-full border-4 border-white shadow-xl overflow-hidden bg-surface-container">
+                        {% if user.profile_picture %}
+                        <img src="{{ user.profile_picture.url }}" alt="{{ user.username }}" class="w-full h-full object-cover" />
+                        {% else %}
+                        <div class="w-full h-full bg-surface-container flex items-center justify-center text-body-lg text-on-surface-variant">
+                            {{ user.first_name|default:user.username|slice:":1" }}
+                        </div>
+                        {% endif %}
                     </div>
-                    <h2 class="font-headline-md text-headline-md text-on-surface mt-4">{{ user.get_full_name|default:user.username }}</h2>
-                    <p class="font-body-sm text-body-sm text-on-surface-variant">{{ user.get_experience_level_display }}</p>
-                </div>
-
-                <div class="space-y-sm">
-                    <div class="flex justify-between py-sm border-b border-outline-variant">
-                        <span class="font-label-md text-label-md text-on-surface-variant">Skill Credits</span>
-                        <span class="font-label-md text-label-md text-primary">{{ user.skill_credits }}</span>
-                    </div>
-                    <div class="flex justify-between py-sm border-b border-outline-variant">
-                        <span class="font-label-md text-label-md text-on-surface-variant">Beginner Tokens</span>
-                        <span class="font-label-md text-label-md text-primary">{{ user.beginner_tokens }}</span>
-                    </div>
-                    <div class="flex justify-between py-sm">
-                        <span class="font-label-md text-label-md text-on-surface-variant">Reputation</span>
-                        <span class="font-label-md text-label-md text-primary">{{ user.reputation_score }}</span>
+                    <h2 class="font-headline-md text-primary mb-1">{{ user.get_full_name|default:user.username }}</h2>
+                    <p class="font-label-md text-secondary uppercase tracking-widest mb-6">{{ user.get_experience_level_display }}</p>
+                    <div class="grid grid-cols-3 gap-4 border-t border-on-surface/10 pt-6">
+                        <div class="text-center">
+                            <p class="font-headline-md text-primary leading-tight">{{ user.skill_credits }}</p>
+                            <p class="text-[10px] uppercase font-bold text-on-surface-variant">Skill Credits</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="font-headline-md text-primary leading-tight">{{ user.beginner_tokens }}</p>
+                            <p class="text-[10px] uppercase font-bold text-on-surface-variant">Beginner Tokens</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="font-headline-md text-primary leading-tight">{{ user.reputation_score }}</p>
+                            <p class="text-[10px] uppercase font-bold text-on-surface-variant">Reputation</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Profile Form -->
-        <div class="md:col-span-2">
-            <div class="bg-white rounded-xl p-md shadow-sm border border-outline-variant">
-                <h2 class="font-headline-md text-headline-md text-on-surface mb-lg">Edit Profile</h2>
+                <div class="glass-card rounded-xl overflow-hidden">
+                    <div class="p-2 space-y-1">
+                        <button type="button" class="w-full flex items-center gap-3 px-4 py-3 bg-secondary/10 text-secondary rounded-lg font-semibold text-left">
+                            <span class="material-symbols-outlined">person</span>
+                            Personal Information
+                        </button>
+                        <a href="{% url 'skills:teachable_skills' %}" class="w-full flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container rounded-lg font-medium text-left transition-colors">
+                            <span class="material-symbols-outlined">school</span>
+                            Teachable Skills
+                        </a>
+                        <a href="{% url 'skills:learnable_skills' %}" class="w-full flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container rounded-lg font-medium text-left transition-colors">
+                            <span class="material-symbols-outlined">auto_stories</span>
+                            Learnable Skills
+                        </a>
+                        <a href="{% url 'portfolio:portfolio' %}" class="w-full flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container rounded-lg font-medium text-left transition-colors">
+                            <span class="material-symbols-outlined">work</span>
+                            Portfolio
+                        </a>
+                    </div>
+                </div>
+            </aside>
 
-                <form method="post" enctype="multipart/form-data">
+            <!-- Right Content -->
+            <div class="lg:col-span-8 space-y-gutter">
+                <form method="post" enctype="multipart/form-data" id="profile-form">
                     {% csrf_token %}
                     {{ form.non_field_errors }}
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+                    <!-- Personal Details -->
+                    <section class="glass-card rounded-xl p-8">
+                        <h3 class="font-headline-md text-primary mb-6">Personal Details</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-2">
-                            <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.first_name.id_for_label }}">First Name</label>
-                            {{ form.first_name|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary" }}
+                            <label class="font-label-md text-on-surface-variant" for="{{ form.first_name.id_for_label }}">First Name</label>
+                            {{ form.first_name|add_class:"w-full bg-transparent border-b border-outline-variant py-2 px-1 input-focus font-body-md" }}
                         </div>
                         <div class="space-y-2">
-                            <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.last_name.id_for_label }}">Last Name</label>
-                            {{ form.last_name|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary" }}
+                            <label class="font-label-md text-on-surface-variant" for="{{ form.last_name.id_for_label }}">Last Name</label>
+                            {{ form.last_name|add_class:"w-full bg-transparent border-b border-outline-variant py-2 px-1 input-focus font-body-md" }}
+                        </div>
+                        <div class="space-y-2">
+                            <label class="font-label-md text-on-surface-variant" for="{{ form.phone.id_for_label }}">Phone</label>
+                            {{ form.phone|add_class:"w-full bg-transparent border-b border-outline-variant py-2 px-1 input-focus font-body-md" }}
+                        </div>
+                        <div class="space-y-2">
+                            <label class="font-label-md text-on-surface-variant" for="{{ form.location.id_for_label }}">Location</label>
+                            {{ form.location|add_class:"w-full bg-transparent border-b border-outline-variant py-2 px-1 input-focus font-body-md" }}
+                        </div>
+                        <div class="md:col-span-2 space-y-2">
+                            <label class="font-label-md text-on-surface-variant" for="{{ form.experience_level.id_for_label }}">Experience Level</label>
+                            {{ form.experience_level|add_class:"w-full bg-transparent border-b border-outline-variant py-2 px-1 input-focus font-body-md appearance-none" }}
+                        </div>
+                        <div class="md:col-span-2 space-y-2">
+                            <label class="font-label-md text-on-surface-variant" for="{{ form.bio.id_for_label }}">Bio</label>
+                            {{ form.bio|add_class:"w-full bg-transparent border border-outline-variant rounded-lg p-4 input-focus font-body-md resize-none" }}
                         </div>
                     </div>
+                </section>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-md mt-md">
-                        <div class="space-y-2">
-                            <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.phone.id_for_label }}">Phone</label>
-                            {{ form.phone|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary" }}
-                        </div>
-                        <div class="space-y-2">
-                            <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.location.id_for_label }}">Location</label>
-                            {{ form.location|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary" }}
-                        </div>
-                        <div class="space-y-2 md:col-span-2">
-                            <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.experience_level.id_for_label }}">Experience Level</label>
-                            {{ form.experience_level|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary" }}
-                        </div>
-                    </div>
-
-                    <div class="mt-md space-y-2">
-                        <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.bio.id_for_label }}">Bio</label>
-                        {{ form.bio|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-2 focus:ring-primary" }}
-                    </div>
-
-                    <div class="mt-md">
-                        <h3 class="font-headline-md text-headline-md text-on-surface mb-4">Social Links</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
-                            <div class="space-y-2">
-                                <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.linkedin.id_for_label }}">LinkedIn</label>
-                                {{ form.linkedin|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary" }}
+                <!-- Profile Picture -->
+                <section class="glass-card rounded-xl p-8">
+                    <h3 class="font-headline-md text-primary mb-4">Profile Picture</h3>
+                    <p class="font-body-sm text-body-sm text-on-surface-variant mb-3">Click the avatar to upload a photo, or choose a file below.</p>
+                    <div class="flex items-center gap-4">
+                        <label class="avatar-circle" for="{{ form.profile_picture.id_for_label }}" style="width:96px;height:96px;">
+                            {% if user.profile_picture %}
+                            <img src="{{ user.profile_picture.url }}" alt="{{ user.username }}" />
+                            {% else %}
+                            <span class="text-2xl font-bold text-gray-500">{{ user.username|slice:":1" }}</span>
+                            {% endif %}
+                            <div class="avatar-overlay">
+                                <span style="font-size:12px;">Edit</span>
                             </div>
-                            <div class="space-y-2">
-                                <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.github.id_for_label }}">GitHub</label>
-                                {{ form.github|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary" }}
-                            </div>
-                            <div class="space-y-2 md:col-span-2">
-                                <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.website.id_for_label }}">Portfolio Website</label>
-                                {{ form.website|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary" }}
-                            </div>
+                        </label>
+                        <div class="flex-1">
+                            {{ form.profile_picture|add_class:"block w-full text-sm text-on-surface-variant file:mr-3 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer" }}
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Skills & Knowledge Exchange -->
+                <section class="glass-card rounded-xl p-8">
+                    <h3 class="font-headline-md text-primary mb-6">Skills & Knowledge Exchange</h3>
+
+                    <!-- Skills I Teach -->
+                    <div class="mb-8">
+                        <label class="font-label-md text-on-surface-variant mb-3 block">Skills I Teach (Expertise)</label>
+                        <div class="flex flex-wrap gap-3">
+                            {% for skill in teachable_skills %}
+                            <span class="skill-chip px-4 py-1.5 rounded-full font-label-md flex items-center gap-2">
+                                {{ skill.skill.name }}
+                                <span class="material-symbols-outlined text-sm cursor-pointer" onclick="this.parentElement.remove()">close</span>
+                            </span>
+                            {% endfor %}
+                            <a href="{% url 'skills:teachable_skills' %}" class="px-4 py-1.5 rounded-full font-label-md border-2 border-dashed border-outline text-on-surface-variant hover:border-secondary transition-colors">
+                                + Add Skill
+                            </a>
                         </div>
                     </div>
 
-                    <div class="mt-md">
-                        <h3 class="font-headline-md text-headline-md text-on-surface mb-2">Profile Picture</h3>
-                        <p class="font-body-sm text-body-sm text-on-surface-variant mb-3">Click the avatar to upload a photo, or choose a file below.</p>
-                        <div class="flex items-center gap-4">
-                            <label class="avatar-circle" for="{{ form.profile_picture.id_for_label }}" style="width:96px;height:96px;">
-                                {% if user.profile_picture %}
-                                <img src="{{ user.profile_picture.url }}" alt="{{ user.username }}" />
-                                {% else %}
-                                <span class="text-2xl font-bold text-gray-500">{{ user.username|slice:":1" }}</span>
-                                {% endif %}
-                                <div class="avatar-overlay">
-                                    <span style="font-size:12px;">Edit</span>
+                    <!-- Skills I'm Learning -->
+                    <div class="mb-8">
+                        <label class="font-label-md text-on-surface-variant mb-3 block">Skills I'm Learning (Growth)</label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {% for skill in learnable_skills %}
+                            <div class="gold-tile rounded-xl p-4 flex justify-between items-center group">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-secondary/10 rounded-lg flex items-center justify-center text-secondary">
+                                        <span class="material-symbols-outlined">psychology</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-primary">{{ skill.skill.name }}</p>
+                                        <p class="text-xs text-on-surface-variant">{{ skill.get_urgency_display }}</p>
+                                    </div>
                                 </div>
-                            </label>
-                            <div class="space-y-2 flex-1">
-                                {{ form.profile_picture|add_class:"block w-full text-sm text-on-surface-variant file:mr-3 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer" }}
+                                <form method="post" action="{% url 'users:delete_learnable_skill' pk=skill.pk %}" class="inline" onsubmit="return confirm('Remove this skill?')">
+                                    {% csrf_token %}
+                                    <button type="submit" class="text-error opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <span class="material-symbols-outlined">delete</span>
+                                    </button>
+                                </form>
                             </div>
+                            {% empty %}
+                            <p class="text-body-sm text-on-surface-variant col-span-2">No learnable skills added yet.</p>
+                            {% endfor %}
                         </div>
                     </div>
 
-                    <div class="mt-md">
-                        <h3 class="font-headline-md text-headline-md text-on-surface mb-4">Change Password (Optional)</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
-                            <div class="space-y-2">
-                                <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.password.id_for_label }}">New Password</label>
-                                {{ form.password|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary" }}
-                            </div>
-                            <div class="space-y-2">
-                                <label class="font-label-md text-label-md text-on-surface-variant" for="{{ form.password_confirm.id_for_label }}">Confirm New Password</label>
-                                {{ form.password_confirm|add_class:"w-full px-sm py-base border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary" }}
-                            </div>
-                        </div>
+                    <!-- Add New Learnable Skill -->
+                    <div class="bg-surface-container-low rounded-xl p-6 border border-on-surface/5">
+                        <p class="font-label-md text-primary mb-4">Request New Learning Area</p>
+                        <form method="post" action="{% url 'users:add_learnable_skill' %}" id="add-learnable-form" class="flex gap-4 flex-col sm:flex-row">
+                            {% csrf_token %}
+                            {{ form_learnable.skill|add_class:"flex-grow bg-white border border-outline-variant rounded-lg px-4 py-2 font-body-md" }}
+                            {{ form_learnable.urgency|add_class:"bg-white border border-outline-variant rounded-lg px-4 py-2 font-body-md" }}
+                            <button type="submit" class="liquid-gold-btn px-6 py-2 rounded-lg font-bold">Add to Roadmap</button>
+                        </form>
                     </div>
 
-                    <button class="mt-lg bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md text-label-md hover:opacity-90 transition-all" type="submit">Save Changes</button>
-                </form>
+                    <script>
+                        (function() {
+                            var btn = document.getElementById('add-learnable-btn');
+                            var form = document.getElementById('add-learnable-form');
+                            if (!btn || !form) return;
+                            btn.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                form.submit();
+                            });
+                        })();
+                    </script>
+                </section>
+
+                <!-- Social Links -->
+                <section class="glass-card rounded-xl p-8">
+                    <h3 class="font-headline-md text-primary mb-6">Digital Presence</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-4 bg-white/50 p-3 rounded-lg border border-on-surface/5">
+                            <span class="material-symbols-outlined text-primary">language</span>
+                            {{ form.website|add_class:"bg-transparent flex-grow border-none focus:ring-0 font-body-md" }}
+                        </div>
+                        <div class="flex items-center gap-4 bg-white/50 p-3 rounded-lg border border-on-surface/5">
+                            <span class="material-symbols-outlined text-primary">terminal</span>
+                            {{ form.github|add_class:"bg-transparent flex-grow border-none focus:ring-0 font-body-md" }}
+                        </div>
+                        <div class="flex items-center gap-4 bg-white/50 p-3 rounded-lg border border-on-surface/5">
+                            <span class="material-symbols-outlined text-primary">group</span>
+                            {{ form.linkedin|add_class:"bg-transparent flex-grow border-none focus:ring-0 font-body-md" }}
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Change Password -->
+                <section class="glass-card rounded-xl p-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="font-headline-md text-primary">Security</h3>
+                    </div>
+                    <form method="post" action="{% url 'users:change_password' %}" class="space-y-4" id="password-change-form">
+                        {% csrf_token %}
+                        {{ password_form.non_field_errors }}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block font-label-md text-on-surface-variant uppercase tracking-wider mb-2" for="{{ password_form.new_password.id_for_label }}">New Password</label>
+                                <div class="relative">
+                                    {{ password_form.new_password|add_class:"w-full bg-white border border-outline-variant rounded-lg px-4 py-3 font-body-md pr-12" }}
+                                    <button type="button" onclick="togglePassword(this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors" aria-label="Toggle password visibility">
+                                        <span class="material-symbols-outlined">visibility</span>
+                                    </button>
+                                </div>
+                                {% if password_form.new_password.errors %}
+                                <p class="text-error text-sm mt-1">{{ password_form.new_password.errors }}</p>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <label class="block font-label-md text-on-surface-variant uppercase tracking-wider mb-2" for="{{ password_form.confirm_password.id_for_label }}">Confirm New Password</label>
+                                <div class="relative">
+                                    {{ password_form.confirm_password|add_class:"w-full bg-white border border-outline-variant rounded-lg px-4 py-3 font-body-md pr-12" }}
+                                    <button type="button" onclick="togglePassword(this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors" aria-label="Toggle password visibility">
+                                        <span class="material-symbols-outlined">visibility</span>
+                                    </button>
+                                </div>
+                                {% if password_form.confirm_password.errors %}
+                                <p class="text-error text-sm mt-1">{{ password_form.confirm_password.errors }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <p class="text-xs text-on-surface-variant">Password must be at least 8 characters, include a letter and a digit.</p>
+                        <div class="flex justify-end">
+                            <button type="submit" class="liquid-gold-btn px-12 py-3 rounded-lg font-bold text-lg shadow-lg flex items-center gap-2">
+                                <span class="material-symbols-outlined">lock</span>
+                                Update Password
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <script>
+                    function togglePassword(btn) {
+                        const input = btn.parentElement.querySelector('input');
+                        if (!input) return;
+                        const isPassword = input.type === 'password';
+                        input.type = isPassword ? 'text' : 'password';
+                        const icon = btn.querySelector('.material-symbols-outlined');
+                        if (icon) {
+                            icon.textContent = isPassword ? 'visibility_off' : 'visibility';
+                        }
+                    }
+
+                    (function() {
+                        const form = document.getElementById('password-change-form');
+                        if (!form) return;
+                        form.addEventListener('submit', function(e) {
+                            const pw = (form.querySelector('[name="new_password"]') || {}).value || '';
+                            const confirm = (form.querySelector('[name="confirm_password"]') || {}).value || '';
+                            const existingInline = form.querySelectorAll('.existing-password-error');
+                            existingInline.forEach(function(el) { el.remove(); });
+
+                            let errorText = '';
+                            if (pw.length < 8) {
+                                errorText = 'Password must be at least 8 characters.';
+                            } else if (!/[A-Za-z]/.test(pw)) {
+                                errorText = 'Password must include at least one letter.';
+                            } else if (!/[0-9]/.test(pw)) {
+                                errorText = 'Password must include at least one digit.';
+                            } else if (pw !== confirm) {
+                                errorText = 'Passwords do not match.';
+                            }
+
+                            if (errorText) {
+                                e.preventDefault();
+                                const errEl = document.createElement('p');
+                                errEl.className = 'existing-password-error text-error text-sm mt-1';
+                                errEl.textContent = errorText;
+                                const grid = form.querySelector('.grid');
+                                if (grid) grid.appendChild(errEl);
+                            }
+                        });
+                    })();
+
+                <!-- Sticky Save Actions -->
+                <div class="sticky bottom-4 z-40 glass-card rounded-xl p-4 border border-outline-variant/40 shadow-lg flex items-center justify-between gap-4">
+                    <a href="{% url 'users:dashboard' %}" class="text-on-surface-variant font-bold px-6 py-3 hover:text-primary transition-colors">Discard Changes</a>
+                    <button type="submit" class="liquid-gold-btn px-12 py-3 rounded-lg font-bold text-lg shadow-lg flex items-center gap-2">
+                        <span class="material-symbols-outlined">save</span>
+                        Save Changes
+                    </button>
+                </div>
             </div>
         </div>
     </div>
+    {% if messages %}
+    <div class="fixed bottom-4 right-4 z-50 space-y-2">
+        {% for message in messages %}
+        <div class="rounded-lg px-4 py-3 shadow-lg border-l-4 {% if message.tags == 'success' %}bg-green-50 border-green-500 text-green-800{% elif message.tags == 'error' %}bg-red-50 border-red-500 text-red-800{% else %}bg-blue-50 border-blue-500 text-blue-800{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 </div>
 {% endblock %}
