@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from apps.skills.models import TeachableSkill
+from apps.skills.models import TeachableSkill, LearnableSkill
 
 
 @login_required
@@ -22,6 +22,9 @@ def portfolio_view(request):
         'achievements': [],
         'teachable_skills': TeachableSkill.objects.filter(
             user=user, is_active=True
+        ).select_related('skill'),
+        'learnable_skills': LearnableSkill.objects.filter(
+            user=user
         ).select_related('skill'),
     }
     return render(request, 'portfolio/portfolio.html', context)

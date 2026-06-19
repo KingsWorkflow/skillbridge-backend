@@ -270,6 +270,17 @@
 
     {% block extra_js %}
     <script>
+        function togglePassword(btn) {
+            const input = btn.parentElement.querySelector('input');
+            if (!input) return;
+            const isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+            const icon = btn.querySelector('.material-symbols-outlined');
+            if (icon) {
+                icon.textContent = isPassword ? 'visibility_off' : 'visibility';
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const messagesBanner = document.getElementById('messages-banner');
             if (messagesBanner) {

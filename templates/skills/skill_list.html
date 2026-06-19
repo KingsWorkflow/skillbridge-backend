@@ -12,7 +12,7 @@
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter mb-lg">
-        <a href="{% url 'skills:teachable' %}" class="bg-white p-md rounded-xl shadow-sm border border-outline-variant hover:shadow-md hover:-translate-y-1 transition-all group">
+        <a href="{% url 'skills:teachable_skills' %}" class="bg-white p-md rounded-xl shadow-sm border border-outline-variant hover:shadow-md hover:-translate-y-1 transition-all group">
             <div class="flex items-center gap-base mb-sm">
                 <span class="material-symbols-outlined text-primary text-3xl">school</span>
                 <h2 class="font-headline-md text-headline-md text-on-surface">My Teachable Skills</h2>
@@ -24,7 +24,7 @@
             </span>
         </a>
 
-        <a href="{% url 'skills:learnable' %}" class="bg-white p-md rounded-xl shadow-sm border border-outline-variant hover:shadow-md hover:-translate-y-1 transition-all group">
+        <a href="{% url 'skills:learnable_skills' %}" class="bg-white p-md rounded-xl shadow-sm border border-outline-variant hover:shadow-md hover:-translate-y-1 transition-all group">
             <div class="flex items-center gap-base mb-sm">
                 <span class="material-symbols-outlined text-secondary text-3xl">auto_stories</span>
                 <h2 class="font-headline-md text-headline-md text-on-surface">My Learnable Skills</h2>
@@ -36,6 +36,26 @@
             </span>
         </a>
     </div>
+
+    {% if top_skills %}
+    <section class="mb-lg">
+        <div class="flex items-center gap-3 mb-4">
+            <span class="material-symbols-outlined text-secondary text-2xl">emoji_events</span>
+            <h2 class="font-headline-md text-headline-md text-on-surface">Top Skills</h2>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-gutter">
+            {% for skill in top_skills %}
+            <a href="?category={{ skill.category|urlencode }}" class="block bg-white rounded-xl p-md border border-outline-variant text-center hover:border-primary/40 transition-colors group">
+                <div class="w-12 h-12 mx-auto mb-2 rounded-full bg-secondary-container/20 text-secondary flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[22px]">star</span>
+                </div>
+                <p class="font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors">{{ skill.name }}</p>
+                <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">{{ skill.category }}</p>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
 
     <section class="bg-white rounded-xl shadow-sm border border-outline-variant p-md">
         <div class="flex justify-between items-center mb-md">

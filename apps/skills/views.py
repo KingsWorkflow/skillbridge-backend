@@ -16,11 +16,13 @@ def skill_list(request):
     if category:
         skills = skills.filter(category__iexact=category)
     categories = Skill.objects.values_list('category', flat=True).distinct().order_by('category')
+    top_skills = Skill.objects.order_by('-popularity_score')[:6]
     return render(request, 'skills/skill_list.html', {
         'skills': skills,
         'q': q,
         'category': category,
         'categories': categories,
+        'top_skills': top_skills,
     })
 
 

@@ -159,9 +159,21 @@ def create_proposal(request, receiver_id):
             user=receiver
         ).select_related('skill')
 
+    selected_request_skill_name = None
+    if request.method == 'POST' and form.is_valid():
+        selected_request_skill = form.cleaned_data.get('request_skill')
+        if selected_request_skill:
+            selected_request_skill_name = selected_request_skill.skill.name
+    elif 'request_skill' in request.GET:
+        try:
+            selected_request_skill_name = LearnableSkill.objects.get(pk=request.GET['request_skill'], user=receiver).skill.name
+        except LearnableSkill.DoesNotExist:
+            pass
+
     return render(request, 'exchanges/proposal_create.html', {
         'form': form,
         'receiver': receiver,
+        'selected_request_skill_name': selected_request_skill_name,
     })
 
 
