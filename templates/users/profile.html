@@ -131,6 +131,32 @@
                             {{ form.bio|add_class:"w-full bg-transparent border border-outline-variant rounded-lg p-4 input-focus font-body-md resize-none" }}
                         </div>
                     </div>
+
+                    <!-- Digital Presence -->
+                    <div class="mt-8">
+                        <h3 class="font-headline-md text-primary mb-4">Digital Presence</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-4 bg-white/50 p-3 rounded-lg border border-on-surface/5">
+                                <span class="material-symbols-outlined text-primary">language</span>
+                                {{ form.website|add_class:"bg-transparent flex-grow border-none focus:ring-0 font-body-md" }}
+                            </div>
+                            <div class="flex items-center gap-4 bg-white/50 p-3 rounded-lg border border-on-surface/5">
+                                <span class="material-symbols-outlined text-primary">terminal</span>
+                                {{ form.github|add_class:"bg-transparent flex-grow border-none focus:ring-0 font-body-md" }}
+                            </div>
+                            <div class="flex items-center gap-4 bg-white/50 p-3 rounded-lg border border-on-surface/5">
+                                <span class="material-symbols-outlined text-primary">group</span>
+                                {{ form.linkedin|add_class:"bg-transparent flex-grow border-none focus:ring-0 font-body-md" }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex justify-end">
+                        <button type="submit" class="liquid-gold-btn px-12 py-3 rounded-lg font-bold text-lg shadow-lg flex items-center gap-2">
+                            <span class="material-symbols-outlined">save</span>
+                            Save Changes
+                        </button>
+                    </div>
                 </section>
 
                 <!-- Profile Picture -->
@@ -227,26 +253,7 @@
                     </script>
                 </section>
 
-                <!-- Social Links -->
-                <section class="glass-card rounded-xl p-8">
-                    <h3 class="font-headline-md text-primary mb-6">Digital Presence</h3>
-                    <div class="space-y-4">
-                        <div class="flex items-center gap-4 bg-white/50 p-3 rounded-lg border border-on-surface/5">
-                            <span class="material-symbols-outlined text-primary">language</span>
-                            {{ form.website|add_class:"bg-transparent flex-grow border-none focus:ring-0 font-body-md" }}
-                        </div>
-                        <div class="flex items-center gap-4 bg-white/50 p-3 rounded-lg border border-on-surface/5">
-                            <span class="material-symbols-outlined text-primary">terminal</span>
-                            {{ form.github|add_class:"bg-transparent flex-grow border-none focus:ring-0 font-body-md" }}
-                        </div>
-                        <div class="flex items-center gap-4 bg-white/50 p-3 rounded-lg border border-on-surface/5">
-                            <span class="material-symbols-outlined text-primary">group</span>
-                            {{ form.linkedin|add_class:"bg-transparent flex-grow border-none focus:ring-0 font-body-md" }}
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Change Password -->
+                <!-- Skills & Knowledge Exchange -->
                 <section class="glass-card rounded-xl p-8">
                     <div class="flex items-center justify-between mb-6">
                         <h3 class="font-headline-md text-primary">Security</h3>
