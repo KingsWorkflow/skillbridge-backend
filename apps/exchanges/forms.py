@@ -1,4 +1,5 @@
 from django import forms
+from apps.skills.models import TeachableSkill, LearnableSkill
 from .models import ExchangeProposal, ExchangeSession
 
 
@@ -6,6 +7,19 @@ class ExchangeProposalForm(forms.ModelForm):
     class Meta:
         model = ExchangeProposal
         fields = ('offer_skill', 'request_skill', 'proposed_hours', 'message')
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        receiver = kwargs.pop('receiver', None)
+        super().__init__(*args, **kwargs)
+        if user is not None:
+            self.fields['offer_skill'].queryset = TeachableSkill.objects.filter(
+                user=user, is_active=True
+            ).select_related('skill')
+        if receiver is not None:
+            self.fields['request_skill'].queryset = LearnableSkill.objects.filter(
+                user=receiver
+            ).select_related('skill')
 
 
 class ExchangeSessionForm(forms.ModelForm):

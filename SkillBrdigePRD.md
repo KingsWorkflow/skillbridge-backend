@@ -1,17 +1,17 @@
-# 📄 Product Requirements Document (PRD) – SkillBridge
+# 📄 Updated Product Requirements Document (PRD) – SkillBridge
 
-## Skill Exchange Platform
+## Skill Exchange Platform (Updated per Professor Feedback)
 
-**Version:** 1.0  
+**Version:** 2.0  
 **Target Launch:** MVP in 2 weeks  
 **Tech Stack:** Django 5.x, PostgreSQL, Django Templates, Alpine.js (minimal), Tailwind CSS (via CDN)  
-**Authentication:** Django sessions (no DRF for pages, only for API endpoints)  
+**Authentication:** Django sessions (no DRF for pages, only for API endpoints)
 
 ---
 
 ## 1. Executive Summary
 
-SkillBridge is a **peer‑to‑peer skill exchange platform** where users can offer to teach skills they have and request to learn skills they want – **without any monetary transaction**. The platform uses a **skill credit economy** and a **verification system** (certificates, on‑site exams, community votes) to build trust. The MVP will be delivered as a server‑rendered Django application using pre‑designed HTML templates. The only dynamic parts will be a few lightweight API endpoints (e.g., for AI recommendations) and minimal Alpine.js for interactivity.
+SkillBridge is a **peer‑to‑peer skill exchange platform** where users can offer to teach skills they have and request to learn skills they want – **without any monetary transaction**. The platform uses a **skill credit economy** and a **simplified verification system** (self-declared, peer-rated, and exam-based) to build trust. The MVP will be delivered as a server‑rendered Django application using pre‑designed HTML templates. **No AI/ML is used** – recommendations are based on simple keyword/skill matching.
 
 ---
 
@@ -34,7 +34,7 @@ SkillBridge is a **peer‑to‑peer skill exchange platform** where users can of
 |----|-------------|
 | **AUTH-01** | Users can register with username, email, password, phone (optional), experience level (beginner/intermediate/advanced). |
 | **AUTH-02** | After registration, user is automatically logged in and redirected to `/dashboard/`. |
-| **AUTH-03** | Login via Django’s session‑based authentication (`LoginView`). |
+| **AUTH-03** | Login via Django's session‑based authentication (`LoginView`). |
 | **AUTH-04** | Logout clears session, redirects to `/login/`. |
 | **AUTH-05** | Profile page allows editing: bio, profile picture, phone, experience level. |
 | **AUTH-06** | Password reset via email (console backend for MVP). |
@@ -53,7 +53,7 @@ SkillBridge is a **peer‑to‑peer skill exchange platform** where users can of
 
 | ID | Requirement |
 |----|-------------|
-| **EXP-01** | User A can send a proposal to User B: “I will teach you X if you teach me Y”. |
+| **EXP-01** | User A can send a proposal to User B: "I will teach you X if you teach me Y". |
 | **EXP-02** | Proposal includes proposed total hours (e.g., 10 hours), optional message. |
 | **EXP-03** | User B can **accept**, **reject**, or **ignore** (leave pending). |
 | **EXP-04** | Once accepted, both users can schedule **exchange sessions** (date, duration, meeting link). |
@@ -71,27 +71,27 @@ SkillBridge is a **peer‑to‑peer skill exchange platform** where users can of
 | **ECO-05** | A transaction log records every credit change (type, amount, description, timestamp). |
 | **ECO-06** | Users can view their credit balance and transaction history on the dashboard. |
 
-### 3.5 AI Recommendations
+### 3.5 Skill Matching (No AI – Simple Keyword Matching)
 
 | ID | Requirement |
 |----|-------------|
-| **AI-01** | On the `/exchange/` page, the system recommends potential exchange partners. |
-| **AI-02** | Recommendations are based on **TF‑IDF + cosine similarity** between user’s teachable/learnable skills and others’ profiles. |
-| **AI-03** | Each recommendation shows: mutual match score, which skills you would teach them, which you would learn. |
-| **AI-04** | Recommendations are cached for 1 hour; manual refresh available. |
+| **MATCH-01** | On the `/exchange/` page, the system recommends potential exchange partners **without AI/ML**. |
+| **MATCH-02** | Recommendations are based on **simple keyword matching** (case‑insensitive) between user's teachable/learnable skills and others' profiles. |
+| **MATCH-03** | Use **regular expressions (regex)** or basic string matching (e.g., `in` operator) to find complementary skills. |
+| **MATCH-04** | Each recommendation shows: which skills you would teach them, which you would learn from them. |
+| **MATCH-05** | Recommendations are cached for 1 hour; manual refresh available. |
+| **MATCH-06** | If no matches found, show a message: "No matching partners found. Try adding more skills!" |
 
-### 3.6 Skill Verification System
+### 3.6 Skill Verification System (Simplified – 3 Levels Only)
 
 | ID | Requirement |
 |----|-------------|
-| **VER-01** | Each user‑skill pair can have a **verification level** (0‑5). |
+| **VER-01** | Each user‑skill pair can have a **verification level** (1‑3). |
 | **VER-02** | **Level 1 – Self‑declared** (automatic when adding teachable skill). |
-| **VER-03** | **Level 2 – Community verified** (after 3 distinct users verify that skill post‑exchange). |
-| **VER-04** | **Level 3 – Certificate verified** (user uploads certificate; admin approves). |
-| **VER-05** | **Level 4 – Platform tested** (user takes an on‑site exam; auto‑graded ≥80%). |
-| **VER-06** | **Level 5 – Expert** (Level 4 + 50+ teaching hours + average rating ≥4.8). |
-| **VER-07** | Verification badges are shown on profile and next to skills in search results. |
-| **VER-08** | Verified teachers get priority in AI recommendations. |
+| **VER-03** | **Level 2 – Community rated** (based on average session ratings ≥ 4.0 from at least 3 unique learners). |
+| **VER-04** | **Level 3 – Platform tested** (user takes an on‑site exam; auto‑graded ≥80%). |
+| **VER-05** | Verification badges are shown on profile and next to skills in search results. |
+| **VER-06** | Verified teachers (Level 3) get priority in skill matching results. |
 
 ### 3.7 Portfolio
 
@@ -99,7 +99,7 @@ SkillBridge is a **peer‑to‑peer skill exchange platform** where users can of
 |----|-------------|
 | **POR-01** | Users can add **projects** (title, description, link, image). |
 | **POR-02** | Users can add **certifications** (name, issuing org, date, certificate file). |
-| **POR-03** | Portfolio is displayed on the user’s public profile. |
+| **POR-03** | Portfolio is displayed on the user's public profile. |
 
 ### 3.8 Admin Panel
 
@@ -206,21 +206,19 @@ SkillBridge is a **peer‑to‑peer skill exchange platform** where users can of
 | `related_session` | FK(ExchangeSession, null=True, blank=True) |
 | `created_at` | DateTimeField |
 
-### 4.8 `verification.SkillVerification`
+### 4.8 `verification.SkillVerification` (Simplified – 3 Levels)
 
-| Field | Type |
-|-------|------|
-| `user` | FK(UserProfile) |
-| `skill` | FK(Skill) |
-| `current_level` | IntegerField | 0‑5 |
+| Field | Type | Description |
+|-------|------|-------------|
+| `user` | FK(UserProfile) | |
+| `skill` | FK(Skill) | |
+| `current_level` | IntegerField | choices: 1 (Self‑declared), 2 (Community rated), 3 (Platform tested) |
 | `self_declared_at` | DateTimeField | auto_now_add |
-| `community_verified_at` | DateTimeField | null |
-| `certificate_verified_at` | DateTimeField | null |
-| `platform_tested_at` | DateTimeField | null |
-| `expert_achieved_at` | DateTimeField | null |
-| `verification_votes` | IntegerField | default 0 |
-| `total_teaching_hours` | IntegerField | default 0 |
-| `average_rating` | FloatField | default 0 |
+| `community_rated_at` | DateTimeField | null (set when level 2 achieved) |
+| `platform_tested_at` | DateTimeField | null (set when level 3 achieved) |
+| `rating_sum` | FloatField | default 0 (sum of ratings for this skill) |
+| `rating_count` | IntegerField | default 0 (number of ratings for this skill) |
+| `average_rating` | FloatField | computed from rating_sum / rating_count |
 
 ### 4.9 `verification.Certificate`
 
@@ -319,10 +317,10 @@ All URLs are prefixed with `/` (no `/api/` for pages; API endpoints are minimal 
 ### 5.3 API Endpoints (JSON, for AJAX/Alpine)
 | Method | Endpoint | Purpose |
 |--------|----------|---------|
-| GET | `/api/recommendations/partners/` | Fetch AI partner matches (JSON) |
+| GET | `/api/match/partners/` | Fetch skill-matched partners (simple keyword matching) |
 | POST | `/api/exchanges/proposals/` | Create proposal via fetch |
 | GET | `/api/notifications/unread/` | Get pending notifications |
-| POST | `/api/verification/community/<user_id>/<skill_id>/` | Verify a user’s skill |
+| POST | `/api/verification/community/<user_id>/<skill_id>/` | Verify a user's skill |
 
 All other interactions use standard Django forms and redirects.
 
@@ -336,28 +334,28 @@ All other interactions use standard Django forms and redirects.
 3. Dashboard shows beginner tokens and prompts to add skills.
 
 ### 6.2 Adding Skills to Teach
-1. User goes to **Profile** → “Add Teachable Skill”.
+1. User goes to **Profile** → "Add Teachable Skill".
 2. Chooses skill from dropdown, proficiency, weekly hours.
 3. Skill appears on profile; system automatically sets verification level to 1 (Self‑declared).
 
-### 6.3 Finding Exchange Partners
+### 6.3 Finding Exchange Partners (No AI – Simple Matching)
 1. User visits `/exchange/`.
-2. AI recommendations load via AJAX (Alpine.js fetch).
+2. System matches skills using **simple keyword/string matching** (regex).
 3. For each partner, user sees which skills they would teach/learn.
-4. User clicks “Propose Exchange” → form pre‑filled with skills.
+4. User clicks "Propose Exchange" → form pre‑filled with skills.
 
 ### 6.4 Exchange Lifecycle
 1. Proposer sends proposal → status = pending.
 2. Receiver sees proposal on `/proposals/` and clicks Accept.
 3. Both users can now schedule sessions (proposal detail page).
 4. After each session, both users rate each other.
-5. When all sessions are completed, the proposer (or receiver) clicks “Complete Exchange”.
+5. When all sessions are completed, the proposer (or receiver) clicks "Complete Exchange".
 6. System transfers credits and updates hours.
 
-### 6.5 Skill Verification
-- **Certificate**: User uploads PDF → admin approves → Level 3.
-- **Community**: After a session, learner sees “Verify that teacher knows X” → click → teacher gets +1 vote. After 3 votes → Level 2.
-- **Exam**: User starts exam → answers questions → auto‑graded → if ≥80% → Level 4.
+### 6.5 Skill Verification (Simplified – 3 Levels)
+- **Level 1 (Self‑declared)**: Automatically set when user adds a teachable skill.
+- **Level 2 (Community rated)**: Automatically upgraded when the skill receives at least 3 ratings with an average ≥ 4.0.
+- **Level 3 (Platform tested)**: User passes the platform exam (≥80%) → admin approves → Level 3.
 
 ---
 
@@ -365,11 +363,11 @@ All other interactions use standard Django forms and redirects.
 
 | Requirement | Target |
 |-------------|--------|
-| **Performance** | Page load < 2 seconds; AI recommendation response < 500 ms (cached). |
+| **Performance** | Page load < 2 seconds; matching response < 500 ms (cached). |
 | **Security** | CSRF protection, session security, file upload validation. |
 | **Scalability** | MVP: support up to 1000 concurrent users; PostgreSQL with proper indexes. |
 | **Database** | Use `select_related` and `prefetch_related` to avoid N+1. |
-| **Caching** | AI recommendations cached for 1 hour (Django cache framework). |
+| **Caching** | Skill matches cached for 1 hour (Django cache framework). |
 | **Mobile** | HTML templates must be responsive (Tailwind classes already present). |
 | **Accessibility** | Basic WCAG 2.1 compliance (alt texts, keyboard navigation). |
 
@@ -432,9 +430,10 @@ Kilo Code must generate the full Django project with:
   - `proposals.html`: expects `sent_proposals`, `received_proposals`.
   - `portfolio.html`: expects `projects`, `certifications`.
 
-- AI recommendation engine (`recommendation_engine.py`) with functions `build_user_feature_matrix()`, `find_exchange_partners(user_id, top_n=10)` using scikit‑learn.
-- A simple API endpoint (JSON) at `/api/recommendations/partners/` that calls the engine.
-- Unit tests for critical flows (registration, proposal creation, credit transfer).
+- **Simple matching engine** (no AI) in `apps/match/engine.py` with:
+  - Functions: `build_user_skill_index()`, `find_exchange_partners(user_id, top_n=10)` using **simple keyword matching** (regex or string matching).
+- A simple API endpoint (JSON) at `/api/match/partners/` that calls the engine.
+- Unit tests for critical flows (registration, proposal creation, credit transfer, skill matching).
 
 ---
 
@@ -451,13 +450,13 @@ Kilo Code must generate the full Django project with:
 
 - [ ] A new user can register, log in, and see their dashboard.
 - [ ] User can add teachable and learnable skills.
-- [ ] AI recommendations show potential exchange partners based on skills.
+- [ ] Simple keyword-based matching shows potential exchange partners.
 - [ ] User can send, accept, reject exchange proposals.
 - [ ] Users can schedule sessions and rate after completion.
 - [ ] Credits are transferred automatically.
 - [ ] Admin can approve certificates and create exams.
+- [ ] Verification system works with 3 levels (self-declared, community rated, platform tested).
 - [ ] All pages are served from Django templates without frontend build step.
 
 ---
 
-**End of PRD.** Kilo Code may now generate the entire project.
