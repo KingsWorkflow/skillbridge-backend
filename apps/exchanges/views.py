@@ -142,7 +142,7 @@ def create_proposal(request, receiver_id):
         return redirect('exchanges:partner_list')
 
     if request.method == 'POST':
-        form = ExchangeProposalForm(request.POST)
+        form = ExchangeProposalForm(request.POST, user=request.user, receiver=receiver)
         if form.is_valid():
             proposal = form.save(commit=False)
             proposal.proposer = request.user
@@ -151,13 +151,7 @@ def create_proposal(request, receiver_id):
             messages.success(request, 'Proposal sent successfully!')
             return redirect('exchanges:proposal_list')
     else:
-        form = ExchangeProposalForm()
-        form.fields['offer_skill'].queryset = TeachableSkill.objects.filter(
-            user=request.user, is_active=True
-        ).select_related('skill')
-        form.fields['request_skill'].queryset = LearnableSkill.objects.filter(
-            user=receiver
-        ).select_related('skill')
+        form = ExchangeProposalForm(user=request.user, receiver=receiver)
 
     selected_request_skill_name = None
     if request.method == 'POST' and form.is_valid():

@@ -6,22 +6,22 @@
 {% block content %}
 <!-- Hero Section -->
 <section class="relative rounded-3xl overflow-hidden mb-gutter h-[600px] flex items-center group">
-    <div class="absolute inset-0 bg-primary opacity-20"></div>
-    <div class="absolute inset-0 topo-bg"></div>
+   
+    <img class="absolute inset-0 w-full h-full object-cover grayscale-[20%] group-hover:scale-105 transition-transform duration-700" data-alt="A diverse group of young professional Nepalese software engineers and analysts collaborating in a high-tech modern office space in Kathmandu. Sunlight streams through large windows casting soft shadows. The atmosphere is energetic and focused with high-end tech equipment visible in the background. The visual style is clean, high-contrast light mode with professional warmth and deep emerald and gold accents throughout the setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3pRSnoZ_X421flDD0hEXeBvNgrgdORwxo44sE7-fjsPvQ-WFDRehGD86tIpGH0UaRkdCwCgMvPSghVVPX2GLSQ6jK29LHY9mbtEsdx-t2VNPvxAjyYvJosr08RppqMupCH-6LvZQn0wjsLeOofjHpkQD3XeoGs__CMBu-zPjP8DxxZoD2HVep8TqiraO6dqXMLu_nYANidUGagQAVejfH9Yp45pupaya5dIfMsz0FJP2nikznWVYNyPJ61uq3GYXHMVUdTWPHt8fN">
     <div class="absolute inset-0 bg-gradient-to-r from-primary/60 to-transparent"></div>
     <!-- Hero Glassmorphic Card -->
-    <div class="relative z-10 ml-8 md:ml-16 max-w-xl glass-morphism p-12 rounded-2xl shadow-2xl border-white/20">
-        <h1 class="font-display-lg text-[48px] md:text-display-lg leading-tight mb-6 text-primary">
-            Bridge the gap between <span class="text-secondary">academics</span> and <span class="text-secondary">industry</span>.
-        </h1>
-        <p class="font-body-lg text-body-lg text-on-surface-variant mb-8">
-            SkillBridge Nepal empowers the next generation of Himalayan talent with AI-driven gap analysis and peer-to-peer skill exchange.
-        </p>
-        <div class="flex flex-wrap gap-4">
-            <a href="{% url 'users:signup' %}" class="bg-[#E0A354] text-[#121212] px-8 py-4 rounded-xl font-headline-md text-[18px] font-bold liquid-gold-glow hover:-translate-y-1 transition-all">Launch Career</a>
-            <a href="{% url 'recommendations:resources' %}" class="border-2 border-primary text-primary px-8 py-4 rounded-xl font-headline-md text-[18px] font-bold hover:bg-primary/5 transition-all">Explore Platform</a>
-        </div>
+    <div class="relative z-10 ml-8 md:ml-16 max-w-xl bg-white p-12 rounded-2xl shadow-2xl border border-gray-100">
+    <h1 class="font-display-lg text-[48px] md:text-display-lg leading-tight mb-6 text-primary">
+        Bridge the gap between <span class="text-secondary">academics</span> and <span class="text-secondary">industry</span>.
+    </h1>
+    <p class="font-body-lg text-body-lg text-on-surface-variant mb-8">
+        SkillBridge Nepal empowers the next generation of Himalayan talent with AI-driven gap analysis and peer-to-peer skill exchange.
+    </p>
+    <div class="flex flex-wrap gap-4">
+        <a href="{% url 'users:signup' %}" class="bg-[#E0A354] text-[#121212] px-8 py-4 rounded-xl font-headline-md text-[18px] font-bold liquid-gold-glow hover:-translate-y-1 transition-all">Launch Career</a>
+        <a href="{% url 'recommendations:resources' %}" class="border-2 border-primary text-primary px-8 py-4 rounded-xl font-headline-md text-[18px] font-bold hover:bg-primary/5 transition-all">Explore Platform</a>
     </div>
+</div>
 </section>
 
 <!-- Bento Features Grid -->
@@ -72,10 +72,12 @@
     </div>
     <!-- Visual Topography Card -->
     <div class="md:col-span-8 h-64 md:h-auto rounded-3xl overflow-hidden relative bento-inner-shadow">
-        <div class="absolute inset-0 bg-surface-container-highest"></div>
-        <div class="absolute inset-0 bg-secondary/10"></div>
+        <img class="absolute inset-0 w-full h-full object-cover" data-alt="A clean, minimalist high-key workspace featuring an open high-end laptop, a cup of coffee, and a small potted plant on a white desk. The background is soft-focused with subtle geometric wall textures. The lighting is bright and natural, conveying a productive, high-professional atmosphere with soft emerald and gold color accents in the accessories. The composition is spacious and modernist." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeph4ZY1_x9o4qYL2ll6fCMqvYy_5cVH1iLYv0QdWRDJK-Y5sMj8U-ao7ndm8r4QCT5uj4fzO9xIGyIGN-RmZVD6rUWRBYLW-FHWj2PLXp5Fdx82ZPrOZpTzhUZrx2-7l9RTn7QChH4lSrGkTHDLzuyuOcd42KV8-1JZWoPvyvSMTCNR_zFHvHCMbvUaOXmt1ZU26Ndi5UkAUC-7flX_J6dXBZ23Zk7nN6LdQymuqCt0zGvLSWmJGoEM1R8Aukc5OVO5aEOoswNTiY">
+       <div class="absolute inset-0 bg-secondary/10 backdrop-grayscale-[50%]"></div>
+        <!-- <div class="absolute inset-0 bg-surface-container-highest"></div>
+        <div class="absolute inset-0 bg-secondary/10"></div> -->
         <div class="absolute bottom-8 left-8 text-white z-10">
-            <p class="font-headline-md text-headline-md font-black">Elevate Your Standard.</p>
+            <p class="font-headline-md text-headline-md">Elevate Your Standard.</p>
             <p class="font-body-md text-body-md opacity-90">Join 5,000+ Nepali professionals.</p>
         </div>
     </div>
