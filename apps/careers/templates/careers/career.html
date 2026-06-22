@@ -6,97 +6,248 @@
   <header class="mb-lg">
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-md mb-lg">
       <div class="max-w-2xl">
-        <span class="bg-primary-container/10 text-primary px-sm py-xs rounded-full font-label-sm text-label-sm mb-base inline-block">AI-Powered</span>
+        <span class="bg-primary-container/10 text-primary px-sm py-xs rounded-full font-label-sm text-label-sm mb-base inline-block">Skills-Based</span>
         <h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-background mb-2">Career Recommendations</h1>
         <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
-          Personalized career paths and learning roadmaps based on your skills.
+          Personalized career paths and learning roadmaps based on your teachable skills.
         </p>
       </div>
-      <a href="{% url 'careers:refresh_recommendations' %}" class="bg-secondary text-on-secondary font-bold px-lg py-sm rounded-lg font-label-md text-label-md">Refresh</a>
+      <button id="refresh-careers-btn" class="bg-secondary text-on-secondary font-bold px-lg py-sm rounded-lg font-label-md text-label-md hover:scale-[1.02] active:scale-95 transition-transform">
+        Refresh
+      </button>
     </div>
-    {% if from_cache %}
-    <div class="text-right">
-      <p class="text-label-sm text-on-surface-variant">Showing recommendations from your 24h cache.</p>
+    <div id="cache-status" class="text-right hidden">
+      <p class="text-label-sm text-on-surface-variant">Showing recommendations from your 1h cache.</p>
     </div>
-    {% endif %}
+    <div id="error-banner" class="hidden mt-md rounded-lg border border-error/30 bg-error-container/10 px-4 py-3 text-error font-body-md"></div>
   </header>
 
-  {% if not recommendations %}
-  <div class="rounded-xl border border-outline-variant bg-white p-md text-center">
-    <p class="text-body-md text-on-surface-variant">No recommendations available yet. Add teachable skills to your profile to get personalized career suggestions.</p>
-  </div>
-  {% endif %}
-
-  <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
-    {% for rec in recommendations %}
-    <div class="rounded-xl border border-outline-variant bg-white p-md shadow-sm">
-      <div class="flex justify-between items-start mb-md">
-        <div>
-          <h3 class="font-headline-md text-headline-md text-on-surface">{{ rec.title }}</h3>
-          {% if rec.category %}
-          <span class="text-label-sm text-secondary">{{ rec.category }}</span>
-          {% endif %}
-        </div>
-        <div class="text-right">
-          <span class="text-headline-md font-bold text-primary">{{ rec.match_score|floatformat:0 }}%</span>
-          <p class="text-label-sm text-on-surface-variant">match</p>
-        </div>
-      </div>
-
-      <p class="font-body-sm text-body-sm text-on-surface-variant mb-md">{{ rec.description }}</p>
-
-      {% if rec.average_salary %}
-      <div class="flex items-center gap-2 mb-2 text-label-sm text-on-surface-variant">
-        <span class="material-symbols-outlined text-[18px]">payments</span>
-        <span>{{ rec.average_salary }}</span>
-      </div>
-      {% endif %}
-
-      {% if rec.growth_outlook %}
-      <div class="flex items-center gap-2 mb-md text-label-sm text-on-surface-variant">
-        <span class="material-symbols-outlined text-[18px]">trending_up</span>
-        <span>{{ rec.growth_outlook }}</span>
-      </div>
-      {% endif %}
-
-      {% if rec.matched_skills %}
-      <div class="mb-md">
-        <p class="text-label-md font-bold text-on-surface mb-xs">Your matched skills</p>
-        <div class="flex flex-wrap gap-xs">
-          {% for skill in rec.matched_skills %}
-          <span class="px-base py-xs rounded-full bg-primary-container/10 text-primary text-label-sm">{{ skill }}</span>
-          {% endfor %}
-        </div>
-      </div>
-      {% endif %}
-
-      {% if rec.missing_skills_ordered %}
-      <div class="mb-md">
-        <p class="text-label-md font-bold text-on-surface mb-xs">Learning roadmap</p>
-        <ol class="list-decimal pl-base text-body-sm text-on-surface-variant space-y-1">
-          {% for item in rec.missing_skills_ordered %}
-          <li class="flex items-center justify-between gap-2">
-            <span>{{ item.name }}</span>
-            {% if item.estimated_hours %}
-            <span class="text-label-sm text-secondary">{{ item.estimated_hours }}h</span>
-            {% endif %}
-          </li>
-          {% endfor %}
-        </ol>
-      </div>
-      {% endif %}
-
-      <div class="flex items-center justify-between border-t border-outline-variant/30 pt-sm">
-        <a href="{% url 'careers:refresh_recommendations' %}" class="text-primary font-bold font-label-sm text-label-sm inline-flex items-center gap-1">
-          <span class="material-symbols-outlined text-[16px]">refresh</span>
-          Regenerate roadmap
-        </a>
-        <span class="px-sm py-xs rounded-md bg-surface-container-high text-label-sm text-on-surface-variant">
-          {{ rec.required_skills_count }} skills required
-        </span>
-      </div>
+  <div id="recommendations-container">
+    {% if not recommendations %}
+    <div class="rounded-xl border border-outline-variant bg-white p-md text-center">
+      <p class="text-body-md text-on-surface-variant">No recommendations available yet. Add teachable skills to your profile to get personalized career suggestions.</p>
     </div>
-    {% endfor %}
-  </section>
+    {% endif %}
+
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter" id="careers-grid">
+      {% for rec in recommendations %}
+      <div class="rounded-xl border border-outline-variant bg-white p-md shadow-sm">
+        <div class="flex justify-between items-start mb-md">
+          <div>
+            <h3 class="font-headline-md text-headline-md text-on-surface">{{ rec.title }}</h3>
+            {% if rec.category %}
+            <span class="text-label-sm text-secondary">{{ rec.category }}</span>
+            {% endif %}
+          </div>
+          <div class="text-right">
+            <span class="text-headline-md font-bold text-primary">{{ rec.match_score|floatformat:0 }}%</span>
+            <p class="text-label-sm text-on-surface-variant">match</p>
+          </div>
+        </div>
+
+        <p class="font-body-sm text-body-sm text-on-surface-variant mb-md">{{ rec.description }}</p>
+
+        {% if rec.average_salary %}
+        <div class="flex items-center gap-2 mb-2 text-label-sm text-on-surface-variant">
+          <span class="material-symbols-outlined text-[18px]">payments</span>
+          <span>{{ rec.average_salary }}</span>
+        </div>
+        {% endif %}
+
+        {% if rec.growth_outlook %}
+        <div class="flex items-center gap-2 mb-md text-label-sm text-on-surface-variant">
+          <span class="material-symbols-outlined text-[18px]">trending_up</span>
+          <span>{{ rec.growth_outlook }}</span>
+        </div>
+        {% endif %}
+
+        {% if rec.matched_skills %}
+        <div class="mb-md">
+          <p class="text-label-md font-bold text-on-surface mb-xs">Your matched skills</p>
+          <div class="flex flex-wrap gap-xs">
+            {% for skill in rec.matched_skills %}
+            <span class="px-base py-xs rounded-full bg-primary-container/10 text-primary text-label-sm">{{ skill }}</span>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+        {% if rec.missing_skills_ordered %}
+        <div class="mb-md">
+          <p class="text-label-md font-bold text-on-surface mb-xs">Learning roadmap</p>
+          <ol class="list-decimal pl-base text-body-sm text-on-surface-variant space-y-1">
+            {% for item in rec.missing_skills_ordered %}
+            <li class="flex items-center justify-between gap-2">
+              <span>{{ item.name }}</span>
+              {% if item.estimated_hours %}
+              <span class="text-label-sm text-secondary">{{ item.estimated_hours }}h</span>
+              {% endif %}
+            </li>
+            {% endfor %}
+          </ol>
+        </div>
+        {% endif %}
+
+        <div class="flex items-center justify-between border-t border-outline-variant/30 pt-sm">
+          <button onclick="refreshCareers()" class="text-primary font-bold font-label-sm text-label-sm inline-flex items-center gap-1 hover:underline">
+            <span class="material-symbols-outlined text-[16px]">refresh</span>
+            Regenerate roadmap
+          </button>
+          <span class="px-sm py-xs rounded-md bg-surface-container-high text-label-sm text-on-surface-variant">
+            {{ rec.required_skills_count }} skills required
+          </span>
+        </div>
+      </div>
+      {% endfor %}
+    </section>
+  </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+function getCookie(name) {
+  const value = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+  return value ? decodeURIComponent(value[2]) : null;
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.appendChild(document.createTextNode(text));
+  return div.innerHTML;
+}
+
+function refreshCareers() {
+  const btn = document.getElementById('refresh-careers-btn');
+  const errorBanner = document.getElementById('error-banner');
+  const cacheStatus = document.getElementById('cache-status');
+  const container = document.getElementById('recommendations-container');
+
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Refreshing...';
+  }
+  if (errorBanner) {
+    errorBanner.classList.add('hidden');
+  }
+
+  fetch("{% url 'careers:api_career_recommendations' %}", {
+    method: 'GET',
+    credentials: 'same-origin',
+    headers: {
+      'X-CSRFToken': getCookie('csrftoken') || '',
+    }
+  })
+  .then(response => {
+    if (!response.ok) {
+      if (response.status === 401) {
+        window.location.href = "{% url 'users:login' %}";
+        return null;
+      }
+      throw new Error('Failed to fetch recommendations');
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (!data) return;
+    if (data.error) {
+      throw new Error(data.error);
+    }
+    const recommendations = data.recommendations || [];
+    if (recommendations.length === 0) {
+      container.innerHTML = `
+        <div class="rounded-xl border border-outline-variant bg-white p-md text-center">
+          <p class="text-body-md text-on-surface-variant">No recommendations available yet. Add teachable skills to your profile to get personalized career suggestions.</p>
+        </div>
+      `;
+    } else {
+      let html = '<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter" id="careers-grid">';
+      recommendations.forEach(rec => {
+        const matchedSkillsHtml = rec.matched_skills && rec.matched_skills.length
+          ? `<div class="mb-md">
+               <p class="text-label-md font-bold text-on-surface mb-xs">Your matched skills</p>
+               <div class="flex flex-wrap gap-xs">
+                 ${rec.matched_skills.map(s => `<span class="px-base py-xs rounded-full bg-primary-container/10 text-primary text-label-sm">${escapeHtml(s)}</span>`).join('')}
+               </div>
+             </div>`
+          : '';
+
+        const missingHtml = rec.missing_skills_ordered && rec.missing_skills_ordered.length
+          ? `<div class="mb-md">
+               <p class="text-label-md font-bold text-on-surface mb-xs">Learning roadmap</p>
+               <ol class="list-decimal pl-base text-body-sm text-on-surface-variant space-y-1">
+                 ${rec.missing_skills_ordered.map(item => `
+                   <li class="flex items-center justify-between gap-2">
+                     <span>${escapeHtml(item.name)}</span>
+                     ${item.estimated_hours ? `<span class="text-label-sm text-secondary">${escapeHtml(item.estimated_hours)}h</span>` : ''}
+                   </li>
+                 `).join('')}
+               </ol>
+             </div>`
+          : '';
+
+        html += `
+        <div class="rounded-xl border border-outline-variant bg-white p-md shadow-sm">
+          <div class="flex justify-between items-start mb-md">
+            <div>
+              <h3 class="font-headline-md text-headline-md text-on-surface">${escapeHtml(rec.title)}</h3>
+              ${rec.category ? `<span class="text-label-sm text-secondary">${escapeHtml(rec.category)}</span>` : ''}
+            </div>
+            <div class="text-right">
+              <span class="text-headline-md font-bold text-primary">${parseFloat(rec.match_score).toFixed(0)}%</span>
+              <p class="text-label-sm text-on-surface-variant">match</p>
+            </div>
+          </div>
+          <p class="font-body-sm text-body-sm text-on-surface-variant mb-md">${escapeHtml(rec.description)}</p>
+          ${rec.average_salary ? `
+          <div class="flex items-center gap-2 mb-2 text-label-sm text-on-surface-variant">
+            <span class="material-symbols-outlined text-[18px]">payments</span>
+            <span>${escapeHtml(rec.average_salary)}</span>
+          </div>` : ''}
+          ${rec.growth_outlook ? `
+          <div class="flex items-center gap-2 mb-md text-label-sm text-on-surface-variant">
+            <span class="material-symbols-outlined text-[18px]">trending_up</span>
+            <span>${escapeHtml(rec.growth_outlook)}</span>
+          </div>` : ''}
+          ${matchedSkillsHtml}
+          ${missingHtml}
+          <div class="flex items-center justify-between border-t border-outline-variant/30 pt-sm">
+            <button onclick="refreshCareers()" class="text-primary font-bold font-label-sm text-label-sm inline-flex items-center gap-1 hover:underline">
+              <span class="material-symbols-outlined text-[16px]">refresh</span>
+              Regenerate roadmap
+            </button>
+            <span class="px-sm py-xs rounded-md bg-surface-container-high text-label-sm text-on-surface-variant">
+              ${rec.required_skills_count} skills required
+            </span>
+          </div>
+        </div>`;
+      });
+      html += '</section>';
+      container.innerHTML = html;
+      if (cacheStatus) cacheStatus.classList.remove('hidden');
+    }
+  })
+  .catch(err => {
+    console.error('Failed to load career recommendations:', err);
+    if (errorBanner) {
+      errorBanner.textContent = 'Unable to load recommendations. Please try again.';
+      errorBanner.classList.remove('hidden');
+    }
+  })
+  .finally(() => {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'Refresh';
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const refreshBtn = document.getElementById('refresh-careers-btn');
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', refreshCareers);
+  }
+});
+</script>
 {% endblock %}

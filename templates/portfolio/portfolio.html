@@ -234,6 +234,25 @@
                 </div>
             </div>
             {% endif %}
+
+            {% if exam_certificates %}
+            <div class="md:col-span-2 glass-panel p-8 rounded-xl bento-tile">
+                <h3 class="font-headline-md text-headline-md text-primary mb-4">Verified Skills</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% for cert in exam_certificates %}
+                    <div class="border border-primary/20 rounded-lg p-4 bg-primary/5">
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="material-symbols-outlined text-primary" style="font-variation-settings: FILL 1;">verified</span>
+                            <h4 class="font-headline-md text-headline-md text-on-surface">{{ cert.skill.name }}</h4>
+                        </div>
+                        <p class="font-body-sm text-body-sm text-on-surface-variant mb-1">{{ cert.issuing_organization }}</p>
+                        <p class="font-label-md text-label-md text-on-surface-variant">{{ cert.issue_date|date:"M d, Y" }}</p>
+                        <span class="inline-block mt-2 px-2 py-1 rounded-full text-xs font-medium border bg-green-100 text-green-800 border-green-200">Approved</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
         </div>
 
         <div class="lg:col-span-4 flex flex-col gap-gutter">

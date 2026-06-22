@@ -55,7 +55,7 @@ class CareerRecommendationTests(TestCase):
         self.assertIn(b'JavaScript', response.content)
         self.assertIn(b'React', response.content)
         self.assertIn(b'Django', response.content)
-        self.assertIn('25%', response.content.decode())
+        self.assertIn('75%', response.content.decode())
 
     def test_cache_served_on_repeated_requests(self):
         CareerPath.objects.create(
@@ -81,6 +81,19 @@ class CareerRecommendationTests(TestCase):
         response = self.client.get('/career/refresh/')
         self.assertEqual(response.status_code, 302)
         self.assertIsNone(cache.get(cache_key))
+
+    def test_api_returns_json(self):
+        self.client.login(username='testuser', password='testpass123')
+        response = self.client.get('/career/api/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        data = response.json()
+        self.assertIn('recommendations', data)
+        self.assertIn('count', data)
+
+    def test_api_unauthenticated_returns_401(self):
+        response = self.client.get('/career/api/')
+        self.assertEqual(response.status_code, 401)
 
 
 class CareerRegressionTests(TestCase):

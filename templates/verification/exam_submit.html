@@ -1,15 +1,34 @@
 {% extends "base.html" %}
-{% block title %}Submit Exam | SkillBridge Nepal{% endblock %}
+{% block title %}Exam Submitted | SkillBridge Nepal{% endblock %}
+{% load static %}
 
 {% block content %}
 <div class="max-w-container-max mx-auto py-lg">
     <header class="mb-lg">
-        <h1 class="font-headline-lg text-headline-lg text-on-background">Submit Exam</h1>
-        <p class="font-body-lg text-body-lg text-on-surface-variant">Submit your answers for verification.</p>
+        <h1 class="font-headline-lg text-headline-lg text-on-background">Exam Submitted</h1>
     </header>
 
-    <div class="bg-white p-md rounded-xl shadow-sm border border-outline-variant">
-        <p class="text-on-surface-variant">Exam submission functionality coming soon.</p>
+    <div class="bg-white p-md rounded-xl shadow-sm border border-outline-variant space-y-md">
+        {% if attempt %}
+        <div class="text-center py-lg">
+            {% if attempt.passed %}
+            <span class="material-symbols-outlined text-6xl text-green-500 mb-base">check_circle</span>
+            <h2 class="font-headline-md text-headline-md text-on-background mb-sm">Congratulations!</h2>
+            <p class="font-body-lg text-body-lg text-on-surface-variant">You passed the exam.</p>
+            {% else %}
+            <span class="material-symbols-outlined text-6xl text-error mb-base">cancel</span>
+            <h2 class="font-headline-md text-headline-md text-on-background mb-sm">Not Passed</h2>
+            <p class="font-body-lg text-body-lg text-on-surface-variant">Score: {{ attempt.score }}%</p>
+            <p class="font-body-sm text-body-sm text-on-surface-variant mt-sm">You can retake the exam after 30 days.</p>
+            {% endif %}
+        </div>
+        <div class="flex justify-center gap-md pt-md border-t border-outline-variant">
+            <a href="{% url 'verification:verification_status' %}" class="bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md">View Verification Status</a>
+            <a href="{% url 'recommendations:partners' %}" class="border border-outline-variant px-lg py-sm rounded-lg font-label-md text-on-surface-variant hover:bg-surface-container-high transition-colors">Find Partners</a>
+        </div>
+        {% else %}
+        <p class="text-on-surface-variant">No exam attempt found.</p>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

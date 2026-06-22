@@ -6,12 +6,12 @@ User = get_user_model()
 
 class SkillVerification(models.Model):
     user = models.ForeignKey(
-        User, 
-        on_delete=models.CASCADE, 
+        User,
+        on_delete=models.CASCADE,
         related_name='verifications'
     )
     skill = models.ForeignKey(
-        'skills.Skill', 
+        'skills.Skill',
         on_delete=models.CASCADE,
         related_name='verifications'
     )
@@ -40,12 +40,12 @@ class Certificate(models.Model):
     ]
 
     user = models.ForeignKey(
-        User, 
-        on_delete=models.CASCADE, 
+        User,
+        on_delete=models.CASCADE,
         related_name='certificates_uploaded'
     )
     skill = models.ForeignKey(
-        'skills.Skill', 
+        'skills.Skill',
         on_delete=models.CASCADE,
         related_name='certificates'
     )
@@ -56,8 +56,8 @@ class Certificate(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     rejection_reason = models.TextField(blank=True)
     verified_by = models.ForeignKey(
-        User, 
-        on_delete=models.SET_NULL, 
+        User,
+        on_delete=models.SET_NULL,
         null=True,
         related_name='certificates_verified'
     )
@@ -75,7 +75,7 @@ class SkillExam(models.Model):
     ]
 
     skill = models.ForeignKey(
-        'skills.Skill', 
+        'skills.Skill',
         on_delete=models.CASCADE,
         related_name='exams'
     )
@@ -83,22 +83,80 @@ class SkillExam(models.Model):
     title = models.CharField(max_length=200)
     time_limit_minutes = models.IntegerField(default=30)
     passing_score = models.IntegerField(default=70)
-    questions = models.JSONField()
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.title} - {self.skill}"
 
+    @property
+    def questions_json(self):
+        return [
+            {
+                'question': q.text,
+                'options': q.options,
+                'correct': q.correct_index,
+                'weight': q.weight,
+                'explanation': q.explanation or '',
+            }
+            for q in self.questions.all().order_by('order')
+        ]
+
+    @property
+    def total_weight(self):
+        return sum(q.weight for q in self.questions.all())
+
+
+class Question(models.Model):
+    QUESTION_TYPE_CHOICES = [
+        ('objective', 'Objective (Multiple Choice)'),
+        ('subjective', 'Subjective (Text Answer)'),
+    ]
+
+    exam = models.ForeignKey(
+        SkillExam,
+        on_delete=models.CASCADE,
+        related_name='questions'
+    )
+    text = models.TextField()
+    question_type = models.CharField(
+        max_length=20,
+        choices=QUESTION_TYPE_CHOICES,
+        default='objective'
+    )
+    options = models.JSONField(
+        blank=True,
+        null=True,
+        help_text="List of options for objective questions, e.g. ['Option A', 'Option B']"
+    )
+    correct_index = models.IntegerField(
+        blank=True,
+        null=True,
+        help_text="0-based index of the correct option (for objective questions)"
+    )
+    model_answer = models.TextField(
+        blank=True,
+        help_text="Model answer for subjective questions"
+    )
+    weight = models.IntegerField(default=1, help_text="Marks for this question")
+    explanation = models.TextField(blank=True, help_text="Explanation shown after answering")
+    order = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ['order']
+
+    def __str__(self):
+        return f"Q{self.order}: {self.text[:60]}"
+
 
 class ExamAttempt(models.Model):
     user = models.ForeignKey(
-        User, 
-        on_delete=models.CASCADE, 
+        User,
+        on_delete=models.CASCADE,
         related_name='exam_attempts'
     )
     exam = models.ForeignKey(
-        'SkillExam', 
+        'SkillExam',
         on_delete=models.CASCADE,
         related_name='attempts'
     )

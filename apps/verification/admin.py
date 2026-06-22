@@ -1,6 +1,26 @@
 from django.contrib import admin, messages
 from django.db.models import F
-from .models import SkillVerification, Certificate, SkillExam, ExamAttempt
+from .models import SkillVerification, Certificate, SkillExam, Question, ExamAttempt
+
+
+class QuestionInline(admin.StackedInline):
+    model = Question
+    extra = 1
+    fields = [
+        'order', 'text', 'question_type', 'options',
+        'correct_index', 'model_answer', 'weight', 'explanation'
+    ]
+    readonly_fields = []
+    verbose_name = 'Question'
+    verbose_name_plural = 'Questions'
+
+    class Media:
+        css = {
+            'all': ('verification/admin/css/question_builder.css',)
+        }
+        js = (
+            'verification/admin/js/question_builder.js',
+        )
 
 
 @admin.register(SkillVerification)
@@ -89,9 +109,38 @@ class SkillExamAdmin(admin.ModelAdmin):
         'created_at',
     )
     list_filter = ('difficulty', 'is_active', 'created_at')
-    search_fields = ('title', 'skill__name', 'questions')
+    search_fields = ('title', 'skill__name')
     readonly_fields = ('created_at',)
     list_select_related = ('skill',)
+    inlines = [QuestionInline]
+    change_form_template = 'admin/verification/skillexam/change_form.html'
+
+    class Media:
+        css = {
+            'all': ('verification/admin/css/question_builder.css',)
+        }
+        js = (
+            'verification/admin/js/question_builder.js',
+        )
+
+
+@admin.register(Question)
+class QuestionAdmin(admin.ModelAdmin):
+    list_display = (
+        'order',
+        'exam',
+        'question_type',
+        'text_preview',
+        'weight',
+        'correct_index',
+    )
+    list_filter = ('question_type', 'exam')
+    search_fields = ('text', 'exam__title')
+    list_select_related = ('exam',)
+
+    def text_preview(self, obj):
+        return obj.text[:80]
+    text_preview.short_description = 'Question'
 
 
 @admin.register(ExamAttempt)
