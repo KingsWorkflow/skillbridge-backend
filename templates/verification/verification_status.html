@@ -24,7 +24,10 @@
 document.addEventListener('DOMContentLoaded', function() {
     var container = document.getElementById('verification-status-container');
 
-    Verification.api.fetchVerificationStatus().then(function(verifications) {
+    Verification.api.fetchVerificationStatus().then(function(data) {
+        var verifications = data.results || [];
+        var currentUserId = data.current_user_id;
+
         if (!verifications.length) {
             container.innerHTML = '<div class="text-center py-xl">' +
                 '<span class="material-symbols-outlined text-on-surface-variant/40 text-5xl mb-base block">verified_user</span>' +
@@ -55,18 +58,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
         var tbody = document.getElementById('verification-table-body');
         verifications.forEach(function(v) {
+            var isSelf = (v.user === currentUserId);
             var badgeClass = Verification.helpers.getLevelBadgeClass(v.current_level);
             var levelLabel = Verification.helpers.mapVerificationLevel(v.current_level);
+            var actionCell = isSelf
+                ? '<span class="text-on-surface-variant/40 text-xs italic">You</span>'
+                : '<a href="/verification/community/' + v.user + '/' + v.skill + '/" class="p-2 rounded-full hover:bg-surface-container-high text-on-surface-variant hover:text-primary transition-colors" title="Community verify">' +
+                    '<span class="material-symbols-outlined text-sm">group</span>' +
+                  '</a>';
             var row = '<tr class="border-b border-outline-variant/50 hover:bg-surface-container-low transition-colors">' +
                 '<td class="p-sm font-body-md text-body-md text-on-surface">' + escapeHtml(v.skill_name) + '</td>' +
                 '<td class="p-sm"><span class="px-2 py-1 rounded-full text-xs font-medium border ' + badgeClass + '">' + escapeHtml(levelLabel) + '</span></td>' +
                 '<td class="p-sm font-body-md text-body-md text-on-surface-variant">' + v.verification_votes + '</td>' +
                 '<td class="p-sm font-body-md text-body-md text-on-surface-variant">' + v.total_teaching_hours + '</td>' +
-                '<td class="p-sm">' +
-                    '<a href="/verification/community/' + v.user + '/' + v.skill + '/" class="p-2 rounded-full hover:bg-surface-container-high text-on-surface-variant hover:text-primary transition-colors" title="Community verify">' +
-                        '<span class="material-symbols-outlined text-sm">group</span>' +
-                    '</a>' +
-                '</td>' +
+                '<td class="p-sm">' + actionCell + '</td>' +
             '</tr>';
             tbody.insertAdjacentHTML('beforeend', row);
         });

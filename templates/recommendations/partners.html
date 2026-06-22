@@ -38,7 +38,7 @@
                     </div>
                 </div>
             </div>
-            <button class="w-full mt-md bg-secondary text-on-secondary py-sm rounded-lg font-label-md text-label-md">Propose Exchange</button>
+            <a href="{% url 'exchanges:create_proposal' receiver_id=partner.partner_user.id %}" class="block w-full mt-md bg-secondary text-on-secondary py-sm rounded-lg font-label-md text-label-md text-center hover:opacity-90 transition-all">Propose Exchange</a>
         </div>
         {% empty %}
         <div class="col-span-full text-center py-xl">
