@@ -2,11 +2,11 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from datetime import timedelta
+from datetime import datetime, timedelta
 import json
 
 from apps.skills.models import Skill
-from .models import SkillVerification, SkillExam, Question, ExamAttempt
+from .models import SkillVerification, SkillExam, Question, ExamAttempt, Certificate
 from .serializers import (
     SkillVerificationSerializer,
     SkillExamSerializer,
@@ -16,9 +16,30 @@ from .serializers import (
 
 @login_required
 def api_verification_status(request):
-    verifications = SkillVerification.objects.filter(user=request.user).select_related('skill')
+    verifications = list(
+        SkillVerification.objects.filter(user=request.user).select_related('skill')
+    )
+    existing_skill_ids = {v.skill_id for v in verifications}
+
+    approved_certificates = Certificate.objects.filter(
+        user=request.user, status='approved'
+    ).select_related('skill')
+
+    for cert in approved_certificates:
+        if cert.skill_id not in existing_skill_ids:
+            synthetic = SkillVerification(
+                user=request.user,
+                skill=cert.skill,
+                current_level=3,
+                certificate_verified_at=datetime.combine(cert.issue_date, datetime.min.time()),
+            )
+            verifications.append(synthetic)
+
     serializer = SkillVerificationSerializer(verifications, many=True)
-    return JsonResponse({'results': serializer.data})
+    return JsonResponse({
+        'results': serializer.data,
+        'current_user_id': request.user.id,
+    })
 
 
 @login_required

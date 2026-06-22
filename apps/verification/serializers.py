@@ -62,6 +62,8 @@ class SkillVerificationSerializer(serializers.ModelSerializer):
     skill_name = serializers.CharField(source='skill.name', read_only=True)
     skill_category = serializers.CharField(source='skill.category', read_only=True)
     level_label = serializers.SerializerMethodField()
+    user = serializers.IntegerField(source='user.id', read_only=True)
+    skill = serializers.IntegerField(source='skill.id', read_only=True)
 
     class Meta:
         model = SkillVerification

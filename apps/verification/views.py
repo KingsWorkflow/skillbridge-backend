@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
-from datetime import timedelta
+from datetime import datetime, timedelta
 from .forms import ExamAnswerForm
 from .models import SkillVerification, SkillExam, Question, ExamAttempt, Certificate
 from apps.skills.models import Skill
@@ -120,9 +120,28 @@ def exam_submit(request):
 
 @login_required
 def verification_status(request):
+    from .models import Certificate
+
     verifications = SkillVerification.objects.filter(
         user=request.user
     ).select_related('skill').order_by('-current_level', 'skill__name')
+    existing_skill_ids = {v.skill_id for v in verifications}
+
+    approved_certificates = Certificate.objects.filter(
+        user=request.user, status='approved'
+    ).select_related('skill')
+
+    for cert in approved_certificates:
+        if cert.skill_id not in existing_skill_ids:
+            synthetic = SkillVerification(
+                user=request.user,
+                skill=cert.skill,
+                current_level=3,
+                certificate_verified_at=datetime.combine(cert.issue_date, datetime.min.time()),
+            )
+            existing_skill_ids.add(cert.skill_id)
+            verifications = list(verifications) + [synthetic]
+
     return render(request, 'verification/verification_status.html', {
         'verifications': verifications,
     })
