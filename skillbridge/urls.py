@@ -27,6 +27,7 @@ urlpatterns = [
     
     # Frontend Pages - Verification
     path('verification/', include('apps.verification.urls')),
+    path('api/verification/', include('apps.verification.api_urls')),
     
     # Frontend Pages - Portfolio
     path('portfolio/', include('apps.portfolio.urls')),

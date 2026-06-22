@@ -3,88 +3,137 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
 from datetime import timedelta
-from .forms import CertificateUploadForm, ExamAnswerForm
-from .models import SkillVerification, Certificate, SkillExam, ExamAttempt
+from .forms import ExamAnswerForm
+from .models import SkillVerification, SkillExam, Question, ExamAttempt, Certificate
 from apps.skills.models import Skill
 
 
 @login_required
-def upload_certificate(request):
-    if request.method == 'POST':
-        form = CertificateUploadForm(request.POST, request.FILES)
-        if form.is_valid():
-            cert = form.save(commit=False)
-            cert.user = request.user
-            cert.save()
-            messages.success(request, 'Certificate uploaded! Awaiting admin approval.')
-            return redirect('users:profile')
-    else:
-        form = CertificateUploadForm()
-    return render(request, 'verification/certificate_upload.html', {'form': form})
-
-
-@login_required
 def verify_community(request, user_id, skill_id):
-    """Allow users to verify another user's skill (community verification)."""
+    """Render community verification page."""
     skill = get_object_or_404(Skill, id=skill_id)
     verification, created = SkillVerification.objects.get_or_create(
         user_id=user_id,
-        skill=skill
+        skill=skill,
     )
-    
     if created:
         verification.self_declared_at = timezone.now()
-    
-    verification.verification_votes += 1
-    
-    # If 3 votes reached, upgrade to level 2
-    if verification.verification_votes >= 3:
-        verification.current_level = 2
-        verification.community_verified_at = timezone.now()
-    
-    verification.save()
-    messages.success(request, 'Skill verified!')
-    return redirect('recommendations:partners')
+        verification.save()
+    return render(request, 'verification/community_verify.html', {
+        'skill': skill,
+        'user_id': user_id,
+        'verification': verification,
+    })
 
 
 @login_required
 def start_exam(request, skill_id):
     skill = get_object_or_404(Skill, id=skill_id)
-    exam = get_object_or_404(SkillExam, skill=skill, is_active=True)
-    
-    # Check if user can retake
+    exam = SkillExam.objects.filter(skill=skill, is_active=True).first()
+
+    if not exam:
+        return render(request, 'verification/exam_start.html', {
+            'form': None,
+            'exam': None,
+            'skill': skill,
+            'blocked': False,
+            'no_exam': True,
+        })
+
     previous_attempt = ExamAttempt.objects.filter(
-        user=request.user, 
-        exam=exam
+        user=request.user, exam=exam
     ).order_by('-started_at').first()
-    
+
+    blocked = False
     if previous_attempt and previous_attempt.can_retake_after and timezone.now() < previous_attempt.can_retake_after:
-        messages.error(request, 'You cannot retake this exam yet.')
-        return redirect('recommendations:partners')
-    
-    if request.method == 'POST':
-        form = ExamAnswerForm(exam.questions, request.POST)
+        blocked = True
+
+    questions_qs = exam.questions.all().order_by('order')
+    questions_data = [
+        {
+            'id': q.id,
+            'text': q.text,
+            'question_type': q.question_type,
+            'options': q.options,
+            'correct_index': q.correct_index,
+            'model_answer': q.model_answer,
+            'weight': q.weight,
+        }
+        for q in questions_qs
+    ]
+
+    if request.method == 'POST' and not blocked:
+        form = ExamAnswerForm(questions_data, request.POST)
         if form.is_valid():
-            score = 0
-            # Simplified scoring - in real implementation would compare answers
+            answers = {}
+            for q in questions_qs:
+                answers[f'question_{q.id}'] = request.POST.get(f'question_{q.id}', '')
+
+            total_weight = sum(q.weight for q in questions_qs)
+            earned_marks = 0
+            for q in questions_qs:
+                student_answer = answers.get(f'question_{q.id}')
+                if student_answer is not None and q.question_type == 'objective':
+                    try:
+                        if int(student_answer) == q.correct_index:
+                            earned_marks += q.weight
+                    except (ValueError, TypeError):
+                        pass
+
+            score = round((earned_marks / total_weight) * 100, 2) if total_weight > 0 else 0
+            passed = score >= exam.passing_score
+
             attempt = ExamAttempt.objects.create(
                 user=request.user,
                 exam=exam,
-                answers={f'question_{i}': request.POST.get(f'question_{i}') for i in range(len(exam.questions))},
+                answers=answers,
                 started_at=timezone.now(),
-                completed_at=timezone.now()
+                completed_at=timezone.now(),
+                score=score,
+                passed=passed,
+                can_retake_after=timezone.now() + timedelta(days=30),
             )
-            attempt.score = score
-            attempt.passed = score >= exam.passing_score
-            attempt.can_retake_after = timezone.now() + timedelta(days=30)
-            attempt.save()
-            
-            if attempt.passed:
-                messages.success(request, f'Exam passed! Score: {score}%')
-            else:
-                messages.error(request, f'Exam not passed. Score: {score}%')
-            return redirect('recommendations:partners')
+            messages.success(request, f'Exam submitted! Score: {score}%')
+            return redirect('verification:exam_submit')
     else:
-        form = ExamAnswerForm(exam.questions)
-    
-    return render(request, 'verification/exam_start.html', {'form': form, 'exam': exam})
+        form = ExamAnswerForm(questions_data)
+
+    return render(request, 'verification/exam_start.html', {
+        'form': form,
+        'exam': exam,
+        'skill': skill,
+        'blocked': blocked,
+        'retake_after': previous_attempt.can_retake_after if previous_attempt else None,
+    })
+
+
+@login_required
+def exam_submit(request):
+    last_attempt = ExamAttempt.objects.filter(
+        user=request.user
+    ).order_by('-started_at').first()
+    return render(request, 'verification/exam_submit.html', {
+        'attempt': last_attempt,
+        'exam': last_attempt.exam if last_attempt else None,
+    })
+
+
+@login_required
+def verification_status(request):
+    verifications = SkillVerification.objects.filter(
+        user=request.user
+    ).select_related('skill').order_by('-current_level', 'skill__name')
+    return render(request, 'verification/verification_status.html', {
+        'verifications': verifications,
+    })
+
+
+@login_required
+def certificate_list(request):
+    certificates = Certificate.objects.filter(
+        user=request.user,
+        status='approved',
+    ).select_related('skill').order_by('-issue_date')
+    return render(request, 'verification/certificate_list.html', {
+        'certificates': certificates,
+    })

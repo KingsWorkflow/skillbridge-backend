@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from apps.skills.models import TeachableSkill, LearnableSkill
+from apps.verification.models import Certificate
 
 
 @login_required
@@ -19,6 +20,7 @@ def portfolio_view(request):
         'profile': user,
         'projects': user.projects.all(),
         'certifications': user.certifications.all(),
+        'exam_certificates': Certificate.objects.filter(user=user, status='approved').select_related('skill').order_by('-issue_date'),
         'achievements': [],
         'teachable_skills': TeachableSkill.objects.filter(
             user=user, is_active=True
