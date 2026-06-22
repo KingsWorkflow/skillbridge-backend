@@ -39,7 +39,7 @@ class CustomLoginView(LoginView):
 
     def form_valid(self, form):
         user = form.get_user()
-        if not user.email_verified:
+        if not getattr(user, 'is_superuser', False) and not getattr(user, 'email_verified', False):
             messages.error(self.request, 'Please verify your email before logging in. Check your inbox for the OTP code.')
             logout(self.request)
             return redirect('users:verify_email')
