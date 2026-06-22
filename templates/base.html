@@ -168,10 +168,11 @@
       </div>
     </div>
     <div class="flex items-center gap-md">
-      <div class="hidden md:flex bg-surface-container-low rounded-full px-4 py-2 items-center gap-xs">
+      <form class="hidden md:flex bg-surface-container-low rounded-full px-4 py-2 items-center gap-xs relative" method="get" action="{% url 'recommendations:search' %}">
         <span class="material-symbols-outlined text-outline">search</span>
-        <input class="bg-transparent border-none focus:ring-0 text-body-sm w-48" placeholder="Search skills..." type="text"/>
-      </div>
+        <input class="bg-transparent border-none focus:ring-0 text-body-sm w-48" placeholder="Search skills..." type="text" name="q" autocomplete="off" id="search-input"/>
+        <div id="search-suggestions" class="hidden absolute top-full left-0 right-0 mt-1 bg-surface border border-outline-variant/30 rounded-xl shadow-2xl z-50 max-h-96 overflow-y-auto"></div>
+      </form>
       <div class="flex items-center gap-4">
       {% if user.is_authenticated %}
       <div class="relative group" id="notification-wrapper">
@@ -304,6 +305,46 @@
                 document.addEventListener('click', function(e) {
                     if (!profileTrigger.contains(e.target) && !profileDropdown.contains(e.target)) {
                         profileDropdown.classList.add('hidden');
+                    }
+                });
+            }
+
+            const searchInput = document.getElementById('search-input');
+            const searchSuggestions = document.getElementById('search-suggestions');
+            if (searchInput && searchSuggestions) {
+                let debounceTimer;
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(debounceTimer);
+                    const query = this.value.trim();
+                    if (query.length < 2) {
+                        searchSuggestions.classList.add('hidden');
+                        return;
+                    }
+                    debounceTimer = setTimeout(() => {
+                        fetch('{% url "recommendations:api_search" %}?q=' + encodeURIComponent(query))
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.suggestions && data.suggestions.length > 0) {
+                                    const iconMap = { skill: 'lightbulb', career: 'work', person: 'person' };
+                                    searchSuggestions.innerHTML = data.suggestions.map(s => {
+                                        const icon = iconMap[s.type] || 'search';
+                                        const href = '{% url "recommendations:search" %}?q=' + encodeURIComponent(s.text);
+                                        return '<a href="' + href + '" class="flex items-center gap-2 px-4 py-2 hover:bg-surface-container-high transition-colors font-body-md text-body-sm text-on-surface">' +
+                                            '<span class="material-symbols-outlined text-sm">' + icon + '</span>' +
+                                            '<span class="truncate">' + s.text + '</span>' +
+                                        '</a>';
+                                    }).join('');
+                                    searchSuggestions.classList.remove('hidden');
+                                } else {
+                                    searchSuggestions.classList.add('hidden');
+                                }
+                            })
+                            .catch(() => { searchSuggestions.classList.add('hidden'); });
+                    }, 200);
+                });
+                document.addEventListener('click', function(e) {
+                    if (!searchInput.contains(e.target) && !searchSuggestions.contains(e.target)) {
+                        searchSuggestions.classList.add('hidden');
                     }
                 });
             }
