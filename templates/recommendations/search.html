@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Search | SkillBridge Nepal{% endblock %}
+
+{% block content %}
+<div class="max-w-container-max mx-auto px-md py-lg">
+    <header class="mb-lg">
+        <h1 class="font-headline-lg text-headline-lg text-on-surface mb-xs">
+            {% if query %}Search results for "{{ query }}"{% else %}Search{% endif %}
+        </h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant">
+            {% if query %}Explore skills, careers, people, projects, and certifications{% else %}Start typing in the search bar to explore the SkillBridge Nepal ecosystem{% endif %}
+        </p>
+    </header>
+
+    {% if query %}
+    {% for category_name, category_results in results.items %}
+    {% if category_results %}
+    <section class="mb-xl">
+        <h2 class="font-headline-md text-headline-md text-primary mb-md capitalize">{{ category_name }}</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+            {% for item in category_results %}
+            <a href="
+                {% if category_name == 'skills' %}{% url 'skills:skill_list' %}?q={{ item.name|urlencode }}
+                {% elif category_name == 'careers' %}{% url 'careers:career_recommendations' %}
+                {% elif category_name == 'people' %}{% url 'users:public_profile' item.username %}
+                {% elif category_name == 'projects' %}{% url 'users:public_profile' item.user.username %}
+                {% elif category_name == 'certifications' %}{% url 'users:public_profile' item.user.username %}
+                {% endif %}"
+               class="block bg-white rounded-xl p-md shadow-sm border border-outline-variant hover:-translate-y-1 transition-transform">
+                <div class="flex items-start gap-md">
+                    <div class="bg-primary-container text-on-primary-container p-sm rounded-lg">
+                        <span class="material-symbols-outlined">
+                            {% if category_name == 'skills' %}lightbulb
+                            {% elif category_name == 'careers' %}work
+                            {% elif category_name == 'people' %}person
+                            {% elif category_name == 'projects' %}code
+                            {% elif category_name == 'certifications' %}verified
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="font-label-md text-label-md text-on-surface truncate">
+                            {% if category_name == 'skills' %}{{ item.name }}{% endif %}
+                            {% if category_name == 'careers' %}{{ item.title }}{% endif %}
+                            {% if category_name == 'people' %}{{ item.first_name }} {{ item.last_name }}{% endif %}
+                            {% if category_name == 'projects' %}{{ item.title }}{% endif %}
+                            {% if category_name == 'certifications' %}{{ item.name }}{% endif %}
+                        </h3>
+                        <p class="font-body-sm text-body-sm text-on-surface-variant mt-xs truncate">
+                            {% if category_name == 'skills' %}{{ item.category }} · Popularity: {{ item.popularity_score|floatformat:1 }}{% endif %}
+                            {% if category_name == 'careers' %}{{ item.category }} · {{ item.growth_outlook|default:'' }}{% endif %}
+                            {% if category_name == 'people' %}@{{ item.username }} · {{ item.title|default:'' }}{% endif %}
+                            {% if category_name == 'projects' %}by {{ item.user.first_name|default:item.user.username }}{% endif %}
+                            {% if category_name == 'certifications' %}{{ item.issuing_organization }} · {{ item.issue_date }}{% endif %}
+                        </p>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+    {% endfor %}
+
+    {% if not results.skills and not results.careers and not results.people and not results.projects and not results.certifications %}
+    <div class="text-center py-xl">
+        <span class="material-symbols-outlined text-6xl text-outline mb-md">search_off</span>
+        <p class="font-body-lg text-body-lg text-on-surface-variant">No results found for "{{ query }}"</p>
+        <p class="font-body-md text-body-md text-on-surface-variant mt-sm">Try searching for skills, careers, people, or projects</p>
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="text-center py-xl">
+        <span class="material-symbols-outlined text-6xl text-outline mb-md">search</span>
+        <p class="font-body-lg text-body-lg text-on-surface-variant">Enter a search term to get started</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

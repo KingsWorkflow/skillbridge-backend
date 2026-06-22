@@ -1,7 +1,12 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from django.db.models import Q
 from .recommendation_engine import find_exchange_partners as ai_find_exchange_partners, resolve_skill_ids_to_names, compute_skill_gap, get_careers_list
+from apps.skills.models import Skill
+from apps.careers.models import CareerPath
+from apps.users.models import UserProfile
+from apps.portfolio.models import Project, Certification
 
 
 @login_required
@@ -145,3 +150,61 @@ def skill_gap_api(request):
 def careers_list_api(request):
     """JSON API listing all available career paths."""
     return JsonResponse({'careers': get_careers_list()})
+
+
+def search(request):
+    """Global search across skills, careers, people, projects, and certifications."""
+    q = request.GET.get('q', '').strip()
+    results = {
+        'skills': [],
+        'careers': [],
+        'people': [],
+        'projects': [],
+        'certifications': [],
+    }
+    if q:
+        results['skills'] = Skill.objects.filter(
+            Q(name__icontains=q) | Q(category__icontains=q)
+        ).order_by('-popularity_score')[:10]
+
+        results['careers'] = CareerPath.objects.filter(
+            Q(title__icontains=q) | Q(description__icontains=q)
+        ).order_by('title')[:10]
+
+        results['people'] = UserProfile.objects.filter(
+            Q(first_name__icontains=q) |
+            Q(last_name__icontains=q) |
+            Q(username__icontains=q) |
+            Q(title__icontains=q) |
+            Q(bio__icontains=q) |
+            Q(location__icontains=q)
+        ).filter(is_active=True).order_by('-reputation_score')[:10]
+
+        results['projects'] = Project.objects.filter(
+            Q(title__icontains=q) | Q(description__icontains=q)
+        ).select_related('user').order_by('-created_at')[:10]
+
+        results['certifications'] = Certification.objects.filter(
+            Q(name__icontains=q) | Q(issuing_organization__icontains=q)
+        ).select_related('user').order_by('-issue_date')[:10]
+
+    return render(request, 'recommendations/search.html', {
+        'query': q,
+        'results': results,
+    })
+
+
+def api_search(request):
+    """JSON API for search suggestions."""
+    q = request.GET.get('q', '').strip()
+    suggestions = []
+    if q and len(q) >= 2:
+        skills = Skill.objects.filter(name__icontains=q).order_by('-popularity_score').values_list('name', flat=True)[:5]
+        suggestions.extend([{'type': 'skill', 'text': s} for s in skills])
+        careers = CareerPath.objects.filter(title__icontains=q).order_by('title').values_list('title', flat=True)[:3]
+        suggestions.extend([{'type': 'career', 'text': c} for c in careers])
+        people = UserProfile.objects.filter(
+            Q(first_name__icontains=q) | Q(last_name__icontains=q) | Q(username__icontains=q)
+        ).filter(is_active=True).order_by('-reputation_score').values_list('username', flat=True)[:3]
+        suggestions.extend([{'type': 'person', 'text': p} for p in people])
+    return JsonResponse({'suggestions': suggestions})
