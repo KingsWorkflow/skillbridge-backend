@@ -47,14 +47,17 @@
             <!-- Left Sidebar -->
             <aside class="lg:col-span-4 space-y-gutter">
                 <div class="glass-card rounded-xl p-8 text-center">
-                    <div class="w-32 h-32 mx-auto mb-6 rounded-full border-4 border-white shadow-xl overflow-hidden bg-surface-container">
+                    <div class="relative inline-block cursor-pointer group w-32 h-32" onclick="var input=document.getElementById('profile-form').querySelector('input[name=profile_picture]'); if(input) input.click();">
                         {% if user.profile_picture %}
-                        <img src="{{ user.profile_picture.url }}" alt="{{ user.username }}" class="w-full h-full object-cover" />
+                        <img src="{{ user.profile_picture.url }}" alt="{{ user.username }}" class="w-full h-full object-cover rounded-full" />
                         {% else %}
-                        <div class="w-full h-full bg-surface-container flex items-center justify-center text-body-lg text-on-surface-variant">
+                        <div class="w-full h-full bg-surface-container flex items-center justify-center text-body-lg text-on-surface-variant rounded-full">
                             {{ user.first_name|default:user.username|slice:":1" }}
                         </div>
                         {% endif %}
+                        <div class="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <span class="material-symbols-outlined text-white text-3xl">edit</span>
+                        </div>
                     </div>
                     <h2 class="font-headline-md text-primary mb-1">{{ user.get_full_name|default:user.username }}</h2>
                     <p class="font-label-md text-secondary uppercase tracking-widest mb-6">{{ user.get_experience_level_display }}</p>
@@ -105,6 +108,7 @@
                 <form method="post" enctype="multipart/form-data" id="profile-form">
                     {% csrf_token %}
                     {{ form.non_field_errors }}
+                    <input type="file" name="profile_picture" class="hidden" accept="image/*" onchange="document.getElementById('profile-form').submit()" />
 
                     <!-- Personal Details -->
                     <section class="glass-card rounded-xl p-8">
@@ -162,27 +166,7 @@
                         </button>
                     </div>
                 </section>
-
-                <!-- Profile Picture -->
-                <section class="glass-card rounded-xl p-8">
-                    <h3 class="font-headline-md text-primary mb-4">Profile Picture</h3>
-                    <p class="font-body-sm text-body-sm text-on-surface-variant mb-3">Click the avatar to upload a photo, or choose a file below.</p>
-                    <div class="flex items-center gap-4">
-                        <label class="avatar-circle" for="{{ form.profile_picture.id_for_label }}" style="width:96px;height:96px;">
-                            {% if user.profile_picture %}
-                            <img src="{{ user.profile_picture.url }}" alt="{{ user.username }}" />
-                            {% else %}
-                            <span class="text-2xl font-bold text-gray-500">{{ user.username|slice:":1" }}</span>
-                            {% endif %}
-                            <div class="avatar-overlay">
-                                <span style="font-size:12px;">Edit</span>
-                            </div>
-                        </label>
-                        <div class="flex-1">
-                            {{ form.profile_picture|add_class:"block w-full text-sm text-on-surface-variant file:mr-3 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer" }}
-                        </div>
-                    </div>
-                </section>
+                </form>
 
                 <!-- Skills & Knowledge Exchange -->
                 <section class="glass-card rounded-xl p-8">
@@ -193,10 +177,13 @@
                         <label class="font-label-md text-on-surface-variant mb-3 block">Skills I Teach (Expertise)</label>
                         <div class="flex flex-wrap gap-3">
                             {% for skill in teachable_skills %}
-                            <span class="skill-chip px-4 py-1.5 rounded-full font-label-md flex items-center gap-2">
-                                {{ skill.skill.name }}
-                                <span class="material-symbols-outlined text-sm cursor-pointer" onclick="this.parentElement.remove()">close</span>
-                            </span>
+                            <form method="post" action="{% url 'users:delete_teachable_skill' pk=skill.pk %}" class="inline" onsubmit="return confirm('Remove this skill?')">
+                                {% csrf_token %}
+                                <span class="skill-chip px-4 py-1.5 rounded-full font-label-md flex items-center gap-2">
+                                    {{ skill.skill.name }}
+                                    <button type="submit" class="material-symbols-outlined text-sm cursor-pointer text-current">close</button>
+                                </span>
+                            </form>
                             {% endfor %}
                             <a href="{% url 'skills:teachable_skills' %}" class="px-4 py-1.5 rounded-full font-label-md border-2 border-dashed border-outline text-on-surface-variant hover:border-secondary transition-colors">
                                 + Add Skill
@@ -347,7 +334,7 @@
                 <!-- Sticky Save Actions -->
                 <div class="sticky bottom-4 z-40 glass-card rounded-xl p-4 border border-outline-variant/40 shadow-lg flex items-center justify-between gap-4">
                     <a href="{% url 'users:dashboard' %}" class="text-on-surface-variant font-bold px-6 py-3 hover:text-primary transition-colors">Discard Changes</a>
-                    <button type="submit" class="liquid-gold-btn px-12 py-3 rounded-lg font-bold text-lg shadow-lg flex items-center gap-2">
+                    <button type="button" onclick="document.getElementById('profile-form').submit()" class="liquid-gold-btn px-12 py-3 rounded-lg font-bold text-lg shadow-lg flex items-center gap-2">
                         <span class="material-symbols-outlined">save</span>
                         Save Changes
                     </button>

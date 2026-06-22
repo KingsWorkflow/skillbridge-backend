@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from .recommendation_engine import find_exchange_partners as ai_find_exchange_partners, resolve_skill_ids_to_names
+from .recommendation_engine import find_exchange_partners as ai_find_exchange_partners, resolve_skill_ids_to_names, compute_skill_gap, get_careers_list
 
 
 @login_required
@@ -67,13 +67,81 @@ def career_recommendations(request):
     })
 
 
+@login_required
 def skill_gap(request):
     """Skill gap analysis page."""
+    target_career = request.GET.get('target_career', '')
+    custom_goals = request.session.get('custom_priority_goals', [])
+    hidden_skill_ids = request.session.get('hidden_priority_skill_ids', [])
+    data = compute_skill_gap(request.user, target_career if target_career else None, custom_goals=custom_goals, hidden_skill_ids=hidden_skill_ids)
     return render(request, 'recommendations/skill_gap.html', {
-        'priority_goals': [
-            {'skill': 'System Design', 'missing': 'Architecture fundamentals', 'progress': '25', 'color': 'secondary', 'icon': 'dns'},
-        ],
-        'mentors': [
-            {'name': 'Alex Smith', 'title': 'Senior Developer', 'skills': ['Python', 'Django', 'System Design'], 'closed_gaps': 8},
-        ],
+        'target_career': data['target_career'],
+        'match_score': data['match_score'],
+        'priority_goals': data['priority_goals'],
+        'mentors': data['mentors'],
+        'chart_data': data['chart_data'],
+        'available_careers': get_careers_list(),
     })
+
+
+@login_required
+def skill_gap_api(request):
+    """JSON API for skill gap data.
+    GET  → returns full analysis (optionally filtered by ?target_career=).
+    POST → mutates custom goals (action=add|remove) and returns updated analysis.
+    """
+    body = {}
+    goals = list(request.session.get('custom_priority_goals', []))
+
+    if request.method == 'POST':
+        try:
+            import json as _json
+            body_data = request.body
+            body = _json.loads(body_data.decode('utf-8')) if body_data else {}
+            action = body.get('action', '')
+
+            if action == 'add':
+                skill = body.get('skill', '').strip()
+                missing = body.get('missing', 'Custom goal').strip()
+                progress = int(body.get('progress', 0))
+                color = body.get('color', 'tertiary')
+                icon = body.get('icon', 'flag')
+                if skill:
+                    goals.append({'skill': skill, 'missing': missing, 'progress': progress, 'color': color, 'icon': icon})
+            elif action == 'remove':
+                index = int(body.get('index', -1))
+                if 0 <= index < len(goals):
+                    goals.pop(index)
+            elif action == 'dismiss':
+                skill_id = body.get('skill_id')
+                if skill_id is not None:
+                    try:
+                        skill_id_int = int(skill_id)
+                        hidden = list(request.session.get('hidden_priority_skill_ids', []))
+                        if skill_id_int not in hidden:
+                            hidden.append(skill_id_int)
+                        request.session['hidden_priority_skill_ids'] = hidden
+                        request.session.modified = True
+                    except (ValueError, TypeError):
+                        pass
+
+            request.session['custom_priority_goals'] = goals
+            request.session.modified = True
+        except Exception:
+            pass
+
+    target_career = request.GET.get('target_career', '') or body.get('target_career', '') or ''
+    hidden_skill_ids = request.session.get('hidden_priority_skill_ids', [])
+    data = compute_skill_gap(
+        request.user,
+        target_career if target_career else None,
+        custom_goals=goals,
+        hidden_skill_ids=hidden_skill_ids,
+    )
+    return JsonResponse(data)
+
+
+@login_required
+def careers_list_api(request):
+    """JSON API listing all available career paths."""
+    return JsonResponse({'careers': get_careers_list()})

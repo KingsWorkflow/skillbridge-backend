@@ -233,3 +233,132 @@ def recommend_careers(user, top_n=5):
 
     results.sort(key=lambda x: x['match_score'], reverse=True)
     return results[:top_n]
+
+
+PROFICIENCY_TO_LEVEL = {
+    'beginner': 25,
+    'intermediate': 50,
+    'expert': 75,
+}
+
+PRIORITY_ICONS = {
+    'Technology': 'code',
+    'Data': 'analytics',
+    'Management': 'groups',
+    'Design': 'palette',
+    'Marketing': 'campaign',
+}
+
+
+def get_careers_list():
+    """Return list of available career paths for the selector."""
+    return list(CareerPath.objects.values_list('title', flat=True).order_by('title'))
+
+
+def compute_skill_gap(user, target_career_title=None, custom_goals=None, hidden_skill_ids=None):
+    """Compute skill gap analysis for a user against a target career.
+    
+    Returns dict with match_score, target_career, priority_goals, mentors, chart_data.
+    custom_goals: list of dicts with keys skill, missing, progress, color, icon (user-added)
+    hidden_skill_ids: set of skill IDs to exclude from priority goals (user-dismissed)
+    """
+    custom_goals = custom_goals or []
+    hidden_skill_ids = set(hidden_skill_ids or [])
+    if not target_career_title:
+        target_career_title = 'Full Stack Developer'
+    
+    career = CareerPath.objects.filter(title__icontains=target_career_title).first()
+    if not career:
+        career = CareerPath.objects.first()
+    if not career:
+        return {
+            'match_score': 0,
+            'target_career': target_career_title,
+            'priority_goals': list(custom_goals),
+            'mentors': [],
+            'chart_data': {'labels': [], 'user': [], 'market': []},
+        }
+    
+    required_skills = career.required_skills.all()
+    user_teachable = user.teachable_skills.filter(is_active=True).select_related('skill')
+    user_teachable_map = {ts.skill_id: ts for ts in user_teachable}
+    
+    required_ids = list(required_skills.values_list('id', flat=True))
+    matched_ids = [sid for sid in required_ids if sid in user_teachable_map]
+    missing_ids = [sid for sid in required_ids if sid not in user_teachable_map]
+    match_score = (len(matched_ids) / len(required_ids)) * 100 if required_ids else 0
+    
+    chart_skills = list(required_skills[:6])
+    chart_labels = [s.name for s in chart_skills]
+    chart_user = []
+    chart_market = []
+    
+    for skill in chart_skills:
+        chart_market.append(80)
+        if skill.id in user_teachable_map:
+            chart_user.append(PROFICIENCY_TO_LEVEL.get(user_teachable_map[skill.id].proficiency_level, 25))
+        else:
+            chart_user.append(5)
+    
+    custom_goal_keys = {(g['skill'], g.get('missing', '')) for g in custom_goals}
+    
+    priority_goals = []
+    for g in custom_goals:
+        priority_goals.append({**g, 'is_custom': True})
+    for skill in required_skills.filter(id__in=missing_ids):
+        if skill.id in hidden_skill_ids:
+            continue
+        estimated_hours = None
+        if career.estimated_hours_per_skill:
+            estimated_hours = career.estimated_hours_per_skill.get(str(skill.id)) or career.estimated_hours_per_skill.get(skill.name)
+        priority_goals.append({
+            'skill': skill.name,
+            'skill_id': skill.id,
+            'missing': 'Not yet acquired',
+            'progress': 0,
+            'color': 'tertiary',
+            'icon': PRIORITY_ICONS.get(skill.category, 'terminal'),
+            'estimated_hours': estimated_hours,
+        })
+    
+    mentors = []
+    if missing_ids:
+        missing_teachers = TeachableSkill.objects.filter(
+            skill_id__in=missing_ids,
+            is_active=True,
+        ).select_related('user', 'skill')
+        mentor_users = {}
+        for mt in missing_teachers:
+            uid = mt.user_id
+            if uid not in mentor_users and uid != user.id:
+                mentor_users[uid] = mt
+        
+        for uid, mt in mentor_users.items():
+            mentor_skills = list(TeachableSkill.objects.filter(user_id=uid, is_active=True).select_related('skill')[:3])
+            avatar = mt.user.profile_picture
+            avatar_url = avatar.url if avatar and hasattr(avatar, 'url') else None
+            mentors.append({
+                'name': mt.user.get_full_name() or mt.user.username,
+                'title': mt.user.title or 'Community Member',
+                'avatar': avatar_url,
+                'skills': [ms.skill.name for ms in mentor_skills],
+                'closed_gaps': mt.user.reputation_score,
+                'user_id': uid,
+                'gap_skill': mt.skill.name,
+                'gap_skill_id': mt.skill_id,
+            })
+        
+        mentors.sort(key=lambda x: x['closed_gaps'], reverse=True)
+        mentors = mentors[:6]
+    
+    return {
+        'match_score': int(round(match_score, 0)),
+        'target_career': career.title,
+        'priority_goals': priority_goals[:8],
+        'mentors': mentors[:3],
+        'chart_data': {
+            'labels': chart_labels,
+            'user': chart_user,
+            'market': chart_market,
+        },
+    }

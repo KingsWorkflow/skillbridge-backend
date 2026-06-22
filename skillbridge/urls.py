@@ -37,6 +37,9 @@ urlpatterns = [
     
     # Frontend Pages - Notifications
     path('notifications/', include('apps.notifications.urls')),
+    
+    # Frontend Pages - Static Content
+    path('', include('apps.pages.urls')),
 ]
 
 if settings.DEBUG:

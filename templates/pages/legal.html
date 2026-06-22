@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}SkillBridge Nepal | Legal{% endblock %}
+{% block html_class %}light{% endblock %}
+
+{% block content %}
+<section class="py-16">
+    <div class="max-w-3xl mx-auto">
+        <h1 class="font-display-lg text-display-lg text-primary mb-8">Legal Information</h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant mb-6">
+            Welcome to the legal section of SkillBridge Nepal. Here you will find important information about our platform's operations, your rights, and our responsibilities.
+        </p>
+        <p class="font-body-lg text-body-lg text-on-surface-variant mb-6">
+            We are committed to operating transparently and protecting your privacy. Please review our Privacy Policy and Terms of Service to understand how we handle your data and what to expect when using our platform.
+        </p>
+        <div class="flex flex-col gap-4 mt-8">
+            <a href="{% url 'pages:privacy_policy' %}" class="inline-flex items-center gap-2 text-secondary hover:underline font-body-md text-body-md">Privacy Policy →</a>
+            <a href="{% url 'pages:terms_of_service' %}" class="inline-flex items-center gap-2 text-secondary hover:underline font-body-md text-body-md">Terms of Service →</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

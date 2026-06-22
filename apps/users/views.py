@@ -23,6 +23,7 @@ from .models import UserProfile
 from apps.skills.models import TeachableSkill, LearnableSkill, Skill
 from apps.portfolio.models import Project, Certification as PortfolioCertification
 from apps.portfolio.forms import ProjectForm, CertificationForm
+from apps.notifications.models import Notification
 
 
 class CustomLoginView(LoginView):
@@ -158,40 +159,136 @@ class CustomLogoutView(LogoutView):
 
 @login_required
 def dashboard_view(request):
-    sent_proposals = request.user.sent_proposals.select_related(
+    user = request.user
+
+    sent_proposals = user.sent_proposals.select_related(
         'offer_skill', 'request_skill', 'receiver'
     ).order_by('-created_at')[:5]
-    received_proposals = request.user.received_proposals.select_related(
+    received_proposals = user.received_proposals.select_related(
         'offer_skill', 'request_skill', 'proposer'
     ).order_by('-created_at')[:5]
-    
+
     upcoming_sessions = []
-    for session in request.user.learning_sessions.filter(completed=False).select_related('skill_taught').order_by('scheduled_date')[:3]:
+    for session in user.learning_sessions.filter(completed=False).select_related('skill_taught').order_by('scheduled_date')[:5]:
+        skill_cat = getattr(session.skill_taught, 'category', 'Technology')
+        icon = {'Technology': 'terminal', 'Data': 'analytics', 'Management': 'groups', 'Design': 'palette', 'Marketing': 'campaign'}.get(skill_cat, 'school')
         upcoming_sessions.append({
+            'id': session.id,
             'skill': session.skill_taught.name,
             'with_user': session.teacher.username,
             'time': session.scheduled_date,
+            'icon': icon,
+            'duration_hours': session.duration_hours,
+            'meeting_link': session.meeting_link,
         })
-    
-    recommended_careers = [
-        {'title': 'Full-Stack Developer', 'match_type': 'Hot', 'description': 'Build web applications end-to-end'},
-        {'title': 'Data Scientist', 'match_type': 'Growing', 'description': 'Extract insights from data'},
-    ]
-    
+
+    teachable_count = user.teachable_skills.filter(is_active=True).count()
+    learnable_count = user.learnable_skills.count()
+    project_count = user.projects.count()
+    cert_count = user.certifications.count()
+    portfolio_items = project_count + cert_count
+
+    portfolio_max = 10
+    portfolio_progress = min(int((portfolio_items / portfolio_max) * 100), 100)
+
+    from apps.recommendations.recommendation_engine import recommend_careers, compute_skill_gap
+    try:
+        raw_recs = recommend_careers(user, top_n=5)
+        recommended_careers = [
+            {
+                'title': r.get('title', ''),
+                'match_type': f"{int(r.get('match_score', 0))}% Match",
+                'description': r.get('description', ''),
+                'match_score': r.get('match_score', 0),
+                'average_salary': r.get('average_salary', ''),
+                'growth_outlook': r.get('growth_outlook', ''),
+                'category': r.get('category', ''),
+                'missing_skills_count': len(r.get('missing_skills', [])),
+                'matched_skills': r.get('matched_skill_names', [])[:3],
+            }
+            for r in raw_recs
+        ]
+    except Exception:
+        recommended_careers = []
+
+    try:
+        gap_data = compute_skill_gap(user)
+        gap_score = gap_data.get('match_score', 0)
+        target_career = gap_data.get('target_career', 'Full Stack Developer')
+        priority_goals = gap_data.get('priority_goals', [])[:4]
+        chart_data = gap_data.get('chart_data', {'labels': [], 'user': [], 'market': []})
+        mentors = gap_data.get('mentors', [])[:3]
+    except Exception:
+        gap_score = 0
+        target_career = 'Full Stack Developer'
+        priority_goals = []
+        chart_data = {'labels': [], 'user': [], 'market': []}
+        mentors = []
+
+    recent_activity = []
+    for p in sent_proposals[:3]:
+        recent_activity.append({
+            'type': 'sent_proposal',
+            'icon': 'send',
+            'title': f"Proposed skill exchange to {p.receiver.username}",
+            'time': p.created_at,
+            'status': p.get_status_display(),
+            'color': 'text-secondary',
+        })
+    for p in received_proposals[:3]:
+        recent_activity.append({
+            'type': 'received_proposal',
+            'icon': 'import_contacts',
+            'title': f"{p.proposer.username} wants to exchange skills",
+            'time': p.created_at,
+            'status': p.get_status_display(),
+            'color': 'text-primary',
+        })
+    recent_activity.sort(key=lambda x: x['time'], reverse=True)
+    recent_activity = recent_activity[:5]
+
+    ai_advice = "Keep building your skills and connecting with mentors."
+    if gap_score >= 80:
+        ai_advice = f"Great work! You're {gap_score}% ready for {target_career}. Focus on soft skills and networking to reach the finish line."
+    elif gap_score >= 50:
+        ai_advice = f"You're {gap_score}% there for {target_career}. Focus on the top missing skills listed below and consider finding a mentor."
+    elif recommended_careers:
+        ai_advice = f"Start by adding more teachable skills to your profile. Based on your current skills, explore the {recommended_careers[0]['title']} path."
+    else:
+        ai_advice = "Add skills you can teach and skills you want to learn to unlock personalized career recommendations."
+
+    unread_count = Notification.objects.filter(recipient=user, is_read=False).count()
+
+    gap_score_radius = 80
+    gap_score_circumference = 2 * 3.141592653589793 * gap_score_radius
+    gap_score_dashoffset = gap_score_circumference * (1 - gap_score / 100)
+
     context = {
-        'skill_credits': request.user.skill_credits,
-        'beginner_tokens': request.user.beginner_tokens,
-        'reputation_score': request.user.reputation_score,
-        'total_hours_taught': request.user.total_hours_taught,
-        'total_hours_learned': request.user.total_hours_learned,
+        'skill_credits': user.skill_credits,
+        'beginner_tokens': user.beginner_tokens,
+        'reputation_score': user.reputation_score,
+        'total_hours_taught': user.total_hours_taught,
+        'total_hours_learned': user.total_hours_learned,
         'recommended_careers': recommended_careers,
         'upcoming_sessions': upcoming_sessions,
-        'gap_score': 70,
-        'priority_skill': 'System Design',
+        'gap_score': gap_score,
+        'gap_score_dashoffset': round(gap_score_dashoffset, 2),
+        'target_career': target_career,
+        'priority_goals': priority_goals,
+        'chart_data': chart_data,
+        'mentors': mentors,
         'recent_proposals': {
             'sent': sent_proposals,
             'received': received_proposals,
         },
+        'recent_activity': recent_activity,
+        'ai_advice': ai_advice,
+        'teachable_count': teachable_count,
+        'learnable_count': learnable_count,
+        'portfolio_progress': portfolio_progress,
+        'portfolio_items': portfolio_items,
+        'upcoming_session_count': len(upcoming_sessions),
+        'unread_count': unread_count,
     }
     return render(request, 'users/dashboard.html', context)
 
