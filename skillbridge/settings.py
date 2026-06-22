@@ -204,3 +204,32 @@ JWT_REFRESH_COOKIE_NAME = 'refresh_token'
 JWT_COOKIE_SECURE = os.getenv('JWT_COOKIE_SECURE', 'False') == 'True'
 JWT_COOKIE_HTTP_ONLY = True
 JWT_COOKIE_SAMESITE = 'Lax'
+
+
+
+# Media Storage — Vercel Blob
+# On Vercel, the local filesystem is read-only at runtime, so MEDIA_ROOT
+# writes (e.g. profile picture uploads) fail with a 500 error.
+# If a Blob read-write token is present, switch to Vercel Blob storage
+# via the custom backend in apps/storage_backends.py. Otherwise, fall
+# back to local filesystem storage for local development.
+USE_VERCEL_BLOB_STORAGE = os.getenv('USE_VERCEL_BLOB_STORAGE', 'False') == 'True'
+ 
+if USE_VERCEL_BLOB_STORAGE:
+    # Vercel sets BLOB_READ_WRITE_TOKEN automatically once a Blob store
+    # is connected to the project; the vercel_blob package reads it
+    # from the environment directly.
+    VERCEL_BLOB_ACCESS = os.getenv('VERCEL_BLOB_ACCESS', 'public')
+    # Base URL blobs are served from, e.g. https://<store-id>.public.blob.vercel-storage.com
+    VERCEL_BLOB_PUBLIC_BASE_URL = os.getenv('VERCEL_BLOB_PUBLIC_BASE_URL', '')
+ 
+    STORAGES = {
+        'default': {
+            'BACKEND': 'apps.storage_backends.VercelBlobStorage',
+        },
+        'staticfiles': {
+            'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
+        },
+    }
+ 
+    MEDIA_URL = f"{VERCEL_BLOB_PUBLIC_BASE_URL.rstrip('/')}/"
