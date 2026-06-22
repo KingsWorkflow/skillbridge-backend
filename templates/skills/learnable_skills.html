@@ -128,10 +128,8 @@
                 </a>
             </div>
 
-            <!-- RIGHT COLUMN: Form + Skills List -->
-            <div class="lg:col-span-7 space-y-10">
-
-                <!-- ADD SKILL FORM -->
+            <!-- RIGHT COLUMN: Add Skill Form Only -->
+            <div class="lg:col-span-7">
                 <div class="solid-card p-8 md:p-12 rounded-2xl shadow-lg border border-gray-100" style="background-color: #ffffff !important; backdrop-filter: none !important;">
                     <div class="flex items-center gap-6 mb-10">
                         <div class="w-16 h-16 rounded-2xl bg-secondary-container flex items-center justify-center text-on-secondary-container">
@@ -217,79 +215,81 @@
                         </div>
                     </form>
                 </div>
+            </div>
+        </div>
 
-                <!-- SKILLS LIST -->
-                <div class="space-y-4">
-                    <div class="flex items-center gap-3 mb-2">
-                        <h2 class="font-headline-md text-headline-md text-on-surface">Your Learnable Skills</h2>
-                        <span class="inline-flex items-center justify-center px-3 py-1 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm font-bold">
-                            {{ learnable_skills|length }}
-                        </span>
-                    </div>
+        <!-- SKILLS LIST - Full Width Below -->
+        <div class="mt-12">
+            <div class="flex items-center gap-3 mb-6">
+                <h2 class="font-headline-md text-headline-md text-on-background">Your Learnable Skills</h2>
+                <span class="inline-flex items-center justify-center px-3 py-1 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm font-bold">
+                    {{ learnable_skills|length }}
+                </span>
+            </div>
 
-                    {% for skill in learnable_skills %}
-                    <div class="skill-card glass-panel rounded-2xl p-5 shadow-sm border border-outline-variant/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4
-                        {% if skill.urgency == 'high' %}border-l-4 border-l-red-400{% elif skill.urgency == 'medium' %}border-l-4 border-l-amber-400{% else %}border-l-4 border-l-emerald-400{% endif %}">
-                        <div class="flex items-start gap-4 flex-grow min-w-0">
-                            <div class="flex-shrink-0 w-11 h-11 rounded-xl bg-secondary-fixed/15 flex items-center justify-center text-secondary">
-                                <span class="material-symbols-outlined text-2xl">auto_stories</span>
-                            </div>
-                            <div class="flex-grow min-w-0">
-                                <div class="flex items-center gap-2 flex-wrap mb-1">
-                                    <h3 class="font-label-md text-label-md text-on-surface font-semibold truncate">
-                                        {{ skill.skill.name }}
-                                    </h3>
-                                    <span class="urgency-badge inline-flex items-center px-2.5 py-0.5 rounded-full font-label-sm text-label-sm font-semibold whitespace-nowrap
-                                        {% if skill.urgency == 'high' %}bg-red-50 text-red-700 border border-red-200/60
-                                        {% elif skill.urgency == 'medium' %}bg-amber-50 text-amber-700 border border-amber-200/60
-                                        {% else %}bg-emerald-50 text-emerald-700 border border-emerald-200/60{% endif %}">
-                                        {{ skill.get_urgency_display }}
-                                    </span>
-                                </div>
-                                {% if skill.motivation %}
-                                <p class="text-body-sm text-on-surface-variant line-clamp-2 leading-relaxed">
-                                    {{ skill.motivation|truncatechars:100 }}
-                                </p>
-                                {% endif %}
-                                <p class="text-xs text-on-surface-variant/70 mt-2 font-body-sm">
-                                    <span class="material-symbols-outlined text-xs align-middle mr-0.5">calendar_today</span>
-                                    Added {{ skill.created_at|date:"M d, Y" }}
-                                </p>
-                            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-base">
+                {% for skill in learnable_skills %}
+                <div class="skill-card glass-panel rounded-2xl p-5 shadow-sm border border-outline-variant/20 flex flex-col gap-4
+                    {% if skill.urgency == 'high' %}border-l-4 border-l-red-400{% elif skill.urgency == 'medium' %}border-l-4 border-l-amber-400{% else %}border-l-4 border-l-emerald-400{% endif %}">
+                    <div class="flex items-start gap-4">
+                        <div class="flex-shrink-0 w-11 h-11 rounded-xl bg-secondary-fixed/15 flex items-center justify-center text-secondary">
+                            <span class="material-symbols-outlined text-2xl">auto_stories</span>
                         </div>
-                        <form method="post"
-                              action="{% url 'skills:learnable_delete' pk=skill.pk %}"
-                              class="inline flex-shrink-0"
-                              onsubmit="return confirm('Remove this learnable skill? This action cannot be undone.')">
-                            {% csrf_token %}
-                            <button type="submit"
-                                    class="group flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-label-sm font-medium
-                                           text-on-surface-variant hover:text-error hover:bg-error/6
-                                           border border-transparent hover:border-error/15
-                                           transition-all"
-                                    title="Remove skill">
-                                <span class="material-symbols-outlined text-base group-hover:scale-110 transition-transform">delete</span>
-                                <span class="hidden sm:inline">Remove</span>
-                            </button>
-                        </form>
-                    </div>
-                    {% empty %}
-                    <div class="text-center py-16 px-6 glass-panel rounded-2xl border border-dashed border-outline-variant/80">
-                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-surface-container-low mb-5">
-                            <span class="material-symbols-outlined text-on-surface-variant/30 text-4xl">auto_stories</span>
+                        <div class="flex-grow min-w-0">
+                            <div class="flex items-center gap-2 flex-wrap mb-1">
+                                <h3 class="font-label-md text-label-md text-on-surface font-semibold truncate">
+                                    {{ skill.skill.name }}
+                                </h3>
+                                <span class="urgency-badge inline-flex items-center px-2.5 py-0.5 rounded-full font-label-sm text-label-sm font-semibold whitespace-nowrap
+                                    {% if skill.urgency == 'high' %}bg-red-50 text-red-700 border border-red-200/60
+                                    {% elif skill.urgency == 'medium' %}bg-amber-50 text-amber-700 border border-amber-200/60
+                                    {% else %}bg-emerald-50 text-emerald-700 border border-emerald-200/60{% endif %}">
+                                    {{ skill.get_urgency_display }}
+                                </span>
+                            </div>
+                            {% if skill.motivation %}
+                            <p class="text-body-sm text-on-surface-variant line-clamp-2 leading-relaxed">
+                                {{ skill.motivation|truncatechars:100 }}
+                            </p>
+                            {% endif %}
+                            <p class="text-xs text-on-surface-variant/70 mt-2 font-body-sm">
+                                <span class="material-symbols-outlined text-xs align-middle mr-0.5">calendar_today</span>
+                                Added {{ skill.created_at|date:"M d, Y" }}
+                            </p>
                         </div>
-                        <h3 class="font-headline-md text-headline-md text-on-surface-variant/60 mb-2">No learnable skills yet</h3>
-                        <p class="text-body-md text-on-surface-variant/70 mb-6 max-w-md mx-auto leading-relaxed">
-                            Start by exploring our skill catalog and adding what you'd like to learn next.
-                        </p>
-                        <a href="{% url 'skills:skill_list' %}"
-                           class="liquid-gold-btn inline-flex items-center gap-2 px-6 py-3 rounded-xl font-label-md uppercase tracking-widest shadow-lg">
-                            <span class="material-symbols-outlined text-lg">explore</span>
-                            Browse Skills Catalog
-                        </a>
                     </div>
-                    {% endfor %}
+                    <form method="post"
+                          action="{% url 'skills:learnable_delete' pk=skill.pk %}"
+                          class="inline self-end"
+                          onsubmit="return confirm('Remove this learnable skill? This action cannot be undone.')">
+                        {% csrf_token %}
+                        <button type="submit"
+                                class="group flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-label-sm font-medium
+                                       text-on-surface-variant hover:text-error hover:bg-error/6
+                                       border border-transparent hover:border-error/15
+                                       transition-all"
+                                title="Remove skill">
+                            <span class="material-symbols-outlined text-base group-hover:scale-110 transition-transform">delete</span>
+                            <span>Remove</span>
+                        </button>
+                    </form>
                 </div>
+                {% empty %}
+                <div class="text-center py-16 px-6 glass-panel rounded-2xl border border-dashed border-outline-variant/80 md:col-span-2 xl:col-span-3">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-surface-container-low mb-5">
+                        <span class="material-symbols-outlined text-on-surface-variant/30 text-4xl">auto_stories</span>
+                    </div>
+                    <h3 class="font-headline-md text-headline-md text-on-surface-variant/60 mb-2">No learnable skills yet</h3>
+                    <p class="text-body-md text-on-surface-variant/70 mb-6 max-w-md mx-auto leading-relaxed">
+                        Start by exploring our skill catalog and adding what you'd like to learn next.
+                    </p>
+                    <a href="{% url 'skills:skill_list' %}"
+                       class="liquid-gold-btn inline-flex items-center gap-2 px-6 py-3 rounded-xl font-label-md uppercase tracking-widest shadow-lg">
+                        <span class="material-symbols-outlined text-lg">explore</span>
+                        Browse Skills Catalog
+                    </a>
+                </div>
+                {% endfor %}
             </div>
         </div>
     </div>

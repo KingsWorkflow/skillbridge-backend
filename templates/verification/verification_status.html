@@ -1,15 +1,88 @@
 {% extends "base.html" %}
 {% block title %}Verification Status | SkillBridge Nepal{% endblock %}
+{% load static %}
 
 {% block content %}
 <div class="max-w-container-max mx-auto py-lg">
     <header class="mb-lg">
         <h1 class="font-headline-lg text-headline-lg text-on-background">Verification Status</h1>
-        <p class="font-body-lg text-body-lg text-on-surface-variant">View your verification badges and progress.</p>
+        <p class="font-body-lg text-body-lg text-on-surface-variant">Track your skill verification levels and achievements.</p>
     </header>
 
-    <div class="bg-white p-md rounded-xl shadow-sm border border-outline-variant">
-        <p class="text-on-surface-variant">Verification status functionality coming soon.</p>
+    <div id="verification-status-container">
+        <div class="text-center py-xl">
+            <span class="material-symbols-outlined text-on-surface-variant/40 text-5xl mb-base block">verified_user</span>
+            <p class="text-on-surface-variant font-body-md">Loading verification status...</p>
+        </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'verification/js/verification.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var container = document.getElementById('verification-status-container');
+
+    Verification.api.fetchVerificationStatus().then(function(verifications) {
+        if (!verifications.length) {
+            container.innerHTML = '<div class="text-center py-xl">' +
+                '<span class="material-symbols-outlined text-on-surface-variant/40 text-5xl mb-base block">verified_user</span>' +
+                '<p class="text-on-surface-variant font-body-md">No verifications yet.</p>' +
+                '<p class="text-on-surface-variant font-body-sm mt-sm">Add teachable skills to get started.</p>' +
+            '</div>';
+            return;
+        }
+
+        container.innerHTML = '<div class="space-y-gutter">' +
+            '<div class="bg-white p-md rounded-xl shadow-sm border border-outline-variant">' +
+                '<div class="overflow-x-auto">' +
+                    '<table class="w-full text-left">' +
+                        '<thead>' +
+                            '<tr class="border-b border-outline-variant">' +
+                                '<th class="p-sm font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Skill</th>' +
+                                '<th class="p-sm font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Level</th>' +
+                                '<th class="p-sm font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Votes</th>' +
+                                '<th class="p-sm font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Hours</th>' +
+                                '<th class="p-sm font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Actions</th>' +
+                            '</tr>' +
+                        '</thead>' +
+                        '<tbody id="verification-table-body"></tbody>' +
+                    '</table>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
+
+        var tbody = document.getElementById('verification-table-body');
+        verifications.forEach(function(v) {
+            var badgeClass = Verification.helpers.getLevelBadgeClass(v.current_level);
+            var levelLabel = Verification.helpers.mapVerificationLevel(v.current_level);
+            var row = '<tr class="border-b border-outline-variant/50 hover:bg-surface-container-low transition-colors">' +
+                '<td class="p-sm font-body-md text-body-md text-on-surface">' + escapeHtml(v.skill_name) + '</td>' +
+                '<td class="p-sm"><span class="px-2 py-1 rounded-full text-xs font-medium border ' + badgeClass + '">' + escapeHtml(levelLabel) + '</span></td>' +
+                '<td class="p-sm font-body-md text-body-md text-on-surface-variant">' + v.verification_votes + '</td>' +
+                '<td class="p-sm font-body-md text-body-md text-on-surface-variant">' + v.total_teaching_hours + '</td>' +
+                '<td class="p-sm">' +
+                    '<a href="/verification/community/' + v.user + '/' + v.skill + '/" class="p-2 rounded-full hover:bg-surface-container-high text-on-surface-variant hover:text-primary transition-colors" title="Community verify">' +
+                        '<span class="material-symbols-outlined text-sm">group</span>' +
+                    '</a>' +
+                '</td>' +
+            '</tr>';
+            tbody.insertAdjacentHTML('beforeend', row);
+        });
+    }).catch(function() {
+        container.innerHTML = '<div class="text-center py-xl">' +
+            '<p class="text-error font-body-md">Failed to load verification status.</p>' +
+            '<button onclick="location.reload()" class="mt-md bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md text-label-md">Retry</button>' +
+        '</div>';
+    });
+});
+
+function escapeHtml(text) {
+    if (!text) return '';
+    return String(text).replace(/[&<>"']/g, function(m) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m];
+    });
+}
+</script>
 {% endblock %}

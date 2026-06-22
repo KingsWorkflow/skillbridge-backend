@@ -1,32 +1,51 @@
 {% extends "base.html" %}
 {% block title %}My Certificates | SkillBridge Nepal{% endblock %}
+{% load static %}
 
 {% block content %}
 <div class="max-w-container-max mx-auto py-lg">
     <header class="mb-lg flex justify-between items-center">
         <div>
             <h1 class="font-headline-lg text-headline-lg text-on-background">My Certificates</h1>
-            <p class="font-body-lg text-body-lg text-on-surface-variant">Your verified certificates and achievements.</p>
+            <p class="font-body-lg text-body-lg text-on-surface-variant">Earned by passing platform exams.</p>
         </div>
-        <a href="{% url 'verification:certificate_upload' %}" class="bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md">Upload New</a>
+        <a href="{% url 'verification:verification_status' %}" class="text-primary font-label-md text-label-md hover:underline">View Verification Status</a>
     </header>
 
-    <div class="space-y-gutter">
+    <div id="certificate-list" class="space-y-gutter">
+        {% if certificates %}
         {% for cert in certificates %}
         <div class="bg-white p-md rounded-xl border border-outline-variant flex items-center gap-md">
             <div class="w-14 h-14 bg-surface-container rounded-lg flex items-center justify-center">
                 <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
             </div>
-            <div>
+            <div class="flex-grow">
                 <h3 class="font-label-md text-label-md text-on-surface">{{ cert.skill.name }}</h3>
-                <p class="font-body-sm text-body-sm text-on-surface-variant">{{ cert.issuing_organization }} • {{ cert.status }}</p>
+                <p class="font-body-sm text-body-sm text-on-surface-variant">{{ cert.issuing_organization }} &bull;
+                    {% if cert.status == 'approved' %}<span class="px-2 py-1 rounded-full text-xs font-medium border bg-green-100 text-green-800 border-green-200">Approved</span>
+                    {% elif cert.status == 'rejected' %}<span class="px-2 py-1 rounded-full text-xs font-medium border bg-red-100 text-red-800 border-red-200">Rejected</span>
+                    {% else %}<span class="px-2 py-1 rounded-full text-xs font-medium border bg-yellow-100 text-yellow-800 border-yellow-200">Pending</span>
+                    {% endif %}
+                </p>
             </div>
         </div>
-        {% empty %}
-        <div class="text-center py-xl">
-            <p class="text-on-surface-variant">No certificates uploaded yet.</p>
-        </div>
         {% endfor %}
+        {% else %}
+        <div class="text-center py-xl">
+            <span class="material-symbols-outlined text-on-surface-variant/40 text-5xl mb-base block">school</span>
+            <p class="text-on-surface-variant font-body-md">No certificates yet.</p>
+            <p class="text-on-surface-variant font-body-sm mt-sm">Pass an exam to earn your first certificate.</p>
+            <a href="{% url 'skills:teachable_skills' %}" class="inline-block mt-md bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md text-label-md hover:opacity-90 transition-all">Go to My Skills</a>
+        </div>
+        {% endif %}
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'verification/js/verification.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+});
+</script>
 {% endblock %}
