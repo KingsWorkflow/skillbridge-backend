@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var btn = document.getElementById('community-verify-btn');
     var resultEl = document.getElementById('community-verify-result');
     var userId = '{{ user_id }}';
-    var skillId = '{{ skill.id|default:skill_id }}';
+    var skillId = '{{ skill.id }}';
 
     if (!btn) return;
 

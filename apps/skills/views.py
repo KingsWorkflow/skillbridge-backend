@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from .forms import TeachableSkillForm, LearnableSkillForm
 from .models import Skill, TeachableSkill, LearnableSkill
-from apps.verification.models import SkillVerification, SkillExam
+from apps.verification.models import SkillVerification, SkillExam, Certificate
 
 
 def skill_list(request):
@@ -56,9 +56,15 @@ def teachable_skills(request):
     exams = SkillExam.objects.filter(is_active=True).select_related('skill')
     exam_map = {e.skill_id: e for e in exams}
 
+    approved_certificates = Certificate.objects.filter(
+        user=request.user, status='approved'
+    ).select_related('skill')
+    certificate_map = {c.skill_id: c for c in approved_certificates}
+
     for ts in teachable_list:
         ts.verification = verification_map.get(ts.skill_id)
         ts.exam = exam_map.get(ts.skill_id)
+        ts.certificate = certificate_map.get(ts.skill_id)
 
     return render(request, 'skills/teachable_skills.html', {
         'teachable_skills': teachable_list,

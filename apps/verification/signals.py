@@ -1,7 +1,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
-from .models import ExamAttempt, Certificate
+from .models import ExamAttempt, Certificate, SkillVerification
 from apps.skills.models import Skill
 
 
@@ -10,18 +10,25 @@ def auto_generate_certificate(sender, instance, created, **kwargs):
     if not instance.passed:
         return
 
-    existing = Certificate.objects.filter(
+    certificate, cert_created = Certificate.objects.get_or_create(
         user=instance.user,
         skill=instance.exam.skill,
-        status='approved',
-    ).exists()
-    if existing:
-        return
-
-    Certificate.objects.create(
-        user=instance.user,
-        skill=instance.exam.skill,
-        issuing_organization='SkillBridge Nepal',
-        issue_date=timezone.now().date(),
-        status='approved',
+        defaults={
+            'issuing_organization': 'SkillBridge Nepal',
+            'issue_date': timezone.now().date(),
+            'status': 'approved',
+        }
     )
+
+    verification, v_created = SkillVerification.objects.get_or_create(
+        user=instance.user,
+        skill=instance.exam.skill,
+        defaults={
+            'current_level': 3,
+            'platform_tested_at': timezone.now(),
+        }
+    )
+    if not v_created and verification.current_level < 3:
+        verification.current_level = 3
+        verification.platform_tested_at = timezone.now()
+        verification.save()

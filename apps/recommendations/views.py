@@ -12,27 +12,25 @@ def exchange_partners(request):
     return render(request, 'recommendations/partners.html', {'partners': partners})
 
 
+@login_required
 def api_partners(request):
     """API endpoint for AJAX calls."""
-    if request.user.is_authenticated:
-        partners = ai_find_exchange_partners(request.user.id, top_n=10)
-        partners = resolve_skill_ids_to_names(partners)
-        # Convert partners to serializable format
-        serialized_partners = []
-        for p in partners:
-            serialized_partners.append({
-                'partner_user': {
-                    'id': p['partner_user'].id,
-                    'username': p['partner_user'].username,
-                    'skill_credits': p['partner_user'].skill_credits,
-                },
-                'similarity_score': p['similarity_score'],
-                'mutual_match_score': p['mutual_match_score'],
-                'i_teach_they_learn': p['i_teach_they_learn'],
-                'i_learn_they_teach': p['i_learn_they_teach'],
-            })
-        return JsonResponse({'partners': serialized_partners})
-    return JsonResponse({'partners': []})
+    partners = ai_find_exchange_partners(request.user.id, top_n=10)
+    partners = resolve_skill_ids_to_names(partners)
+    serialized_partners = []
+    for p in partners:
+        serialized_partners.append({
+            'partner_user': {
+                'id': p['partner_user'].id,
+                'username': p['partner_user'].username,
+                'skill_credits': p['partner_user'].skill_credits,
+            },
+            'similarity_score': p['similarity_score'],
+            'mutual_match_score': p['mutual_match_score'],
+            'i_teach_they_learn': p['i_teach_they_learn'],
+            'i_learn_they_teach': p['i_learn_they_teach'],
+        })
+    return JsonResponse({'partners': serialized_partners})
 
 
 def get_exchange_partners(user_id, top_n=10):
