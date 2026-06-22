@@ -2,17 +2,26 @@
 {% load static %}
 {% block title %}Skill Gap Analysis | SkillBridge Nepal{% endblock %}
 
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
 {% block content %}
 <div class="max-w-container-max mx-auto px-md py-lg">
     <header class="mb-lg">
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-md">
             <div>
                 <span class="bg-primary-container text-on-primary-container px-sm py-xs rounded-full font-label-sm text-label-sm mb-base inline-block uppercase tracking-wider">Analysis Active</span>
-                <h1 class="font-headline-lg text-headline-lg text-primary mb-xs">Skill Gap: {{ target_career|default:'Full Stack Developer' }}</h1>
-                <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">Based on your current portfolio and market demand in Kathmandu's tech ecosystem, you are {{ match_score|default:'72' }}% ready for a Senior Full Stack role.</p>
+                <h1 class="font-headline-lg text-headline-lg text-primary mb-xs">Skill Gap: <span id="targetCareerTitle">{{ target_career|default:'Full Stack Developer' }}</span></h1>
+                <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">Based on your current portfolio and market demand in Kathmandu's tech ecosystem, you are <span id="matchScore" class="font-bold text-primary">{{ match_score|floatformat:'0'|default:'72' }}</span>% ready for this role.</p>
             </div>
-            <div class="flex gap-sm">
-                <button id="refreshBtn" class="h-12 px-md bg-[#F4A261] text-white font-bold rounded-lg shadow-sm hover:-translate-y-1 transition-all duration-200">Refresh Skills</button>
+            <div class="flex gap-sm flex-wrap">
+                <select id="careerSelector" class="h-12 px-md bg-surface-container border border-outline-variant rounded-lg text-body-sm focus:outline-none focus:ring-2 focus:ring-primary">
+                    {% for career in available_careers %}
+                    <option value="{{ career }}" {% if career == target_career %}selected{% endif %}>{{ career }}</option>
+                    {% endfor %}
+                </select>
+                <button id="refreshBtn" class="h-12 px-md bg-[#F4A261] text-white font-bold rounded-lg shadow-sm hover:-translate-y-1 transition-all duration-200">Refresh Analysis</button>
             </div>
         </div>
     </header>
@@ -29,12 +38,9 @@
                 </div>
             </div>
             <div class="flex-grow flex items-center justify-center py-lg relative">
-                <div class="w-full max-w-md aspect-square relative border border-outline-variant rounded-full flex items-center justify-center">
-                    <!-- Simulated Radar -->
-                    <svg class="w-full h-full transform -rotate-15 overflow-visible" viewbox="0 0 100 100">
-                        <polygon fill="rgba(30, 111, 92, 0.4)" points="50,25 70,45 65,70 35,65 25,40" stroke="#1E6F5C" stroke-width="1.5"></polygon>
-                        <polygon fill="rgba(255, 171, 105, 0.2)" points="50,10 85,35 75,80 25,80 15,35" stroke="#8e4e14" stroke-width="0.5"></polygon>
-                    </svg>
+                <div class="w-full max-w-md aspect-square relative">
+                    <canvas id="skillRadarChart"></canvas>
+                    <p id="chartPlaceholder" class="hidden absolute inset-0 flex items-center justify-center text-body-sm text-on-surface-variant"></p>
                 </div>
             </div>
         </div>
@@ -42,25 +48,360 @@
         <!-- Priority Goals -->
         <div class="md:col-span-4 bg-white rounded-xl p-md shadow-sm border border-surface-container flex flex-col gap-md">
             <h3 class="font-headline-md text-headline-md text-on-surface">Priority Goals</h3>
-            <div class="space-y-md">
-                {% for goal in priority_goals|slice:":3" %}
-                <div class="flex items-start gap-sm">
-                    <div class="w-8 h-8 rounded-lg bg-{{ goal.color|default:'tertiary-container' }} flex items-center justify-center text-white flex-shrink-0">
+            <div class="space-y-md" id="priorityGoalsList">
+                {% for goal in priority_goals|slice:":8" %}
+                <div class="flex items-start gap-sm" data-index="{{ forloop.counter0 }}" data-skill-id="{{ goal.skill_id|default:'' }}" data-is-custom="{{ goal.is_custom|yesno:'true,false' }}">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white flex-shrink-0" style="background-color: {% if goal.color == 'secondary' %}#8e4e14{% elif goal.color == 'primary' %}#005645{% elif goal.color == 'error' %}#ba1a1a{% else %}#007065{% endif %}">
                         <span class="material-symbols-outlined text-[18px]">{{ goal.icon|default:'terminal' }}</span>
                     </div>
                     <div class="flex-grow">
                         <p class="font-label-md text-label-md text-on-surface">{{ goal.skill }}</p>
                         <p class="text-body-sm text-on-surface-variant mb-1">Missing: {{ goal.missing|default:'Key skills' }}</p>
+                        {% if goal.estimated_hours %}
+                        <p class="text-body-xs text-on-surface-variant mb-1">Estimated {{ goal.estimated_hours }} hours to learn</p>
+                        {% endif %}
+                        {% if goal.progress is not None %}
                         <div class="w-full h-1 bg-surface-container rounded-full">
-                            <div class="h-full bg-{{ goal.color|default:'tertiary' }} w-{{ goal.progress|default:'25' }}"></div>
+                            <div class="h-full rounded-full" style="width: {{ goal.progress|default:'0' }}%; background-color: {% if goal.color == 'secondary' %}#8e4e14{% elif goal.color == 'primary' %}#005645{% elif goal.color == 'error' %}#ba1a1a{% else %}#007065{% endif %}"></div>
                         </div>
+                        {% endif %}
                     </div>
+                    <button type="button" class="remove-goal-btn ml-auto inline-flex items-center justify-center rounded-full hover:bg-error/10 transition-colors" data-index="{{ forloop.counter0 }}" data-skill-id="{{ goal.skill_id|default:'' }}" data-is-custom="{{ goal.is_custom|yesno:'true,false' }}" title="Remove goal" style="font-size: 20px; line-height: 1; min-width: 28px; height: 28px; color: #ba1a1a; cursor: pointer;">×</button>
                 </div>
+                {% empty %}
+                <p class="text-body-sm text-on-surface-variant">No priority goals yet. Select a target career or add custom goals below.</p>
                 {% endfor %}
+            </div>
+
+            <!-- Add Custom Goal -->
+            <div class="pt-md border-t border-outline-variant">
+                <h4 class="font-label-md text-label-md text-on-surface mb-sm">Add Custom Priority Goal</h4>
+                <div class="flex gap-xs">
+                    <input id="customGoalInput" type="text" placeholder="e.g., Learn GraphQL" class="flex-grow h-10 px-sm bg-surface-container-low border border-outline-variant rounded-lg text-body-sm focus:outline-none focus:ring-2 focus:ring-primary"/>
+                    <button type="button" id="addGoalBtn" class="h-10 px-md bg-primary text-white rounded-lg text-label-sm font-bold hover:bg-primary/90 transition-colors">Add</button>
+                </div>
             </div>
         </div>
     </div>
 
+    {{ chart_data|json_script:"chart-data" }}
+
+    <script>
+        (function() {
+            console.log('[SkillGap] Script initialized');
+
+            window.addEventListener('error', function(e) {
+                console.error('[SkillGap] Global error:', e.message, 'at', e.filename + ':' + e.lineno);
+            });
+
+            window.addEventListener('unhandledrejection', function(e) {
+                console.error('[SkillGap] Unhandled promise rejection:', e.reason);
+            });
+
+            let rawData = {};
+            try {
+                const chartDataEl = document.getElementById('chart-data');
+                if (chartDataEl && chartDataEl.textContent) {
+                    rawData = JSON.parse(chartDataEl.textContent);
+                    console.log('[SkillGap] chart-data parsed:', rawData.labels ? rawData.labels.length : 0, 'labels');
+                } else {
+                    console.warn('[SkillGap] chart-data element not found or empty');
+                }
+            } catch (e) {
+                console.error('[SkillGap] Failed to parse chart-data:', e);
+            }
+            const ctx = document.getElementById('skillRadarChart');
+            let radarChart = null;
+            let currentCareer = document.getElementById('targetCareerTitle').textContent.trim();
+            console.log('[SkillGap] currentCareer:', currentCareer);
+
+            function renderChart(data) {
+                const labels = (data && data.labels && data.labels.length > 0) ? data.labels : rawData.labels;
+                const userData = (data && data.user && data.user.length > 0) ? data.user : rawData.user;
+                const marketData = (data && data.market && data.market.length > 0) ? data.market : rawData.market;
+                if (!labels.length) {
+                    console.warn('[SkillGap] renderChart: no labels');
+                    const placeholder = document.getElementById('chartPlaceholder');
+                    if (placeholder) {
+                        placeholder.classList.remove('hidden');
+                        placeholder.textContent = 'Select a career to load skill data.';
+                    }
+                    return;
+                }
+                const placeholder = document.getElementById('chartPlaceholder');
+                if (placeholder) placeholder.classList.add('hidden');
+                console.log('[SkillGap] renderChart:', labels.length, 'skills');
+
+                if (radarChart && ctx) {
+                    radarChart.data.labels = labels;
+                    radarChart.data.datasets[0].data = userData || [];
+                    radarChart.data.datasets[1].data = marketData || [];
+                    radarChart.update('none');
+                    return;
+                }
+
+                if (!ctx) {
+                    console.warn('[SkillGap] renderChart: canvas not found');
+                    return;
+                }
+
+                radarChart = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Your Level',
+                                data: userData || [],
+                                backgroundColor: 'rgba(0, 86, 69, 0.25)',
+                                borderColor: '#1E6F5C',
+                                borderWidth: 2,
+                                pointBackgroundColor: '#1E6F5C',
+                            },
+                            {
+                                label: 'Market Goal',
+                                data: marketData || [],
+                                backgroundColor: 'rgba(255, 171, 105, 0.15)',
+                                borderColor: '#ffab69',
+                                borderWidth: 2,
+                                pointBackgroundColor: '#ffab69',
+                            },
+                        ],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: { stepSize: 20, display: false },
+                                grid: { color: 'rgba(0,0,0,0.06)' },
+                                pointLabels: { font: { family: 'Inter, sans-serif', size: 12 } },
+                            },
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.dataset.label + ': ' + context.raw + '%';
+                                    }
+                                }
+                            }
+                        },
+                    },
+                });
+            }
+
+            renderChart(rawData);
+
+            function getCookie(name) {
+                try {
+                    let cookieValue = null;
+                    if (document.cookie && document.cookie !== '') {
+                        const cookies = document.cookie.split(';');
+                        for (let i = 0; i < cookies.length; i++) {
+                            const cookie = cookies[i].trim();
+                            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                break;
+                            }
+                        }
+                    }
+                    return cookieValue;
+                } catch (e) {
+                    console.error('getCookie error:', e);
+                    return null;
+                }
+            }
+            const csrftoken = getCookie('csrftoken');
+            console.log('[SkillGap] CSRF token found:', !!csrftoken);
+
+            function getApiHeaders(includeCsrf = false) {
+                const headers = {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json',
+                };
+                if (includeCsrf && csrftoken) {
+                    headers['X-CSRFToken'] = csrftoken;
+                }
+                return headers;
+            }
+
+            function fetchSkillGap(career) {
+                console.log('[SkillGap] fetchSkillGap called with career:', career);
+                const url = new URL('{% url 'recommendations:skill_gap_api' %}', window.location.origin);
+                if (career) url.searchParams.set('target_career', career);
+                return fetch(url.toString(), {
+                    method: 'GET',
+                    headers: getApiHeaders(),
+                    credentials: 'same-origin',
+                })
+                .then(response => {
+                    console.log('[SkillGap] fetchSkillGap response status:', response.status);
+                    if (!response.ok) throw new Error('API error: ' + response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('[SkillGap] fetchSkillGap data received:', data);
+                    if (data.chart_data && data.chart_data.labels && data.chart_data.labels.length > 0) {
+                        renderChart(data.chart_data);
+                    }
+                    updateMatchScore(data.match_score);
+                    const goals = data.priority_goals || [];
+                    console.log('[SkillGap] Rendering priority goals:', goals.length);
+                    renderPriorityGoals(goals);
+                    if (data.target_career) {
+                        currentCareer = data.target_career;
+                        document.getElementById('targetCareerTitle').textContent = currentCareer;
+                        const selector = document.getElementById('careerSelector');
+                        if (selector && Array.from(selector.options).some(o => o.value === currentCareer)) {
+                            selector.value = currentCareer;
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.error('[SkillGap] fetchSkillGap error:', err);
+                    throw err;
+                });
+            }
+
+            function renderPriorityGoals(goals) {
+                const container = document.getElementById('priorityGoalsList');
+                if (!container) return;
+                if (!goals.length) {
+                    container.innerHTML = '<p class="text-body-sm text-on-surface-variant">No priority goals found. Select a target career or add custom goals below.</p>';
+                    return;
+                }
+                const bgMap = {
+                    'tertiary': '#007065',
+                    'secondary': '#8e4e14',
+                    'primary': '#005645',
+                    'error': '#ba1a1a',
+                };
+                container.innerHTML = goals.map((goal, idx) => {
+                    const isCustom = !!goal.is_custom;
+                    const color = goal.color || 'tertiary';
+                    const icon = goal.icon || 'terminal';
+                    const progress = goal.progress !== undefined ? goal.progress : 0;
+                    const skillId = goal.skill_id || '';
+                    const bgColor = bgMap[color] || bgMap['tertiary'];
+                    return `
+                    <div class="flex items-start gap-sm" data-index="${idx}">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white flex-shrink-0" style="background-color: ${bgColor}">
+                            <span class="material-symbols-outlined text-[18px]">${icon}</span>
+                        </div>
+                        <div class="flex-grow">
+                            <p class="font-label-md text-label-md text-on-surface">${goal.skill}</p>
+                            <p class="text-body-sm text-on-surface-variant mb-1">Missing: ${goal.missing || 'Key skills'}</p>
+                            ${goal.estimated_hours ? `<p class="text-body-xs text-on-surface-variant mb-1">Estimated ${goal.estimated_hours} hours to learn</p>` : ''}
+                            ${progress > 0 ? `<div class="w-full h-1 bg-surface-container rounded-full"><div class="h-full rounded-full" style="width: ${progress}%; background-color: ${bgColor}"></div></div>` : ''}
+                        </div>
+                        <button type="button" class="remove-goal-btn ml-auto inline-flex items-center justify-center rounded-full hover:bg-error/10 transition-colors" data-index="${idx}" data-skill-id="${skillId}" data-is-custom="${isCustom ? 'true' : 'false'}" title="Remove goal" style="font-size: 20px; line-height: 1; min-width: 28px; height: 28px; color: #ba1a1a; cursor: pointer;">×</button>
+                    </div>`;
+                }).join('');
+            }
+
+            function bindSkillGapEvents() {
+                const refreshBtn = document.getElementById('refreshBtn');
+                if (refreshBtn) {
+                    refreshBtn.addEventListener('click', function() {
+                        const btn = this;
+                        btn.disabled = true;
+                        btn.textContent = 'Analyzing...';
+                        fetchSkillGap(currentCareer)
+                            .then(() => { btn.disabled = false; btn.textContent = 'Refresh Skills'; })
+                            .catch(() => { btn.disabled = false; btn.textContent = 'Refresh Skills'; });
+                    });
+                }
+
+                const careerSelector = document.getElementById('careerSelector');
+                if (careerSelector) {
+                    careerSelector.addEventListener('change', function() {
+                        currentCareer = this.value;
+                        fetchSkillGap(currentCareer);
+                    });
+                }
+
+                const addGoalBtn = document.getElementById('addGoalBtn');
+                const customGoalInput = document.getElementById('customGoalInput');
+                if (addGoalBtn && customGoalInput) {
+                    addGoalBtn.addEventListener('click', function() {
+                        const skill = customGoalInput.value.trim();
+                        if (!skill) return;
+                        fetch('{% url 'recommendations:skill_gap_api' %}', {
+                            method: 'POST',
+                            headers: getApiHeaders(true),
+                            credentials: 'same-origin',
+                            body: JSON.stringify({ action: 'add', skill: skill, missing: 'Custom goal', progress: 0, color: 'secondary', icon: 'flag' }),
+                        })
+                        .then(response => {
+                            if (!response.ok) throw new Error('Add failed: ' + response.status);
+                            return response.json();
+                        })
+                        .then(data => {
+                            customGoalInput.value = '';
+                            if (data.chart_data && data.chart_data.labels && data.chart_data.labels.length > 0) {
+                                renderChart(data.chart_data);
+                            }
+                            updateMatchScore(data.match_score);
+                            renderPriorityGoals(data.priority_goals || []);
+                        })
+                        .catch(err => console.error('[SkillGap] Add goal error:', err));
+                    });
+                }
+
+                const priorityGoalsList = document.getElementById('priorityGoalsList');
+                if (priorityGoalsList) {
+                    priorityGoalsList.addEventListener('click', function(e) {
+                        const btn = e.target.closest('.remove-goal-btn');
+                        if (!btn || btn.disabled) return;
+                        const isCustom = btn.dataset.isCustom === 'true';
+                        const index = parseInt(btn.dataset.index, 10);
+                        const skillId = btn.dataset.skillId;
+                        btn.disabled = true;
+                        btn.textContent = '';
+                        const bodyObj = isCustom
+                            ? { action: 'remove', index: index, target_career: currentCareer }
+                            : { action: 'dismiss', skill_id: skillId, target_career: currentCareer };
+                        fetch('{% url 'recommendations:skill_gap_api' %}', {
+                            method: 'POST',
+                            headers: getApiHeaders(true),
+                            credentials: 'same-origin',
+                            body: JSON.stringify(bodyObj),
+                        })
+                        .then(response => {
+                            if (!response.ok) throw new Error('Remove failed: ' + response.status);
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.target_career) {
+                                currentCareer = data.target_career;
+                                const titleEl = document.getElementById('targetCareerTitle');
+                                const selector = document.getElementById('careerSelector');
+                                if (titleEl) titleEl.textContent = currentCareer;
+                                if (selector && Array.from(selector.options).some(o => o.value === currentCareer)) {
+                                    selector.value = currentCareer;
+                                }
+                            }
+                            if (data.chart_data && data.chart_data.labels && data.chart_data.labels.length > 0) {
+                                renderChart(data.chart_data);
+                            }
+                            updateMatchScore(data.match_score);
+                            renderPriorityGoals(data.priority_goals || []);
+                        })
+                        .catch(() => {
+                            btn.disabled = false;
+                            btn.textContent = '×';
+                        });
+                    });
+                }
+            }
+
+            bindSkillGapEvents();
+        })();
+    </script>
     <!-- Mentor Matches -->
     <section class="mt-xl">
         <div class="flex justify-between items-end mb-md">
@@ -84,10 +425,17 @@
                     <span class="px-base py-xs bg-tertiary-fixed-dim/20 text-tertiary rounded-full text-label-sm">{{ skill }}</span>
                     {% endfor %}
                 </div>
+                {% if mentor.gap_skill %}
+                <p class="text-body-sm text-on-surface-variant mb-md">Can help with: <span class="font-bold text-on-surface">{{ mentor.gap_skill }}</span></p>
+                {% endif %}
                 <div class="pt-md border-t border-surface-container flex justify-between items-center">
-                    <p class="text-label-sm text-secondary font-bold">Closed {{ mentor.closed_gaps|default:'8' }} Gaps</p>
-                    <button class="bg-primary text-white px-md py-base rounded-lg text-label-md font-bold">Request Swap</button>
+                    <p class="text-label-sm text-secondary font-bold">Closed {{ mentor.closed_gaps|default:'0'|floatformat:0 }} Gaps</p>
+                    <a href="{% url 'exchanges:create_proposal' mentor.user_id %}?skill={{ mentor.gap_skill|urlencode }}" class="bg-primary text-white px-md py-base rounded-lg text-label-md font-bold hover:bg-primary/90 transition-colors">Request Swap</a>
                 </div>
+            </div>
+            {% empty %}
+            <div class="md:col-span-3 bg-white rounded-xl p-md border border-surface-container shadow-sm">
+                <p class="text-body-sm text-on-surface-variant">No mentors available for the selected career yet. Try selecting a different career or add more skills to get matched.</p>
             </div>
             {% endfor %}
         </div>

@@ -252,14 +252,14 @@
                 </div>
                 <div class="grid grid-cols-2 gap-12">
                     <div class="flex flex-col gap-3">
-                        <span class="font-label-md text-label-md text-primary uppercase tracking-widest">Mission</span>
-                        <a class="text-on-surface-variant hover:text-secondary transition-all font-body-md text-body-md" href="#">Our Story</a>
-                        <a class="text-on-surface-variant hover:text-secondary transition-all font-body-md text-body-md" href="#">Success Stories</a>
+                        <a class="font-label-md text-label-md text-primary uppercase tracking-widest hover:text-secondary transition-all" href="{% url 'pages:mission' %}">Mission</a>
+                        <a class="text-on-surface-variant hover:text-secondary transition-all font-body-md text-body-md" href="{% url 'pages:our_story' %}">Our Story</a>
+                        <a class="text-on-surface-variant hover:text-secondary transition-all font-body-md text-body-md" href="{% url 'pages:success_stories' %}">Success Stories</a>
                     </div>
                     <div class="flex flex-col gap-3">
-                        <span class="font-label-md text-label-md text-primary uppercase tracking-widest">Legal</span>
-                        <a class="text-on-surface-variant hover:text-secondary transition-all font-body-md text-body-md" href="#">Privacy Policy</a>
-                        <a class="text-on-surface-variant hover:text-secondary transition-all font-body-md text-body-md" href="#">Terms of Service</a>
+                        <a class="font-label-md text-label-md text-primary uppercase tracking-widest hover:text-secondary transition-all" href="{% url 'pages:legal' %}">Legal</a>
+                        <a class="text-on-surface-variant hover:text-secondary transition-all font-body-md text-body-md" href="{% url 'pages:privacy_policy' %}">Privacy Policy</a>
+                        <a class="text-on-surface-variant hover:text-secondary transition-all font-body-md text-body-md" href="{% url 'pages:terms_of_service' %}">Terms of Service</a>
                     </div>
                 </div>
             </div>
